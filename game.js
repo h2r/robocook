@@ -7,17 +7,23 @@
 */
 
 var EnumGameState = {
-	Init: 0,		//Game initializing, precache
-	Splash: 1,		//Splash intro
-	MainMenu: 2,	//Main menu active
-	Matchmaking: 3,	//Matchmaking step, connection to server
-	MatchStart: 4,	//Main play started > intro state
-	MatchActive: 5,	//Main play started > active play state
-	MatchEnd: 6,	//Main play finished > success or failure
-	PostMatch: 7	//Post main play conditions, restart?
+	GameInit: 0,		//Game initializing, precache
+	SplashInit: 10,		//Splash intro
+	SplashIdle: 11,
+	SplashTrans: 12,	//Splash transition out
+	MainMenuInit: 20,	//Main menu active
+	MainMenuIdle: 21,
+	MainMenuTrans: 22,
+	MatchmakingInit: 30,	//Matchmaking step, connection to server
+	MatchInit: 40,	//Main play started > init state
+	MatchIntro: 50,	//Main intro display
+	MatchActive: 60,	//Main active play state
+	MatchEnd: 70,	//Main play finished success or failure
+	MatchTrans: 71,	//Match transition out
+	PostMatch: 80	//Post main play conditions, restart?
 }
 
-var CurrentGameState = EnumGameState.Init;
+var CurrentGameState = EnumGameState.GameInit;
 
 function fnMain(jQuery){
 	//Configure game
@@ -25,24 +31,46 @@ function fnMain(jQuery){
 	
 	//Stage config
 	$("#stage").height(gameConfig.StageHeight).width(gameConfig.StageWidth)
-		.css("background-color",""+gameConfig.StageBgColor);
+		.css("background-color",""+gameConfig.StageBgColor).
+		playground({height: gameConfig.StageHeight, width: gameConfig.StageWidth, refreshRate: gameConfig.GameLoopInterval});
 		
 	//Setup main loop
-	SetInterval(gameLoop, gameConfig.GameLoopInterval); 
+	$.playground().registerCallback(fnGameLoop, gameConfig.GameLoopInterval); 
+	
+	//Start game
+	$.playground().startGame();
 }
 
 function fnGameLoop() {
+	if (CurrentGameState === EnumGameState.GameInit) {
+		console.log("Main loop initialized.")
+	}
+	
 	switch(CurrentGameState)
 	{
-		case EnumGameState.Init:
-			fnSceneSplash
+		case EnumGameState.GameInit:
+			console.log("Entering switch on GameInit state.");
+			CurrentGameState = EnumGameState.SplashInit;
+			fnSceneSplash();
 			break;
+			
+		case EnumGameState.SplashIdle:
+			//console.log("Idling at splash...")
 	}
 }
 
 //Function for the splash scene
 function fnSceneSplash() {
+	switch(CurrentGameState)
+	{
+		case EnumGameState.SplashInit:
+			gameSceneSplash.Init();
+			CurrentGameState = EnumGameState.SplashIdle;
+			break;
+	}
 }
+
+//Function for the welcome
 
 //Function for the main menu scene
 function fnSceneMainMenu() {
