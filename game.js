@@ -21,7 +21,7 @@ var EnumGameState = {
 	MatchEnd: 70,	//Main play finished success or failure
 	MatchTrans: 71,	//Match transition out
 	PostMatch: 80	//Post main play conditions, restart?
-}
+};
 
 var CurrentGameState = EnumGameState.GameInit;
 
@@ -55,7 +55,8 @@ function fnGameLoop() {
 			break;
 			
 		case EnumGameState.SplashIdle:
-			//console.log("Idling at splash...")
+			fnSceneSplash();
+			break;
 	}
 }
 
@@ -65,7 +66,20 @@ function fnSceneSplash() {
 	{
 		case EnumGameState.SplashInit:
 			gameSceneSplash.Init();
-			CurrentGameState = EnumGameState.SplashIdle;
+			break;
+			
+		case EnumGameState.SplashIdle:
+			while(gameCommandQueue.IsEmpty() === false) {
+				console.log("Splash Scene -> Fetching command!");
+				var command = FetchNextCommand();
+				console.log("Splash Scene -> Processing command "+command.Command+" for target "+command.Target);
+				if (command.Target === gameConfig.SceneSplashName) {
+					if (command.Command === EnumGameCommands.Start) {
+						gameSceneSplash.Start();
+					}
+				}
+			}
+
 			break;
 	}
 }

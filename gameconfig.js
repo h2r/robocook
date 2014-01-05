@@ -10,10 +10,12 @@ var gameConfig = {
 	StageWidth: 768,
 	StageBgColor: "black",
 	//Metagame control
-	GameLoopInterval: 60,
+	GameLoopInterval: 500,
 	//General game positions
 	StageX: 0,
-	StageY: 0
+	StageY: 0,
+	//Scenes
+	SceneSplashName : "splashScene"
 };
 
 var gamePos = new Object();
