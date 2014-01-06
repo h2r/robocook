@@ -42,10 +42,13 @@ function fnMain(jQuery){
 }
 
 function fnGameLoop() {
+	//Debugging code
 	if (CurrentGameState === EnumGameState.GameInit) {
 		console.log("Main loop initialized.")
 	}
 	
+	//This is the entry point for decision making in the game loop.
+	//All possible game states should be reflected here.
 	switch(CurrentGameState)
 	{
 		case EnumGameState.GameInit:
@@ -56,6 +59,22 @@ function fnGameLoop() {
 			
 		case EnumGameState.SplashIdle:
 			fnSceneSplash();
+			break;
+			
+		case EnumGameState.SplashTrans:
+			fnSceneSplash();
+			break;
+		
+		case EnumGameState.MainMenuInit:
+			fnSceneMainMenu();
+			break;
+			
+		case EnumGameState.MainMenuIdle:
+			fnSceneMainMenu();
+			break;
+		
+		case EnumGameState.MainMenuTrans:
+			fnSceneMainMenu();
 			break;
 	}
 }
@@ -79,13 +98,110 @@ function fnSceneSplash() {
 					}
 				}
 			}
-
+			break;
+			
+		case EnumGameState.SplashTrans:
+			gameSceneSplash.Trans();
 			break;
 	}
 }
 
-//Function for the welcome
-
 //Function for the main menu scene
 function fnSceneMainMenu() {
+	switch(CurrentGameState)
+	{
+		case EnumGameState.MainMenuInit:
+			gameSceneMainMenu.Init();
+			break;
+			
+		case EnumGameState.MainMenuIdle:
+			while(gameCommandQueue.IsEmpty() === false) {
+				console.log("Main Menu Scene -> Fetching command!");
+				var command = FetchNextCommand();
+				console.log("Main Menu Scene -> Processing command "+command.Command+" for target "+command.Target);
+				if (command.Target === gameConfig.SceneSplashName) {
+					//Process commands here
+				}
+			}
+			break;
+			
+		case EnumGameState.MainMenuTrans:
+			gameSceneSplash.Trans();
+			break;
+	}
 }
+
+/*
+function fnSceneMatchmaking() {
+	switch(CurrentGameState)
+	{
+		case EnumGameState.MainMenuInit:
+			gameSceneMainMenu.Init();
+			break;
+			
+		case EnumGameState.MainMenuIdle:
+			while(gameCommandQueue.IsEmpty() === false) {
+				console.log("Main Menu Scene -> Fetching command!");
+				var command = FetchNextCommand();
+				console.log("Main Menu Scene -> Processing command "+command.Command+" for target "+command.Target);
+				if (command.Target === gameConfig.SceneSplashName) {
+					//Process commands here
+				}
+			}
+			break;
+			
+		case EnumGameState.MainMenuTrans:
+			gameSceneSplash.Trans();
+			break;
+	}
+}*/
+
+/*
+function fnSceneMatch() {
+	switch(CurrentGameState)
+	{
+		case EnumGameState.MainMenuInit:
+			gameSceneMainMenu.Init();
+			break;
+			
+		case EnumGameState.MainMenuIdle:
+			while(gameCommandQueue.IsEmpty() === false) {
+				console.log("Main Menu Scene -> Fetching command!");
+				var command = FetchNextCommand();
+				console.log("Main Menu Scene -> Processing command "+command.Command+" for target "+command.Target);
+				if (command.Target === gameConfig.SceneSplashName) {
+					//Process commands here
+				}
+			}
+			break;
+			
+		case EnumGameState.MainMenuTrans:
+			gameSceneSplash.Trans();
+			break;
+	}
+}*/
+
+/*
+function fnScenePostMatch() {
+	switch(CurrentGameState)
+	{
+		case EnumGameState.MainMenuInit:
+			gameSceneMainMenu.Init();
+			break;
+			
+		case EnumGameState.MainMenuIdle:
+			while(gameCommandQueue.IsEmpty() === false) {
+				console.log("Main Menu Scene -> Fetching command!");
+				var command = FetchNextCommand();
+				console.log("Main Menu Scene -> Processing command "+command.Command+" for target "+command.Target);
+				if (command.Target === gameConfig.SceneSplashName) {
+					//Process commands here
+				}
+			}
+			break;
+			
+		case EnumGameState.MainMenuTrans:
+			gameSceneSplash.Trans();
+			break;
+	}
+}*/
