@@ -15,6 +15,8 @@ var EnumGameState = {
 	MainMenuIdle: 21,
 	MainMenuTrans: 22,
 	MatchmakingInit: 30,	//Matchmaking step, connection to server
+	MatchmakingIdle: 31,
+	MatchmakingTrans: 32,
 	MatchInit: 40,	//Main play started > init state
 	MatchIntro: 50,	//Main intro display
 	MatchActive: 60,	//Main active play state
@@ -31,8 +33,12 @@ function fnMain(jQuery){
 	
 	//Stage config
 	$("#stage").height(gameConfig.StageHeight).width(gameConfig.StageWidth)
-		.css("background-color",""+gameConfig.StageBgColor).
-		playground({height: gameConfig.StageHeight, width: gameConfig.StageWidth, refreshRate: gameConfig.GameLoopInterval});
+		.css({
+			"background-color":""+gameConfig.StageBgColor,
+			"position":"absolute",
+			"top":"10px",
+			"left":"10px"
+		}).playground({height: gameConfig.StageHeight, width: gameConfig.StageWidth, refreshRate: gameConfig.GameLoopInterval});
 		
 	//Setup main loop
 	$.playground().registerCallback(fnGameLoop, gameConfig.GameLoopInterval); 
@@ -56,25 +62,39 @@ function fnGameLoop() {
 			CurrentGameState = EnumGameState.SplashInit;
 			fnSceneSplash();
 			break;
-			
+		//Splash states	
 		case EnumGameState.SplashIdle:
 			fnSceneSplash();
 			break;
-			
 		case EnumGameState.SplashTrans:
 			fnSceneSplash();
 			break;
-		
+		//Main menu states
 		case EnumGameState.MainMenuInit:
 			fnSceneMainMenu();
 			break;
-			
 		case EnumGameState.MainMenuIdle:
 			fnSceneMainMenu();
 			break;
-		
 		case EnumGameState.MainMenuTrans:
 			fnSceneMainMenu();
+			break;
+		//Matchmaking states
+		case EnumGameState.MatchmakingInit:
+			fnSceneMainMenu();
+			break;
+		case EnumGameState.MatchmakingIdle:
+			fnSceneMainMenu();
+			break;
+		case EnumGameState.MatchmakingTrans:
+			fnSceneMainMenu();
+			break;
+		//Match states
+		case EnumGameState.MatchInit:
+			fnSceneMatch();
+			break;
+		case EnumGameState.MatchIntro:
+			fnSceneMatch();
 			break;
 	}
 }
@@ -119,14 +139,22 @@ function fnSceneMainMenu() {
 				console.log("Main Menu Scene -> Fetching command!");
 				var command = FetchNextCommand();
 				console.log("Main Menu Scene -> Processing command "+command.Command+" for target "+command.Target);
-				if (command.Target === gameConfig.SceneSplashName) {
-					//Process commands here
+				if (command.Target === gameConfig.SceneMainMenuName) {
+					if (command.Command === EnumGameCommands.Singleplayer) {
+						gameSceneMainMenu.Singleplayer();
+					}
+					if (command.Command === EnumGameCommands.Multiplayer) {
+						gameSceneMainMenu.Multiplayer();
+					}
+					if (command.Command === EnumGameCommands.Exit) {
+						gameSceneMainMenu.Exit();
+					}
 				}
 			}
 			break;
 			
 		case EnumGameState.MainMenuTrans:
-			gameSceneSplash.Trans();
+			gameSceneMainMenu.Trans();
 			break;
 	}
 }
@@ -156,30 +184,36 @@ function fnSceneMatchmaking() {
 	}
 }*/
 
-/*
+
 function fnSceneMatch() {
 	switch(CurrentGameState)
 	{
-		case EnumGameState.MainMenuInit:
-			gameSceneMainMenu.Init();
+		case EnumGameState.MatchInit:
+			gameSceneMatch.Init();
 			break;
 			
-		case EnumGameState.MainMenuIdle:
+		case EnumGameState.MatchIntro:
+			//Command monitoring code
 			while(gameCommandQueue.IsEmpty() === false) {
 				console.log("Main Menu Scene -> Fetching command!");
 				var command = FetchNextCommand();
 				console.log("Main Menu Scene -> Processing command "+command.Command+" for target "+command.Target);
-				if (command.Target === gameConfig.SceneSplashName) {
+				if (command.Target === gameConfig.SceneMatchName) {
 					//Process commands here
 				}
 			}
 			break;
 			
-		case EnumGameState.MainMenuTrans:
-			gameSceneSplash.Trans();
+		case EnumGameState.MatchActive:
+			break;
+			
+		case EnumGameState.MatchEnd:
+			break;
+			
+		case EnumGameState.MatchTrans:
 			break;
 	}
-}*/
+}
 
 /*
 function fnScenePostMatch() {

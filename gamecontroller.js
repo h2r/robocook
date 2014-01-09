@@ -1,6 +1,9 @@
 //Command enum controls available commands
 var EnumGameCommands = {
-	Start: 0
+	Start: 0,
+	Singleplayer: 10,
+	Multiplayer: 20,
+	Exit: 30
 };
 
 //Command object
@@ -31,7 +34,7 @@ function FetchNextCommand() {
 		throw "Command queue empty!";
 	} else {
 		var command = gameCommandQueue.Dequeue();
-		console.log("Command -> Retrieving command. "+gameCommandQueue.Length+" remain in queue.");
+		console.log("Command -> Retrieving command. "+gameCommandQueue.Length()+" remain in queue.");
 		return command;
 	}
 }
