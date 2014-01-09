@@ -96,6 +96,9 @@ function fnGameLoop() {
 		case EnumGameState.MatchIntro:
 			fnSceneMatch();
 			break;
+		case EnumGameState.MatchActive:
+			fnSceneMatch();
+			break;
 	}
 }
 
@@ -193,6 +196,7 @@ function fnSceneMatch() {
 			break;
 			
 		case EnumGameState.MatchIntro:
+			gameSceneMatch.Intro();
 			//Command monitoring code
 			while(gameCommandQueue.IsEmpty() === false) {
 				console.log("Main Menu Scene -> Fetching command!");
@@ -205,6 +209,7 @@ function fnSceneMatch() {
 			break;
 			
 		case EnumGameState.MatchActive:
+			gameSceneMatch.Active();
 			break;
 			
 		case EnumGameState.MatchEnd:

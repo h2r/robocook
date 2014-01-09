@@ -3,7 +3,9 @@ var EnumGameCommands = {
 	Start: 0,
 	Singleplayer: 10,
 	Multiplayer: 20,
-	Exit: 30
+	Exit: 30,
+	Clear: 40,
+	Write: 50
 };
 
 //Command object

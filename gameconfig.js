@@ -55,6 +55,7 @@ gamePos.MatchDivIngsY = 384;
 
 var gameSprites = {};
 gameSprites["MatchBackground"] = "./Sprites/MatchBackground_PH.JPG";
+gameSprites["OverlaySelectionP1"] = "./Sprites/OverlaySelectionP1.PNG";
 gameSprites["IngEgg"] = "./Sprites/IngEgg.PNG";
 gameSprites["IngPotato"] = "./Sprites/IngPotato.PNG";
 gameSprites["IngCupOfFlour"] = "./Sprites/IngCupOfFlour.PNG";
@@ -70,3 +71,23 @@ gameSprites["ToolMasher"] = "./Sprites/ToolMasher.PNG";
 gameSprites["ToolPeeler"] = "./Sprites/ToolPeeler.PNG";
 gameSprites["ToolKnife"] = "./Sprites/ToolKnife.PNG";
 gameSprites["ToolHands"] = "./Sprites/ToolHands.PNG";
+
+var gameAnimations = {
+	background1: new $.gameQuery.Animation({imageURL: gameSprites["MatchBackground"]}),
+	overSelectionP1: new $.gameQuery.Animation({imageURL: gameSprites["OverlaySelectionP1"]}),
+	animOven: new $.gameQuery.Animation({imageURL: gameSprites["AppOven"]}),
+	animStoveTop: new $.gameQuery.Animation({imageURL: gameSprites["AppStoveTop"]}),
+	animBowlLarge: new $.gameQuery.Animation({imageURL: gameSprites["ContBowlLarge"]}),
+	animCuttingBoard: new $.gameQuery.Animation({imageURL: gameSprites["ContCuttingBoard"]}),
+	animPotLarge: new $.gameQuery.Animation({imageURL: gameSprites["ContPotLarge"]}),
+	animHands: new $.gameQuery.Animation({imageURL: gameSprites["ToolHands"]}),
+	animMasher: new $.gameQuery.Animation({imageURL: gameSprites["ToolMasher"]}),
+	animPeeler: new $.gameQuery.Animation({imageURL: gameSprites["ToolPeeler"]}),
+	animKnife: new $.gameQuery.Animation({imageURL: gameSprites["ToolKnife"]}),
+	animEgg: new $.gameQuery.Animation({imageURL: gameSprites["IngEgg"]}),
+	animPotato: new $.gameQuery.Animation({imageURL: gameSprites["IngPotato"]}),
+	animCupOfFlour: new $.gameQuery.Animation({imageURL: gameSprites["IngCupOfFlour"]}),
+	animWater: new $.gameQuery.Animation({imageURL: gameSprites["IngWater"]}),
+	animSaltTbsp: new $.gameQuery.Animation({imageURL: gameSprites["IngSaltTbsp"]}),
+	animSaltDash: new $.gameQuery.Animation({imageURL: gameSprites["IngSaltDash"]})	
+};
