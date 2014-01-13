@@ -6,6 +6,17 @@
 *
 */
 
+//Cookies
+//Meatloaf
+//Brownies
+//Gnocchi
+
+/*TODO
+* Implement console
+* Add big friendly reset button
+* Implement tutorial
+*/
+
 var EnumGameState = {
 	GameInit: 0,		//Game initializing, precache
 	SplashInit: 10,		//Splash intro

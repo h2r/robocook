@@ -53,41 +53,36 @@ gamePos.MatchDivContsY = 256;
 gamePos.MatchDivIngsX = 0;
 gamePos.MatchDivIngsY = 384;
 
+//All objects loaded by the game by default
+var gameObjects = {};
+gameObjects["Empty"] = new gameObject("Empty", EnumGOType.Empty, "");
+gameObjects["AppOven"] = new gameObject("AppOven", EnumGOType.App, "AppOven.PNG");
+gameObjects["AppStoveTop"] = new gameObject("AppStoveTop", EnumGOType.App, "AppStoveTop.PNG");
+gameObjects["AppCounterTop"] = new gameObject("AppCounterTop", EnumGOType.App, "AppCounterTop.PNG");
+gameObjects["ContBowlLarge"] = new gameObject("ContBowlLarge", EnumGOType.Cont, "ContBowlLarge.PNG");
+gameObjects["ContPotLarge"] = new gameObject("ContPotLarge", EnumGOType.Cont, "ContPotLarge.PNG");
+gameObjects["ContCuttingBoard"] = new gameObject("ContCuttingBoard", EnumGOType.Cont, "ContCuttingBoard.PNG");
+gameObjects["ToolMasher"] = new gameObject("ToolMasher", EnumGOType.Tool, "ToolMasher.PNG");
+gameObjects["ToolPeeler"] = new gameObject("ToolPeeler", EnumGOType.Tool, "ToolPeeler.PNG");
+gameObjects["ToolKnife"] = new gameObject("ToolKnife", EnumGOType.Tool, "ToolKnife.PNG");
+gameObjects["ToolHands"] = new gameObject("ToolHands", EnumGOType.Tool, "ToolHands.PNG");
+/*gameObjects["IngEgg"] = new gameObject("IngEgg", EnumGOType.Ing, "IngEgg.PNG");
+gameObjects["IngPotato"] = new gameObject("IngPotato", EnumGOType.Ing, "IngPotato.PNG");
+gameObjects["IngCupOfFlour"] = new gameObject("IngCupOfFlour", EnumGOType.Ing, "IngCupOfFlour.PNG");
+gameObjects["IngWater"] = new gameObject("IngWater", EnumGOType.Ing, "IngWater.PNG");
+gameObjects["IngSaltTbsp"] = new gameObject("IngSaltTbsp", EnumGOType.Ing, "IngSaltTbsp.PNG");
+gameObjects["IngSaltDash"] = new gameObject("IngSaltDash", EnumGOType.Ing, "IngSaltDash.PNG");*/
+
 var gameSprites = {};
 gameSprites["MatchBackground"] = "./Sprites/MatchBackground_PH.JPG";
 gameSprites["OverlaySelectionP1"] = "./Sprites/OverlaySelectionP1.PNG";
-gameSprites["IngEgg"] = "./Sprites/IngEgg.PNG";
-gameSprites["IngPotato"] = "./Sprites/IngPotato.PNG";
-gameSprites["IngCupOfFlour"] = "./Sprites/IngCupOfFlour.PNG";
-gameSprites["IngWater"] = "./Sprites/IngWater.PNG";
-gameSprites["IngSaltTbsp"] = "./Sprites/IngSaltTbsp.PNG";
-gameSprites["IngSaltDash"] = "./Sprites/IngSaltDash.PNG";
-gameSprites["AppOven"] = "./Sprites/AppOven128.PNG";
-gameSprites["AppStoveTop"] = "./Sprites/AppStoveTop128.PNG";
-gameSprites["ContBowlLarge"] = "./Sprites/ContBowlLarge.PNG";
-gameSprites["ContPotLarge"] = "./Sprites/ContPotLarge.PNG";
-gameSprites["ContCuttingBoard"] = "./Sprites/ContCuttingBoard.PNG";
-gameSprites["ToolMasher"] = "./Sprites/ToolMasher.PNG";
-gameSprites["ToolPeeler"] = "./Sprites/ToolPeeler.PNG";
-gameSprites["ToolKnife"] = "./Sprites/ToolKnife.PNG";
-gameSprites["ToolHands"] = "./Sprites/ToolHands.PNG";
 
 var gameAnimations = {
 	background1: new $.gameQuery.Animation({imageURL: gameSprites["MatchBackground"]}),
-	overSelectionP1: new $.gameQuery.Animation({imageURL: gameSprites["OverlaySelectionP1"]}),
-	animOven: new $.gameQuery.Animation({imageURL: gameSprites["AppOven"]}),
-	animStoveTop: new $.gameQuery.Animation({imageURL: gameSprites["AppStoveTop"]}),
-	animBowlLarge: new $.gameQuery.Animation({imageURL: gameSprites["ContBowlLarge"]}),
-	animCuttingBoard: new $.gameQuery.Animation({imageURL: gameSprites["ContCuttingBoard"]}),
-	animPotLarge: new $.gameQuery.Animation({imageURL: gameSprites["ContPotLarge"]}),
-	animHands: new $.gameQuery.Animation({imageURL: gameSprites["ToolHands"]}),
-	animMasher: new $.gameQuery.Animation({imageURL: gameSprites["ToolMasher"]}),
-	animPeeler: new $.gameQuery.Animation({imageURL: gameSprites["ToolPeeler"]}),
-	animKnife: new $.gameQuery.Animation({imageURL: gameSprites["ToolKnife"]}),
-	animEgg: new $.gameQuery.Animation({imageURL: gameSprites["IngEgg"]}),
-	animPotato: new $.gameQuery.Animation({imageURL: gameSprites["IngPotato"]}),
-	animCupOfFlour: new $.gameQuery.Animation({imageURL: gameSprites["IngCupOfFlour"]}),
-	animWater: new $.gameQuery.Animation({imageURL: gameSprites["IngWater"]}),
-	animSaltTbsp: new $.gameQuery.Animation({imageURL: gameSprites["IngSaltTbsp"]}),
-	animSaltDash: new $.gameQuery.Animation({imageURL: gameSprites["IngSaltDash"]})	
+	overSelectionP1: new $.gameQuery.Animation({imageURL: gameSprites["OverlaySelectionP1"]})
 };
+
+var ingsGnocci = [
+	"IngEgg", "IntPotato", "IntPotato", "IngCupOfFlour", "IngCupOfFlour",
+	"IngWater", "IngWater", "IngSaltTbsp", "IngSaltDash"
+];
