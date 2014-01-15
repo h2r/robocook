@@ -8,9 +8,10 @@ EnumGOType = {
 };
 
 //Game Object
-function gameObject(name, type, sprite)
+function gameObject(id, name, type, sprite)
 {
 	this.Name = name;
+	this.ID = id;
 	this.Type = type;
 	this.Sprite = sprite;
 	

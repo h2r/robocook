@@ -12,17 +12,26 @@ var EnumGameCommands = {
 function GameCommand(enumCommand, target) {
 	this.Command = enumCommand;
 	this.Target = target;
-};
+}
 
-var gameCommandQueue = {
-	Queue: new Array(),
-	Enqueue: function(command) { this.Queue.push(command); },
-	Dequeue: function() { return this.Queue.shift(); },
-	Peek: function() { return this.Queue[0];	},
-	Clear: function() { this.Queue = new Array(); },
-	Length: function() { return this.Queue.length; },
-	IsEmpty: function() { return (this.Queue.length === 0); }
-};
+function ComQueue() {
+	this.Queue = new Array();
+	this.Enqueue = Enqueue;
+	this.Dequeue = Dequeue;
+	this.Peek = Peek;
+	this.Clear = Clear;
+	this.Length = Length;
+	this.IsEmpty = IsEmpty;
+	
+	function Enqueue(command) { this.Queue.push(command); }
+	function Dequeue() { return this.Queue.shift(); }
+	function Peek() { return this.Queue[0];	}
+	function Clear() { this.Queue = new Array(); }
+	function Length() { return this.Queue.length; }
+	function IsEmpty() { return (this.Queue.length === 0); }
+}
+
+var gameCommandQueue = new ComQueue();
 
 function RegisterCommand(target, command) {
 	console.log("Command -> Registering command "+command+" for target "+target);
@@ -38,5 +47,22 @@ function FetchNextCommand() {
 		var command = gameCommandQueue.Dequeue();
 		console.log("Command -> Retrieving command. "+gameCommandQueue.Length()+" remain in queue.");
 		return command;
+	}
+}
+
+var serverSimulator = {
+	CommandQueue: new ComQueue(),
+
+	SendCommand: function(target, command) {
+		console.log("Server -> " + command + " sent to server regarding " + target);
+		
+	},
+	
+	Main: function() {
+		while (serverSimulator.CommandQueue.IsEmpty() === false)
+		{
+			console.log(serverSimulator.CommandQueue.Length());
+			var cmd = serverSimulator.CommandQueue.Dequeue();
+		}
 	}
 }

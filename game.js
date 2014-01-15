@@ -53,6 +53,7 @@ function fnMain(jQuery){
 		
 	//Setup main loop
 	$.playground().registerCallback(fnGameLoop, gameConfig.GameLoopInterval); 
+	$.playground().registerCallback(serverSimulator.Main, gameConfig.GameLoopInterval); 
 	
 	//Start game
 	$.playground().startGame();
@@ -229,6 +230,15 @@ function fnSceneMatch() {
 		case EnumGameState.MatchTrans:
 			break;
 	}
+}
+
+function GetKeyByValue(value, array) {
+    for( var prop in array ) {
+        if( array.hasOwnProperty(prop) ) {
+             if( array[ prop ] === value )
+                 return prop;
+        }
+    }
 }
 
 /*

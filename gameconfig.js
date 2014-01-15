@@ -55,23 +55,18 @@ gamePos.MatchDivIngsY = 384;
 
 //All objects loaded by the game by default
 var gameObjects = {};
-gameObjects["Empty"] = new gameObject("Empty", EnumGOType.Empty, "");
-gameObjects["AppOven"] = new gameObject("AppOven", EnumGOType.App, "AppOven.PNG");
-gameObjects["AppStoveTop"] = new gameObject("AppStoveTop", EnumGOType.App, "AppStoveTop.PNG");
-gameObjects["AppCounterTop"] = new gameObject("AppCounterTop", EnumGOType.App, "AppCounterTop.PNG");
-gameObjects["ContBowlLarge"] = new gameObject("ContBowlLarge", EnumGOType.Cont, "ContBowlLarge.PNG");
-gameObjects["ContPotLarge"] = new gameObject("ContPotLarge", EnumGOType.Cont, "ContPotLarge.PNG");
-gameObjects["ContCuttingBoard"] = new gameObject("ContCuttingBoard", EnumGOType.Cont, "ContCuttingBoard.PNG");
-gameObjects["ToolMasher"] = new gameObject("ToolMasher", EnumGOType.Tool, "ToolMasher.PNG");
-gameObjects["ToolPeeler"] = new gameObject("ToolPeeler", EnumGOType.Tool, "ToolPeeler.PNG");
-gameObjects["ToolKnife"] = new gameObject("ToolKnife", EnumGOType.Tool, "ToolKnife.PNG");
-gameObjects["ToolHands"] = new gameObject("ToolHands", EnumGOType.Tool, "ToolHands.PNG");
-/*gameObjects["IngEgg"] = new gameObject("IngEgg", EnumGOType.Ing, "IngEgg.PNG");
-gameObjects["IngPotato"] = new gameObject("IngPotato", EnumGOType.Ing, "IngPotato.PNG");
-gameObjects["IngCupOfFlour"] = new gameObject("IngCupOfFlour", EnumGOType.Ing, "IngCupOfFlour.PNG");
-gameObjects["IngWater"] = new gameObject("IngWater", EnumGOType.Ing, "IngWater.PNG");
-gameObjects["IngSaltTbsp"] = new gameObject("IngSaltTbsp", EnumGOType.Ing, "IngSaltTbsp.PNG");
-gameObjects["IngSaltDash"] = new gameObject("IngSaltDash", EnumGOType.Ing, "IngSaltDash.PNG");*/
+gameObjects["Empty"] = new gameObject("Empty", "Nothing", EnumGOType.Empty, "");
+gameObjects["AppOven"] = new gameObject("AppOven", "Oven", EnumGOType.App, "AppOven.PNG");
+gameObjects["AppStoveTop"] = new gameObject("AppStoveTop", "Stove Top", EnumGOType.App, "AppStoveTop.PNG");
+gameObjects["AppCounterTop"] = new gameObject("AppCounterTop", "Kitchen Counter", EnumGOType.App, "AppCounterTop.PNG");
+gameObjects["ContBowlLarge"] = new gameObject("ContBowlLarge", "Large Bowl", EnumGOType.Cont, "ContBowlLarge.PNG");
+gameObjects["ContPotLarge"] = new gameObject("ContPotLarge", "Large Pot", EnumGOType.Cont, "ContPotLarge.PNG");
+gameObjects["ContCuttingBoard"] = new gameObject("ContCuttingBoard", "Cutting Board", EnumGOType.Cont, "ContCuttingBoard.PNG");
+gameObjects["ToolMasher"] = new gameObject("ToolMasher", "Masher", EnumGOType.Tool, "ToolMasher.PNG");
+gameObjects["ToolPeeler"] = new gameObject("ToolPeeler", "Peeler", EnumGOType.Tool, "ToolPeeler.PNG");
+gameObjects["ToolKnife"] = new gameObject("ToolKnife", "Knife", EnumGOType.Tool, "ToolKnife.PNG");
+gameObjects["ToolHands"] = new gameObject("ToolHands", "Hands", EnumGOType.Tool, "ToolHands.PNG");
+
 
 var gameSprites = {};
 gameSprites["MatchBackground"] = "./Sprites/MatchBackground_PH.JPG";
@@ -82,7 +77,14 @@ var gameAnimations = {
 	overSelectionP1: new $.gameQuery.Animation({imageURL: gameSprites["OverlaySelectionP1"]})
 };
 
-var ingsGnocci = [
-	"IngEgg", "IntPotato", "IntPotato", "IngCupOfFlour", "IngCupOfFlour",
-	"IngWater", "IngWater", "IngSaltTbsp", "IngSaltDash"
+var recipeGnocchi = [
+	"IngEgg", "Egg", 
+	"IngPotato", "Potato", 
+	"IngPotato", "Potato", 
+	"IngCupOfFlour", "Cup of Flour", 
+	"IngCupOfFlour", "Cup of Flour", 
+	"IngWater", "Water", 
+	"IngWater", "Water", 
+	"IngSaltTbsp", "Tablespoon of Salt",
+	"IngSaltDash", "Dash of Salt"
 ];

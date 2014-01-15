@@ -19,6 +19,8 @@ var gameSceneMatch = {
 	
 	Init: function() {
 		console.log("Match Scene -> Initializing.");
+		//Initialize tile selector
+		tileSelector.Init(gameSceneMatch.SlotsEnum);
 		
 		//Initialize game objects
 		for (var i=0; i<this.SlotsEnum.length; i++) { 
@@ -37,20 +39,42 @@ var gameSceneMatch = {
 		this.GameObjects["ing3"] = gameObjects["ToolPeeler"];
 		this.GameObjects["ing4"] = gameObjects["ToolMasher"];
 		
-		//Load recipe		
+		//Load recipe
+		for (var i=0; i<(recipeGnocchi.length/2); i++)
+		{
+			this.GameObjects[this.SlotsEnum[i+19]] = new gameObject(recipeGnocchi[i*2], recipeGnocchi[(i*2)+1], EnumGOType.Tool, recipeGnocchi[i*2]+".PNG");
+		}
 		
-		//Console div
+		//Info panel
+		$("#stage").append("<div id='infoDiv'></div>");
+		$("#infoDiv").css({
+			"position":"absolute",
+			"width":"768px",
+			"height":"128px",
+			"top":"0px",
+			"left":"0px",
+			"background-color":"red",
+			"font-size":"8pt",
+			"color":"black"
+		})
+		.append("ROBOCOOK<br/>Prototype v0.3<br />Recipe: Gnocchi");
+		
+		
+		//Console panel
 		$("#stage").append("<div id='consoleDiv'></div>");
-		$("#consoleDiv").css({
+		$("#" + matchConsole.DisplayDiv).css({
 			"position":"absolute",
 			"width":"384px",
 			"height":"192px",
 			"top":"64px",
 			"left":"0px",
-			"background-color":"black"
+			"background-color":"black",
+			"font-size":"8pt",
+			"color":"green"
 		});
+		matchConsole.Display();
 		
-		//Command div
+		//Command panel
 		$("#stage").append("<div id='commandDiv'></div>");
 		$("#commandDiv").css({
 			"position":"absolute",
@@ -62,7 +86,7 @@ var gameSceneMatch = {
 		});
 		
 		var j=0;
-		//Initialize groups, add sprites
+		//Initialize groups, add tiles as sprites
 		$.playground().addGroup("background", {width: gameConfig.StageWidth, height: gameConfig.StageHeight})
 				.addSprite("background", {animation: gameAnimations.background1, width: gameConfig.StageWidth, height: gameConfig.StageHeight})
 				.end()
@@ -152,123 +176,123 @@ var gameSceneMatch = {
 				.addSprite("ing23sel",{width: 64, height: 64, posx: 64*10, posy: 192})
 				.addSprite("ing24sel",{width: 64, height: 64, posx: 64*11, posy: 192});
 				
-		//Functionality
+		//Set selector click functions
 		$("#app1sel").click(function () { console.log("Match Scene -> App1 clicked."); 
-			tileSelector.ToggleSelect("app1"); 
+			tileSelector.AttemptSelect("app1"); 
 		});
 		$("#app2sel").click(function () { console.log("Match Scene -> App2 clicked."); 
-			tileSelector.ToggleSelect("app2");
+			tileSelector.AttemptSelect("app2");
 		});
 		$("#app3sel").click(function () { console.log("Match Scene -> App3 clicked.");
-			tileSelector.ToggleSelect("app3");
+			tileSelector.AttemptSelect("app3");
 		});
 		$("#cont1sel").click(function () { console.log("Match Scene -> Cont1 clicked."); 
-			tileSelector.ToggleSelect("cont1");
+			tileSelector.AttemptSelect("cont1");
 		});
 		$("#cont2sel").click(function () { console.log("Match Scene -> Cont2 clicked."); 
-			tileSelector.ToggleSelect("cont2");
+			tileSelector.AttemptSelect("cont2");
 		});
 		$("#cont3sel").click(function () { console.log("Match Scene -> Cont3 clicked."); 
-			tileSelector.ToggleSelect("cont3");
+			tileSelector.AttemptSelect("cont3");
 		});
 		$("#cont4sel").click(function () { console.log("Match Scene -> Cont4 clicked.");
-			tileSelector.ToggleSelect("cont4");
+			tileSelector.AttemptSelect("cont4");
 		});
 		$("#cont5sel").click(function () { console.log("Match Scene -> Cont5 clicked.");
-			tileSelector.ToggleSelect("cont5");
+			tileSelector.AttemptSelect("cont5");
 		});
 		$("#cont6sel").click(function () { console.log("Match Scene -> Cont6 clicked.");
-			tileSelector.ToggleSelect("cont6");
+			tileSelector.AttemptSelect("cont6");
 		});
 		$("#cont7sel").click(function () { console.log("Match Scene -> Cont7 clicked.");
-			tileSelector.ToggleSelect("cont7");
+			tileSelector.AttemptSelect("cont7");
 		});
 		$("#cont8sel").click(function () { console.log("Match Scene -> Cont8 clicked.");
-			tileSelector.ToggleSelect("cont8");
+			tileSelector.AttemptSelect("cont8");
 		});
 		$("#cont9sel").click(function () { console.log("Match Scene -> Cont9 clicked.");
-			tileSelector.ToggleSelect("cont9");
+			tileSelector.AttemptSelect("cont9");
 		});
 		$("#cont10sel").click(function () { console.log("Match Scene -> Cont10 clicked.");
-			tileSelector.ToggleSelect("cont10");
+			tileSelector.AttemptSelect("cont10");
 		});
 		$("#cont11sel").click(function () { console.log("Match Scene -> Cont11 clicked.");
-			tileSelector.ToggleSelect("cont11");
+			tileSelector.AttemptSelect("cont11");
 		});
 		$("#cont12sel").click(function () { console.log("Match Scene -> Cont12 clicked.");
-			tileSelector.ToggleSelect("cont12");
+			tileSelector.AttemptSelect("cont12");
 		});
 		$("#ing1sel").click(function () { console.log("Match Scene -> Ing1 clicked.");
-			tileSelector.ToggleSelect("ing1");
+			tileSelector.AttemptSelect("ing1");
 		});
 		$("#ing2sel").click(function () { console.log("Match Scene -> Ing2 clicked.");
-			tileSelector.ToggleSelect("ing2");
+			tileSelector.AttemptSelect("ing2");
 		});
 		$("#ing3sel").click(function () { console.log("Match Scene -> Ing3 clicked.");
-			tileSelector.ToggleSelect("ing3");
+			tileSelector.AttemptSelect("ing3");
 		});
 		$("#ing4sel").click(function () { console.log("Match Scene -> Ing4 clicked.");
-			tileSelector.ToggleSelect("ing4");
+			tileSelector.AttemptSelect("ing4");
 		});
 		$("#ing5sel").click(function () { console.log("Match Scene -> Ing5 clicked.");
-			tileSelector.ToggleSelect("ing5");
+			tileSelector.AttemptSelect("ing5");
 		});
 		$("#ing6sel").click(function () { console.log("Match Scene -> Ing6 clicked.");
-			tileSelector.ToggleSelect("ing6");
+			tileSelector.AttemptSelect("ing6");
 		});
 		$("#ing7sel").click(function () { console.log("Match Scene -> Ing7 clicked.");
-			tileSelector.ToggleSelect("ing7");
+			tileSelector.AttemptSelect("ing7");
 		});
 		$("#ing8sel").click(function () { console.log("Match Scene -> Ing8 clicked.");
-			tileSelector.ToggleSelect("ing8");
+			tileSelector.AttemptSelect("ing8");
 		});
 		$("#ing9sel").click(function () { console.log("Match Scene -> Ing9 clicked.");
-			tileSelector.ToggleSelect("ing9");
+			tileSelector.AttemptSelect("ing9");
 		});
 		$("#ing10sel").click(function () { console.log("Match Scene -> Ing10 clicked.");
-			tileSelector.ToggleSelect("ing10");
+			tileSelector.AttemptSelect("ing10");
 		});
 		$("#ing11sel").click(function () { console.log("Match Scene -> Ing11 clicked.");
-			tileSelector.ToggleSelect("ing11");
+			tileSelector.AttemptSelect("ing11");
 		});
 		$("#ing12sel").click(function () { console.log("Match Scene -> Ing12 clicked.");
-			tileSelector.ToggleSelect("ing12");
+			tileSelector.AttemptSelect("ing12");
 		});
 		$("#ing13sel").click(function () { console.log("Match Scene -> Ing13 clicked.");
-			tileSelector.ToggleSelect("ing13");
+			tileSelector.AttemptSelect("ing13");
 		});
 		$("#ing14sel").click(function () { console.log("Match Scene -> Ing14 clicked.");
-			tileSelector.ToggleSelect("ing14");
+			tileSelector.AttemptSelect("ing14");
 		});
 		$("#ing15sel").click(function () { console.log("Match Scene -> Ing15 clicked.");
-			tileSelector.ToggleSelect("ing15");
+			tileSelector.AttemptSelect("ing15");
 		});
 		$("#ing16sel").click(function () { console.log("Match Scene -> Ing16 clicked.");
-			tileSelector.ToggleSelect("ing16");
+			tileSelector.AttemptSelect("ing16");
 		});
 		$("#ing17sel").click(function () { console.log("Match Scene -> Ing17 clicked.");
-			tileSelector.ToggleSelect("ing17");
+			tileSelector.AttemptSelect("ing17");
 		});
 		$("#ing18sel").click(function () { console.log("Match Scene -> Ing18 clicked.");
-			tileSelector.ToggleSelect("ing18");
+			tileSelector.AttemptSelect("ing18");
 		});
 		$("#ing19sel").click(function () { console.log("Match Scene -> Ing19 clicked.");
-			tileSelector.ToggleSelect("ing19");
+			tileSelector.AttemptSelect("ing19");
 		});
 		$("#ing20sel").click(function () { console.log("Match Scene -> Ing20 clicked.");
-			tileSelector.ToggleSelect("ing20");
+			tileSelector.AttemptSelect("ing20");
 		});
 		$("#ing21sel").click(function () { console.log("Match Scene -> Ing21 clicked.");
-			tileSelector.ToggleSelect("ing21");
+			tileSelector.AttemptSelect("ing21");
 		});
 		$("#ing22sel").click(function () { console.log("Match Scene -> Ing22 clicked.");
-			tileSelector.ToggleSelect("ing22");
+			tileSelector.AttemptSelect("ing22");
 		});
 		$("#ing23sel").click(function () { console.log("Match Scene -> Ing23 clicked.");
-			tileSelector.ToggleSelect("ing23");
+			tileSelector.AttemptSelect("ing23");
 		});
 		$("#ing24sel").click(function () { console.log("Match Scene -> Ing24 clicked.");
-			tileSelector.ToggleSelect("ing24");
+			tileSelector.AttemptSelect("ing24");
 		});
 		
 		//Advance game state to intro
@@ -293,70 +317,154 @@ var gameSceneMatch = {
 ///////////
 //Console//
 ///////////
-/*var matchConsole = {
+var matchConsole = {
 	DisplayDiv: "consoleDiv",
-	Lines: [5],
-	Update: function() {
-		
-	}
+	Lines: [ 
+		"Welcome to ROBOCOOK!", 
+		"-", 
+		"-", 
+		"-", 
+		"-",
+		"-",
+		"-",
+		"-",
+		"-",
+		"-",
+		"-",
+		"-",
+	],
 	
 	Write: function(line) {
-		
+		this.Lines.shift();
+		this.Lines.push(line);
+		this.Display();
+	},
+	
+	Display: function() {
+		$("#"+this.DisplayDiv).empty();
+		$("#"+this.DisplayDiv).append("<br/>");
+		for (var i=0; i<this.Lines.length; i++) {
+			$("#"+this.DisplayDiv).append(this.Lines[i] + "<br/>");
+		}
 	}
-};*/
+};
 
 
 ////////////
 //Selector//
 ////////////
+/*
+Selection Rules: Only 2 selections allowed at a time.
+*/
 var tileSelector = {
-	TileSelected: {},
-	Selections: {},
+	TileSelected: [],
+	Selections: [],
+	
+	Init: function(slotenum) {
+		console.log("Tile Selector -> Initializing...");
+		for (var i = 0; i < slotenum.length; i++) {
+			//console.log(slotenum[i]+" = false");
+			this.TileSelected[slotenum[i]] = false;
+		}
+	},
 
 	AttemptSelect: function(tileName)
 	{
-		console.log("");
+		this.SelectObject(tileName);		
 	},
 	
-	ToggleSelect: function(tileName)
+	SelectObject: function(tileName)
 	{
-		if (this.TileSelected[tileName] === true)
-		{
-			console.log("Selector -> Deselecting tile " + tileName);
-			//Clear if true
-			$("#" + tileName + "sel").setAnimation();
+		//Unpackage slot
+		gameObj = gameSceneMatch.GameObjects[tileName];
+		if (this.TileSelected[tileName]) {
+			matchConsole.Write("Player 1 deselected "+gameObj.Name+"...");
 			this.TileSelected[tileName] = false;
-			UpdateCommands();
-
+			var index = this.Selections.indexOf(gameObj)
+			this.Selections.splice(index, 1);
+			$("#"+tileName+"sel").setAnimation();
 		} else {
-			console.log("Selector -> Selecting tile " + tileName);
-			//Select if false
-			$("#" + tileName + "sel").setAnimation(gameAnimations.overSelectionP1);
+			//Check for selection max
+			if (this.Selections.length === 2) {
+				matchConsole.Write("You cannot have more than 2 objects selected!");
+				return false;
+			}
 			this.TileSelected[tileName] = true;
-			UpdateCommands();
+			matchConsole.Write("Player 1 selected "+gameObj.Name+"...");
+			this.Selections.push(gameObj);
+			$("#"+tileName+"sel").setAnimation(gameAnimations.overSelectionP1);
 		}
+		actionManager.Update(this.Selections);
+	},
+	
+	Clear: function ()
+	{
+		var slotenum = gameSceneMatch.SlotsEnum;
+		
+		for (var i = 0; i < slotenum.length; i++) {
+			this.TileSelected[slotenum[i]] = false;
+			$("#"+slotenum[i]+"sel").setAnimation();
+		}
+		this.Selections.length = 0;
+		actionManager.Update(this.Selections);
 	}
 };
 
-////////////
-//Commands//
-////////////
-function UpdateCommands()
-{
-	$("#commandDiv").empty();
-	if (tileSelector.TileSelected["app1"]===true)
-	{
-		$("#commandDiv").append("<button id='btnExamine'>Examine</button>");
-		$("#commandDiv").append("<button id='btnTurnOn'>Turn On</button>");
-	}
-	if (tileSelector.TileSelected["app2"]===true)
-	{
-		$("#commandDiv").append("<button id='btnExamine'>Examine</button>");
-		$("#commandDiv").append("<button id='btnPreHeat350'>Pre-heat to 350F</button>");
-		$("#commandDiv").append("<button id='btnPreHeat375'>Pre-heat to 375F</button>");
-		$("#commandDiv").append("<button id='btnPreHeat400'>Pre-heat to 400F</button>");
-		$("#commandDiv").append("<button id='btnPreHeat425'>Pre-heat to 425F</button>");
-		$("#commandDiv").append("<button id='btnPreHeat450'>Pre-heat to 450F</button>");
-		$("#commandDiv").append("<button id='btnPreHeat500'>Pre-heat to 500F</button>");
+///////////
+//Actions//
+///////////
+var actionManager = {
+	CommandDiv: "#commandDiv",
+
+	Update: function (selections) {
+		$(this.CommandDiv).empty();
+		
+		switch (selections.length)
+		{
+			case 0:
+				return;
+				break;
+			case 1:
+				this.SingularActions(selections[0]);
+				break;
+			case 2:
+				this.DualActions(selections[0], selections[1]);
+				break;
+		}
+	},
+	
+	SingularActions: function(obj1) {
+		switch (obj1.Name)
+		{
+			case "Stove Top":
+				this.AddActionButton("action1","Turn On High", new ActionHandler(obj1, null, function(event) { 
+						event.preventDefault();
+						console.log("Action -> Turn on button clicked!");
+						tileSelector.Clear();
+						var tileSlot1 = GetKeyByValue(obj1, gameSceneMatch.GameObjects);
+						var gO = new gameObject("AppStoveTopHigh", "Stove Top on High", EnumGOType.App, "AppStoveTopHigh.PNG");
+						gameSceneMatch.GameObjects[tileSlot1] = gO;
+						$("#"+tileSlot1).setAnimation(gO.Anim);
+						matchConsole.Write("Player 1 turned on the "+obj1.Name); 
+					}));
+				break;
+		}
+	},
+	
+	DualActions: function(obj1, obj2) {
+		throw ("Dual actions not yet implemented!");
+	},
+	
+	AddActionButton: function(id, name, handler) {
+		$(this.CommandDiv).append("<button id='"+id+"' type='button'>"+name+"</button>");
+		$("#"+id).click(handler.Handler);
 	}
 }
+
+function ActionHandler(obj1, obj2, handler)
+{
+	this.GameObject1 = obj1;
+	this.GameObject2 = obj2;
+	this.Handler = handler;
+}
+
