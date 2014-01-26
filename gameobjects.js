@@ -22,3 +22,21 @@ function gameObject(id, name, type, sprite)
 	}	
 }
 
+//A game container does not have to have a sprite
+function gameContainer(id, name, sprite)
+{
+	this.ID = id;
+	this.Name = name;
+	this.Sprite = sprite;
+		
+	this.Contains = [];
+	
+	this.AddTo = function(gobj) {
+		throw "Not yet implemented!";
+	}
+	
+	this.RemoveFrom = function(gobj) {
+		throw "Not yet implemented!";
+	}
+}
+

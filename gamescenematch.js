@@ -34,61 +34,32 @@ var gameSceneMatch = {
 		this.GameObjects["cont1"] = gameObjects["ContBowlLarge"];
 		this.GameObjects["cont2"] = gameObjects["ContPotLarge"];
 		this.GameObjects["cont3"] = gameObjects["ContCuttingBoard"];
-		this.GameObjects["ing1"] = gameObjects["ToolHands"];
+		/*this.GameObjects["ing1"] = gameObjects["ToolHands"];
 		this.GameObjects["ing2"] = gameObjects["ToolKnife"];
 		this.GameObjects["ing3"] = gameObjects["ToolPeeler"];
-		this.GameObjects["ing4"] = gameObjects["ToolMasher"];
+		this.GameObjects["ing4"] = gameObjects["ToolMasher"];*/
 		
 		//Load recipe
 		for (var i=0; i<(recipeGnocchi.length/2); i++)
 		{
-			this.GameObjects[this.SlotsEnum[i+19]] = new gameObject(recipeGnocchi[i*2], recipeGnocchi[(i*2)+1], EnumGOType.Tool, recipeGnocchi[i*2]+".PNG");
+			this.GameObjects[this.SlotsEnum[i+15]] = new gameObject(recipeGnocchi[i*2], recipeGnocchi[(i*2)+1], EnumGOType.Ing, recipeGnocchi[i*2]+".PNG");
 		}
-		
-		//Info panel
-		$("#stage").append("<div id='infoDiv'></div>");
-		$("#infoDiv").css({
-			"position":"absolute",
-			"width":"768px",
-			"height":"128px",
-			"top":"0px",
-			"left":"0px",
-			"background-color":"red",
-			"font-size":"8pt",
-			"color":"black"
-		})
-		.append("ROBOCOOK<br/>Prototype v0.3<br />Recipe: Gnocchi");
-		
-		
-		//Console panel
-		$("#stage").append("<div id='consoleDiv'></div>");
-		$("#" + matchConsole.DisplayDiv).css({
-			"position":"absolute",
-			"width":"384px",
-			"height":"192px",
-			"top":"64px",
-			"left":"0px",
-			"background-color":"black",
-			"font-size":"8pt",
-			"color":"green"
-		});
-		matchConsole.Display();
-		
-		//Command panel
-		$("#stage").append("<div id='commandDiv'></div>");
-		$("#commandDiv").css({
-			"position":"absolute",
-			"width":"384px",
-			"height":"192px",
-			"top":"64px",
-			"left":"384px",
-			"background-color":"blue"
-		});
 		
 		var j=0;
 		//Initialize groups, add tiles as sprites
-		$.playground().addGroup("background", {width: gameConfig.StageWidth, height: gameConfig.StageHeight})
+		$.playground()
+			.addGroup("background", {width: gameConfig.StageWidth, height: gameConfig.StageHeight})
 				.addSprite("background", {animation: gameAnimations.background1, width: gameConfig.StageWidth, height: gameConfig.StageHeight})
+				.end()
+			.addGroup("infoDiv",{width: 768, height: 64, posx: 0, posy: 0})
+				.css({"background-color":"red", "font-size":"8pt", "color":"black"})
+				.append("ROBOCOOK<br/>Prototype v0.3<br />Recipe: Gnocchi")
+				.end()
+			.addGroup(matchConsole.DisplayDiv, {width: 384, height: 192, posx: 0, posy: 64})
+				.css({"background-color":"black", "font-size":"8pt", "color":"green"})
+				.end()
+			.addGroup("commandDiv", {width: 384, height: 192, posx: 384, posy: 64})
+				.css({"background-color":"blue"})
 				.end()
 			.addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 256})
 				.addSprite(this.SlotsEnum[j], {animation: this.GameObjects[this.SlotsEnum[j++]].Anim, width: 128, height: 128})
@@ -135,165 +106,20 @@ var gameSceneMatch = {
 				.addSprite(this.SlotsEnum[j], {animation: this.GameObjects[this.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64*10, posy: 64})
 				.addSprite(this.SlotsEnum[j], {animation: this.GameObjects[this.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64*11, posy: 64})
 				.end()
-			.addGroup("selections", {width: 768, height: 256, posx: 0, posy: 256})
-				.addSprite("app1sel", {width: 64, height: 64, posx: 32, posy: 32})
-				.addSprite("app2sel", {width: 64, height: 64, posx: 160, posy: 32})
-				.addSprite("app3sel", {width: 64, height: 64, posx: 288, posy: 32})
-				.addSprite("cont1sel", {width: 64, height: 64, posx: 384})
-				.addSprite("cont2sel", {width: 64, height: 64, posx: 448})
-				.addSprite("cont3sel", {width: 64, height: 64, posx: 512})
-				.addSprite("cont4sel", {width: 64, height: 64, posx: 576})
-				.addSprite("cont5sel", {width: 64, height: 64, posx: 640})
-				.addSprite("cont6sel", {width: 64, height: 64, posx: 704})
-				.addSprite("cont7sel", {width: 64, height: 64, posx: 384, posy: 64})
-				.addSprite("cont8sel", {width: 64, height: 64, posx: 448, posy: 64})
-				.addSprite("cont9sel", {width: 64, height: 64, posx: 512, posy: 64})
-				.addSprite("cont10sel", {width: 64, height: 64, posx: 576, posy: 64})
-				.addSprite("cont11sel", {width: 64, height: 64, posx: 640, posy: 64})
-				.addSprite("cont12sel", {width: 64, height: 64, posx: 704, posy: 64})
-				.addSprite("ing1sel",{width: 64, height: 64, posx: 0, posy: 128})
-				.addSprite("ing2sel",{width: 64, height: 64, posx: 64, posy: 128})
-				.addSprite("ing3sel",{width: 64, height: 64, posx: 64*2, posy: 128})
-				.addSprite("ing4sel",{width: 64, height: 64, posx: 64*3, posy: 128})
-				.addSprite("ing5sel",{width: 64, height: 64, posx: 64*4, posy: 128})
-				.addSprite("ing6sel",{width: 64, height: 64, posx: 64*5, posy: 128})
-				.addSprite("ing7sel",{width: 64, height: 64, posx: 64*6, posy: 128})
-				.addSprite("ing8sel",{width: 64, height: 64, posx: 64*7, posy: 128})
-				.addSprite("ing9sel",{width: 64, height: 64, posx: 64*8, posy: 128})
-				.addSprite("ing10sel",{width: 64, height: 64, posx: 64*9, posy: 128})
-				.addSprite("ing11sel",{width: 64, height: 64, posx: 64*10, posy: 128})
-				.addSprite("ing12sel",{width: 64, height: 64, posx: 64*11, posy: 128})
-				.addSprite("ing13sel",{width: 64, height: 64, posx: 0, posy: 192})
-				.addSprite("ing14sel",{width: 64, height: 64, posx: 64, posy: 192})
-				.addSprite("ing15sel",{width: 64, height: 64, posx: 64*2, posy: 192})
-				.addSprite("ing16sel",{width: 64, height: 64, posx: 64*3, posy: 192})
-				.addSprite("ing17sel",{width: 64, height: 64, posx: 64*4, posy: 192})
-				.addSprite("ing18sel",{width: 64, height: 64, posx: 64*5, posy: 192})
-				.addSprite("ing19sel",{width: 64, height: 64, posx: 64*6, posy: 192})
-				.addSprite("ing20sel",{width: 64, height: 64, posx: 64*7, posy: 192})
-				.addSprite("ing21sel",{width: 64, height: 64, posx: 64*8, posy: 192})
-				.addSprite("ing22sel",{width: 64, height: 64, posx: 64*9, posy: 192})
-				.addSprite("ing23sel",{width: 64, height: 64, posx: 64*10, posy: 192})
-				.addSprite("ing24sel",{width: 64, height: 64, posx: 64*11, posy: 192});
-				
-		//Set selector click functions
-		$("#app1sel").click(function () { console.log("Match Scene -> App1 clicked."); 
-			tileSelector.AttemptSelect("app1"); 
-		});
-		$("#app2sel").click(function () { console.log("Match Scene -> App2 clicked."); 
-			tileSelector.AttemptSelect("app2");
-		});
-		$("#app3sel").click(function () { console.log("Match Scene -> App3 clicked.");
-			tileSelector.AttemptSelect("app3");
-		});
-		$("#cont1sel").click(function () { console.log("Match Scene -> Cont1 clicked."); 
-			tileSelector.AttemptSelect("cont1");
-		});
-		$("#cont2sel").click(function () { console.log("Match Scene -> Cont2 clicked."); 
-			tileSelector.AttemptSelect("cont2");
-		});
-		$("#cont3sel").click(function () { console.log("Match Scene -> Cont3 clicked."); 
-			tileSelector.AttemptSelect("cont3");
-		});
-		$("#cont4sel").click(function () { console.log("Match Scene -> Cont4 clicked.");
-			tileSelector.AttemptSelect("cont4");
-		});
-		$("#cont5sel").click(function () { console.log("Match Scene -> Cont5 clicked.");
-			tileSelector.AttemptSelect("cont5");
-		});
-		$("#cont6sel").click(function () { console.log("Match Scene -> Cont6 clicked.");
-			tileSelector.AttemptSelect("cont6");
-		});
-		$("#cont7sel").click(function () { console.log("Match Scene -> Cont7 clicked.");
-			tileSelector.AttemptSelect("cont7");
-		});
-		$("#cont8sel").click(function () { console.log("Match Scene -> Cont8 clicked.");
-			tileSelector.AttemptSelect("cont8");
-		});
-		$("#cont9sel").click(function () { console.log("Match Scene -> Cont9 clicked.");
-			tileSelector.AttemptSelect("cont9");
-		});
-		$("#cont10sel").click(function () { console.log("Match Scene -> Cont10 clicked.");
-			tileSelector.AttemptSelect("cont10");
-		});
-		$("#cont11sel").click(function () { console.log("Match Scene -> Cont11 clicked.");
-			tileSelector.AttemptSelect("cont11");
-		});
-		$("#cont12sel").click(function () { console.log("Match Scene -> Cont12 clicked.");
-			tileSelector.AttemptSelect("cont12");
-		});
-		$("#ing1sel").click(function () { console.log("Match Scene -> Ing1 clicked.");
-			tileSelector.AttemptSelect("ing1");
-		});
-		$("#ing2sel").click(function () { console.log("Match Scene -> Ing2 clicked.");
-			tileSelector.AttemptSelect("ing2");
-		});
-		$("#ing3sel").click(function () { console.log("Match Scene -> Ing3 clicked.");
-			tileSelector.AttemptSelect("ing3");
-		});
-		$("#ing4sel").click(function () { console.log("Match Scene -> Ing4 clicked.");
-			tileSelector.AttemptSelect("ing4");
-		});
-		$("#ing5sel").click(function () { console.log("Match Scene -> Ing5 clicked.");
-			tileSelector.AttemptSelect("ing5");
-		});
-		$("#ing6sel").click(function () { console.log("Match Scene -> Ing6 clicked.");
-			tileSelector.AttemptSelect("ing6");
-		});
-		$("#ing7sel").click(function () { console.log("Match Scene -> Ing7 clicked.");
-			tileSelector.AttemptSelect("ing7");
-		});
-		$("#ing8sel").click(function () { console.log("Match Scene -> Ing8 clicked.");
-			tileSelector.AttemptSelect("ing8");
-		});
-		$("#ing9sel").click(function () { console.log("Match Scene -> Ing9 clicked.");
-			tileSelector.AttemptSelect("ing9");
-		});
-		$("#ing10sel").click(function () { console.log("Match Scene -> Ing10 clicked.");
-			tileSelector.AttemptSelect("ing10");
-		});
-		$("#ing11sel").click(function () { console.log("Match Scene -> Ing11 clicked.");
-			tileSelector.AttemptSelect("ing11");
-		});
-		$("#ing12sel").click(function () { console.log("Match Scene -> Ing12 clicked.");
-			tileSelector.AttemptSelect("ing12");
-		});
-		$("#ing13sel").click(function () { console.log("Match Scene -> Ing13 clicked.");
-			tileSelector.AttemptSelect("ing13");
-		});
-		$("#ing14sel").click(function () { console.log("Match Scene -> Ing14 clicked.");
-			tileSelector.AttemptSelect("ing14");
-		});
-		$("#ing15sel").click(function () { console.log("Match Scene -> Ing15 clicked.");
-			tileSelector.AttemptSelect("ing15");
-		});
-		$("#ing16sel").click(function () { console.log("Match Scene -> Ing16 clicked.");
-			tileSelector.AttemptSelect("ing16");
-		});
-		$("#ing17sel").click(function () { console.log("Match Scene -> Ing17 clicked.");
-			tileSelector.AttemptSelect("ing17");
-		});
-		$("#ing18sel").click(function () { console.log("Match Scene -> Ing18 clicked.");
-			tileSelector.AttemptSelect("ing18");
-		});
-		$("#ing19sel").click(function () { console.log("Match Scene -> Ing19 clicked.");
-			tileSelector.AttemptSelect("ing19");
-		});
-		$("#ing20sel").click(function () { console.log("Match Scene -> Ing20 clicked.");
-			tileSelector.AttemptSelect("ing20");
-		});
-		$("#ing21sel").click(function () { console.log("Match Scene -> Ing21 clicked.");
-			tileSelector.AttemptSelect("ing21");
-		});
-		$("#ing22sel").click(function () { console.log("Match Scene -> Ing22 clicked.");
-			tileSelector.AttemptSelect("ing22");
-		});
-		$("#ing23sel").click(function () { console.log("Match Scene -> Ing23 clicked.");
-			tileSelector.AttemptSelect("ing23");
-		});
-		$("#ing24sel").click(function () { console.log("Match Scene -> Ing24 clicked.");
-			tileSelector.AttemptSelect("ing24");
-		});
+			.addGroup("holding", {width: 756, height: 512, posx: 0, posy: 0})
+				.addSprite("holdingBox",{animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 0, posy: 0})
+				.end()
+			.addGroup("selectionDiv", {width: 756, height: 512, posx: 0, posy: 0})
+				.mousemove(mouseTracker.RecordMousePos)
+				.click(mouseTracker.RegisterClick)
+				.end();
+		
+		
+		//Init console
+		matchConsole.Display();
+		
+		//Init mouse tracker
+		mouseTracker.Init();
 		
 		//Advance game state to intro
 		console.log("Match Scene -> Transitioning out of init to intro.");
@@ -307,10 +133,76 @@ var gameSceneMatch = {
 	
 	Active: function () {
 		//console.log("Match Scene -> Entering active state.");
+		mouseTracker.Update();
 	},
 	
 	Trans: function() {
 		throw ("Not yet implemented!");
+	}
+};
+
+/////////////////
+//Mouse Tracker//
+/////////////////
+var mouseTracker = {
+	Target: "",
+	ClickTicks: 0,
+	Holding: null,
+	OffsetX: 0,
+	OffsetY: 0,
+	X: 0,
+	Y: 0,
+	//Below X and Y are translated from absolute X and Y to grid coordinates
+	GridX: 0,
+	GridY: 0,
+	
+	RegisterClick: function(event) {
+		console.log("Click at " + mouseTracker.X + " " + mouseTracker.Y);
+		var gx = mouseTracker.X >>> 6;
+		var gy = mouseTracker.Y >>> 6;
+		if (gx === mouseTracker.GridX && gy === mouseTracker.GridY) {
+			mouseTracker.DoubleClick(gx, gy);
+		} else {
+			mouseTracker.GridX = gx;
+			mouseTracker.GridY = gy;
+			mouseTracker.ClickTicks = 0;
+		}
+		console.log("Grid coords: " + mouseTracker.GridX + "x" + mouseTracker.GridY);
+	},
+	
+	RecordMousePos: function(event) {
+		//console.log(event.pageX+" "+event.pageY);
+		mouseTracker.X = event.pageX - mouseTracker.OffsetX;
+		mouseTracker.Y = event.pageY - mouseTracker.OffsetY;
+	},
+	
+	Update: function() {
+		//Doubleclick tracking
+		if (mouseTracker.GridX && mouseTracker.GridY) {
+			mouseTracker.ClickTicks++;
+			console.log("" + mouseTracker.ClickTicks);
+			if (mouseTracker.ClickTicks > 5) {
+				var gx = mouseTracker.GridX;
+				var gy = mouseTracker.GridY;
+				mouseTracker.GridX = 0;
+				mouseTracker.GridY = 0;
+				mouseTracker.ClickTicks = 0;
+				mouseTracker.SingleClick(gx, gy);
+			}
+		}
+		$("#holdingBox").x(mouseTracker.X-32).y(mouseTracker.Y-32);
+	},
+	
+	Init: function() {
+		$.playground().registerCallback(mouseTracker.Update, 1); 
+	},
+	
+	SingleClick: function(gx, gy) {
+		throw "Not yet implemented!";
+	},
+	
+	DoubleClick: function(gx, gy) {
+		throw "Not yet implemented!";
 	}
 };
 
@@ -350,65 +242,7 @@ var matchConsole = {
 };
 
 
-////////////
-//Selector//
-////////////
-/*
-Selection Rules: Only 2 selections allowed at a time.
-*/
-var tileSelector = {
-	TileSelected: [],
-	Selections: [],
-	
-	Init: function(slotenum) {
-		console.log("Tile Selector -> Initializing...");
-		for (var i = 0; i < slotenum.length; i++) {
-			//console.log(slotenum[i]+" = false");
-			this.TileSelected[slotenum[i]] = false;
-		}
-	},
 
-	AttemptSelect: function(tileName)
-	{
-		this.SelectObject(tileName);		
-	},
-	
-	SelectObject: function(tileName)
-	{
-		//Unpackage slot
-		gameObj = gameSceneMatch.GameObjects[tileName];
-		if (this.TileSelected[tileName]) {
-			matchConsole.Write("Player 1 deselected "+gameObj.Name+"...");
-			this.TileSelected[tileName] = false;
-			var index = this.Selections.indexOf(gameObj)
-			this.Selections.splice(index, 1);
-			$("#"+tileName+"sel").setAnimation();
-		} else {
-			//Check for selection max
-			if (this.Selections.length === 2) {
-				matchConsole.Write("You cannot have more than 2 objects selected!");
-				return false;
-			}
-			this.TileSelected[tileName] = true;
-			matchConsole.Write("Player 1 selected "+gameObj.Name+"...");
-			this.Selections.push(gameObj);
-			$("#"+tileName+"sel").setAnimation(gameAnimations.overSelectionP1);
-		}
-		actionManager.Update(this.Selections);
-	},
-	
-	Clear: function ()
-	{
-		var slotenum = gameSceneMatch.SlotsEnum;
-		
-		for (var i = 0; i < slotenum.length; i++) {
-			this.TileSelected[slotenum[i]] = false;
-			$("#"+slotenum[i]+"sel").setAnimation();
-		}
-		this.Selections.length = 0;
-		actionManager.Update(this.Selections);
-	}
-};
 
 ///////////
 //Actions//
@@ -448,6 +282,19 @@ var actionManager = {
 						matchConsole.Write("Player 1 turned on the "+obj1.Name); 
 					}));
 				break;
+				
+			case "Oven":
+				this.AddActionButton("action1","Preheat to 375F", new ActionHandler(obj1, null, function(event) { 
+						event.preventDefault();
+						console.log("Action -> Turn on button clicked!");
+						tileSelector.Clear();
+						var tileSlot1 = GetKeyByValue(obj1, gameSceneMatch.GameObjects);
+						var gO = new gameObject("AppOven375", "Oven at 375 degrees", EnumGOType.App, "AppOven375.PNG");
+						gameSceneMatch.GameObjects[tileSlot1] = gO;
+						$("#"+tileSlot1).setAnimation(gO.Anim);
+						matchConsole.Write("Player 1 preheated the "+obj1.Name+" to 375 degrees!"); 
+					}));
+				break;
 		}
 	},
 	
@@ -459,7 +306,7 @@ var actionManager = {
 		$(this.CommandDiv).append("<button id='"+id+"' type='button'>"+name+"</button>");
 		$("#"+id).click(handler.Handler);
 	}
-}
+};
 
 function ActionHandler(obj1, obj2, handler)
 {
@@ -468,3 +315,64 @@ function ActionHandler(obj1, obj2, handler)
 	this.Handler = handler;
 }
 
+
+////////////
+//Selector//
+////////////
+/*
+Selection Rules: Only 2 selections allowed at a time.
+*/
+var tileSelector = {
+	TileSelected: [],
+	Selections: [],
+	
+	Init: function(slotenum) {
+		console.log("Tile Selector -> Initializing...");
+		for (var i = 0; i < slotenum.length; i++) {
+			//console.log(slotenum[i]+" = false");
+			this.TileSelected[slotenum[i]] = false;
+		}
+	},
+
+	AttemptSelect: function(tileName)
+	{
+		this.SelectObject(tileName);		
+	},
+	
+	SelectObject: function(tileName)
+	{
+		//Unpackage slot
+		gameObj = gameSceneMatch.GameObjects[tileName];
+		if (this.TileSelected[tileName]) {
+			//De-select
+			//matchConsole.Write("Player 1 deselected "+gameObj.Name+"...");
+			this.TileSelected[tileName] = false;
+			var index = this.Selections.indexOf(gameObj)
+			this.Selections.splice(index, 1);
+			$("#"+tileName+"sel").setAnimation();
+		} else {
+			//Check for selection max
+			if (this.Selections.length === 1) {
+				//matchConsole.Write("You cannot have more than 1 object selected!");
+				return false;
+			}
+			this.TileSelected[tileName] = true;
+			//matchConsole.Write("Player 1 selected "+gameObj.Name+"...");
+			this.Selections.push(gameObj);
+			$("#"+tileName+"sel").setAnimation(gameAnimations.overSelectionP1);
+		}
+		actionManager.Update(this.Selections);
+	},
+	
+	Clear: function ()
+	{
+		var slotenum = gameSceneMatch.SlotsEnum;
+		
+		for (var i = 0; i < slotenum.length; i++) {
+			this.TileSelected[slotenum[i]] = false;
+			$("#"+slotenum[i]+"sel").setAnimation();
+		}
+		this.Selections.length = 0;
+		actionManager.Update(this.Selections);
+	}
+};

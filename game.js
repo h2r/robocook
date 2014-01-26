@@ -54,6 +54,7 @@ function fnMain(jQuery){
 	//Setup main loop
 	$.playground().registerCallback(fnGameLoop, gameConfig.GameLoopInterval); 
 	$.playground().registerCallback(serverSimulator.Main, gameConfig.GameLoopInterval); 
+	//$.playground().registerCallback(mouseTracker.Update, 10);
 	
 	//Start game
 	$.playground().startGame();
