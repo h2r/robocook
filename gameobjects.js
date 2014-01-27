@@ -8,7 +8,7 @@ EnumGOType = {
 };
 
 //Game Object
-function gameObject(id, name, type, sprite)
+function gameObject(id, name, type, sprite, fnDesc)
 {
 	this.Name = name;
 	this.ID = id;
@@ -19,7 +19,14 @@ function gameObject(id, name, type, sprite)
 		this.Anim = null;
 	} else {
 		this.Anim = new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite});
-	}	
+	}
+
+	if (fnDesc) { this.Desc = fnDesc } 
+	else {
+		this.Desc = function() {	
+			return "This is a " + this.Name;
+		}
+	}
 }
 
 //A game container does not have to have a sprite
