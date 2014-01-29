@@ -175,6 +175,23 @@ var inventoryGrid = {
 		return obj;
 	},
 	
+	PlaceObj: function(obj, slot) {
+		
+		if (!slot) throw "Attempted to place in non slot!";
+		//Place in non empty slot
+		if (!inventoryGrid.IsSlotEmpty(slot)) { 
+			throw "Placing on objects not yet implemented!";
+		} else {
+			console.log(slot);
+			if ((slot.charAt(0) === "c" ) === (obj.Type === EnumGOType.Ing)) {
+				throw "Placing object in mismatched slot!";
+			} else {
+				inventoryGrid.GameObjects[slot] = obj;
+				$("#"+slot).setAnimation(obj.Anim);
+			}
+		}
+	},
+	
 	//Gets the description of the gameObject in slot
 	GetObjDesc: function(slot) {
 		var obj = inventoryGrid.GameObjects[slot];
@@ -286,9 +303,16 @@ var mouseTracker = {
 	},
 	
 	PutDownObj: function() {
+		try {
+			var slot = inventoryGrid.GetSlot(mouseTracker.GridX, mouseTracker.GridY);
+			inventoryGrid.PlaceObj(mouseTracker.Holding, slot);
+		} catch (err) {
+			var slot = inventoryGrid.GetSlot(mouseTracker.DownX, mouseTracker.DownY);
+			inventoryGrid.PlaceObj(mouseTracker.Holding, slot);
+		}
 		mouseTracker.Dragging = false;
 		mouseTracker.Holding = null;
-		throw "Putting down objects not implemented!";
+		$("#holdingBox").setAnimation();
 	},
 	
 	//Mouse actions
@@ -303,7 +327,7 @@ var mouseTracker = {
 	},
 	
 	MouseDrag: function() {
-		var slot = inventoryGrid.GetSlot(mouseTracker.GridX, mouseTracker.GridY);
+		var slot = inventoryGrid.GetSlot(mouseTracker.DownX, mouseTracker.DownY);
 		if (slot) {
 			var gotype = inventoryGrid.GetObjType(slot);
 			if (gotype === EnumGOType.Ing || gotype === EnumGOType.Cont) {
