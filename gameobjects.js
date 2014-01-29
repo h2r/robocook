@@ -34,7 +34,7 @@ function gameObject(id, name, type, sprite, fnDesc)
 }
 
 //A game container does not have to have a sprite
-function gameContainer(id, name, sprite, fnDesc)
+function gameContainer(id, name, sprite)
 {
 	this.Name = name;
 	this.ID = id;
@@ -47,13 +47,17 @@ function gameContainer(id, name, sprite, fnDesc)
 		this.Anim = new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite});
 	}
 
-	if (fnDesc) { this.Desc = fnDesc } 
-	else {
-		this.Desc = function() {	
-			return "This is a " + this.Name;
+	this.Desc = function() {	
+		if (!this.Contains.length) {
+			return "This is an empty " + this.Name;
+		} else {
+			var str = "This is a " + this.Name + " containing";
+			for (var i=0; i<this.Contains.length; i++) {
+				str += " " + this.Contains[i].Name;
+			}
 		}
 	}
-		
+	
 	this.Contains = [];
 	
 	this.AddTo = function(gobj) {

@@ -66,6 +66,7 @@ gameObjects["ToolMasher"] = new gameObject("ToolMasher", "Masher", EnumGOType.To
 gameObjects["ToolPeeler"] = new gameObject("ToolPeeler", "Peeler", EnumGOType.Tool, "ToolPeeler.PNG");
 gameObjects["ToolKnife"] = new gameObject("ToolKnife", "Knife", EnumGOType.Tool, "ToolKnife.PNG");
 gameObjects["ToolHands"] = new gameObject("ToolHands", "Hands", EnumGOType.Tool, "ToolHands.PNG");
+//gameObjects["IngDish"] = new gameObject("IngDish", "Dish", "OverlaySelectionP1.PNG");
 
 
 var gameSprites = {};
