@@ -1,10 +1,15 @@
+var actionHandler = null;
+var gameRecipe = null;
+
 var gameSceneMatch = {
 	GameMode: 0,	
 		
 	Init: function() {
 		console.log("Match Scene -> Initializing.");
-		//Initialize tile selector
-		tileSelector.Init(inventoryGrid.SlotsEnum);
+		
+		//Load recipe
+		actionHandler = gnocchiHandler;
+		gameRecipe = recipeGnocchi;
 		
 		//Load kitchen
 		inventoryGrid.Init();
@@ -71,6 +76,9 @@ var gameSceneMatch = {
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64*11, posy: 64})
 				.end()
 			.addGroup("holding", {width: 756, height: 512, posx: 0, posy: 0})
+				.addSprite("app1Box",{animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 32, posy: 288})
+				.addSprite("app2Box",{animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 160, posy: 288})
+				.addSprite("app3Box",{animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 288, posy: 288})
 				.addSprite("holdingBox",{animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 0, posy: 0})
 				.end()
 			.addGroup("selectionDiv", {width: 756, height: 512, posx: 0, posy: 0})
@@ -100,6 +108,7 @@ var gameSceneMatch = {
 	Active: function () {
 		//console.log("Match Scene -> Entering active state.");
 		mouseTracker.Update();
+		actionHandler.UpdateAppliances();
 	},
 	
 	Trans: function() {
@@ -138,12 +147,19 @@ var inventoryGrid = {
 		return inventoryGrid.Grid[(gy*12)+gx];
 	},
 	
+	ChangeSlotAnim: function(slot, anim) {
+		$("#"+slot).setAnimation(anim);
+	},
+	
+	ClearSlotAnim: function(slot) {
+		$("#"+slot).setAnimation();
+	},
+	
 	Init: function() {
 		
 		//Initialize
 		for (var i=0; i<inventoryGrid.SlotsEnum.length; i++) { 
 			inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i]] = gameObjects["Empty"]; 
-			tileSelector.TileSelected[inventoryGrid.SlotsEnum[i]] = false;	
 		}
 		
 		//Load defaults
@@ -155,9 +171,8 @@ var inventoryGrid = {
 		inventoryGrid.GameObjects["cont3"] = gameObjects["ContCuttingBoard"];
 		
 		//Load recipe
-		for (var i=0; i<(recipeGnocchi.length/2); i++) {
-			inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i+15]] =
-				new gameObject(recipeGnocchi[i*2], recipeGnocchi[(i*2)+1], EnumGOType.Ing, recipeGnocchi[i*2]+".PNG");
+		for (var i=0; i<(gameRecipe.length/3); i++) {
+			inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i+15]] = new gameIngredient(gameRecipe[i*3], gameRecipe[(i*3)+1], gameRecipe[i*3]+".PNG", gameRecipe[(i*3)+3]);
 		}
 	},
 	
@@ -167,20 +182,34 @@ var inventoryGrid = {
 		else return (obj === gameObjects["Empty"]);
 	},
 	
+	IsSlotApp: function(slot) {
+		return (inventoryGrid.GameObjects[slot].Type === EnumGOType.App);
+	},
+	
 	FetchObj: function(slot) {
 		console.log("Fetching object in " + slot);
-		var obj = inventoryGrid.GameObjects[slot];
-		inventoryGrid.GameObjects[slot] = gameObjects["Empty"];
-		$("#"+slot).setAnimation();
+		if (!inventoryGrid.IsSlotApp(slot)) {
+			var obj = inventoryGrid.GameObjects[slot];
+			inventoryGrid.GameObjects[slot] = gameObjects["Empty"];
+			$("#"+slot).setAnimation();
+		} else {
+			if (inventoryGrid.GameObjects[slot].Contains.length === 0) throw "Appliance empty!";
+			var obj = inventoryGrid.GameObjects[slot].Contains[0];
+			inventoryGrid.GameObjects[slot].Contains.length = 0;
+			inventoryGrid.ClearSlotAnim(slot + "Box");
+			matchConsole.Write("Player 1 took the " + obj.Name + " off of the " + inventoryGrid.GameObjects[slot].Name);
+			
+		}
 		return obj;
 	},
 	
 	PlaceObj: function(obj, slot) {
-		
 		if (!slot) throw "Attempted to place in non slot!";
 		//Place in non empty slot
 		if (!inventoryGrid.IsSlotEmpty(slot)) { 
-			throw "Placing on objects not yet implemented!";
+			var gobj = inventoryGrid.GameObjects[slot];
+			var origin = inventoryGrid.GetSlot(mouseTracker.DownX, mouseTracker.DownY);
+			obj.ActOn(gobj, slot, origin);
 		} else {
 			console.log(slot);
 			if ((slot.charAt(0) === "c" ) === (obj.Type === EnumGOType.Ing)) {
@@ -323,7 +352,9 @@ var mouseTracker = {
 	},
 	
 	DoubleClick: function(gx, gy) {
-		throw "Doubleclick not yet implemented!";
+		var slot = inventoryGrid.GetSlot(gx, gy);
+		var obj = inventoryGrid.GameObjects[slot];
+		actionHandler.HandleAction(obj, slot);
 	},
 	
 	MouseDrag: function() {
@@ -333,6 +364,11 @@ var mouseTracker = {
 			if (gotype === EnumGOType.Ing || gotype === EnumGOType.Cont) {
 				mouseTracker.Dragging = true;
 				mouseTracker.PickUpObj(slot);
+			} else if (gotype === EnumGOType.App) {
+				if (inventoryGrid.GameObjects[slot].Contains.length > 0) {
+					mouseTracker.Dragging = true;
+					mouseTracker.PickUpObj(slot);
+				}
 			}
 		}
 	}
@@ -348,9 +384,6 @@ var matchConsole = {
 		"-", 
 		"-", 
 		"-", 
-		"-",
-		"-",
-		"-",
 		"-",
 		"-",
 		"-",
@@ -373,138 +406,140 @@ var matchConsole = {
 	}
 };
 
-
-
-
-///////////
-//Actions//
-///////////
-var actionManager = {
-	CommandDiv: "#commandDiv",
-
-	Update: function (selections) {
-		$(this.CommandDiv).empty();
-		
-		switch (selections.length)
-		{
-			case 0:
-				return;
-				break;
-			case 1:
-				this.SingularActions(selections[0]);
-				break;
-			case 2:
-				this.DualActions(selections[0], selections[1]);
-				break;
-		}
-	},
-	
-	SingularActions: function(obj1) {
-		switch (obj1.Name)
-		{
-			case "Stove Top":
-				this.AddActionButton("action1","Turn On High", new ActionHandler(obj1, null, function(event) { 
-						event.preventDefault();
-						console.log("Action -> Turn on button clicked!");
-						tileSelector.Clear();
-						var tileSlot1 = GetKeyByValue(obj1, inventoryGrid.GameObjects);
-						var gO = new gameObject("AppStoveTopHigh", "Stove Top on High", EnumGOType.App, "AppStoveTopHigh.PNG");
-						inventoryGrid.GameObjects[tileSlot1] = gO;
-						$("#"+tileSlot1).setAnimation(gO.Anim);
-						matchConsole.Write("Player 1 turned on the "+obj1.Name); 
-					}));
+//////////////////
+//Action Handler//
+//////////////////
+/*
+var actionHandler = {
+	HandleAction: function(gobj, slot)	{
+		switch (gobj.ID) {
+			case "IngPotatoes":
+				matchConsole.Write("Player 1 peeled the potatoes.");
+				var nobj = new gameIngredient("IngPotatoesPeeled", "Peeled Potatoes", "IngPotatoesPeeled.PNG");
+				inventoryGrid.GameObjects[slot] = nobj;
+				inventoryGrid.ChangeSlotAnim(slot, nobj.Anim);
 				break;
 				
-			case "Oven":
-				this.AddActionButton("action1","Preheat to 375F", new ActionHandler(obj1, null, function(event) { 
-						event.preventDefault();
-						console.log("Action -> Turn on button clicked!");
-						tileSelector.Clear();
-						var tileSlot1 = GetKeyByValue(obj1, inventoryGrid.GameObjects);
-						var gO = new gameObject("AppOven375", "Oven at 375 degrees", EnumGOType.App, "AppOven375.PNG");
-						inventoryGrid.GameObjects[tileSlot1] = gO;
-						$("#"+tileSlot1).setAnimation(gO.Anim);
-						matchConsole.Write("Player 1 preheated the "+obj1.Name+" to 375 degrees!"); 
-					}));
+			case "AppOven":
+				matchConsole.Write("Player 1 turned the oven on.");
+				actionHandler.SwapAppliances(slot, gameObjects["AppOven"], gameObjects["AppOvenOn"]);
+				break;
+				
+			case "AppOvenOn":
+				matchConsole.Write("Player 1 turned the oven off.");
+				actionHandler.SwapAppliances(slot, gameObjects["AppOvenOn"], gameObjects["AppOven"]);
+				break;
+				
+			case "AppStoveTop":
+				matchConsole.Write("Player 1 turned the stove top on.");
+				actionHandler.SwapAppliances(slot, gameObjects["AppStoveTop"], gameObjects["AppStoveTopOn"]);
+				break;
+				
+			case "AppStoveTopOn":
+				matchConsole.Write("Player 1 turned the stove top off.");
+				actionHandler.SwapAppliances(slot, gameObjects["AppStoveTopOn"], gameObjects["AppStoveTop"]);
+				break;
+				
+			case "ContPotLarge":
+				if (actionHandler.VerifyContents(gobj, ["IngWater", "IngSaltTbsp"])) {
+					matchConsole.Write("Player 1 mixed salted water in the large pot!");
+					gobj.Contains.length = 0;
+					gobj.AddTo(new gameIngredient("IngSaltedWater", "Salted Water", ""));
+				} else if (actionHandler.VerifyContents(gobj, ["IngWater", "IngSaltDash"])) {
+					matchConsole.Write("Player 1 mixed lightly salted water in the large pot!");
+					gobj.Contains.length = 0;
+					gobj.AddTo(new gameIngredient("IngSaltedWaterLight", "Lightly Salted Water", ""));
+				} else if (actionHandler.VerifyContents(gobj, ["IngTenderPotatoes", "IngSaltedWater"])) {
+					matchConsole.Write("Player 1 drained the water from the pot!");
+					gobj.Contains.length = 0;
+					gobj.AddTo(new gameIngredient("IngTenderPotatoes", "Tender Potatoes", ""));
+				} else if (actionHandler.VerifyContents(gobj, ["IngCookedGnocchi", "IngSaltedWaterLight"])) {
+					matchConsole.Write("Player 1 drained the water from the pot!");
+					gobj.Contains.length = 0;
+					gobj.AddTo(new gameIngredient("IngCookedGnocchi", "Cooked Gnocchi", ""));
+				} else if (actionHandler.VerifyContents(gobj, ["IngTenderPotatoes"])) {
+					matchConsole.Write("Player 1 mashed the tender potatoes!");
+					gobj.Contains.length = 0;
+					gobj.AddTo(new gameIngredient("IngMashedPotatoes", "Mashed Potatoes", ""));
+				}
+				break;
+				
+			case "ContBowlLarge":
+				if (actionHandler.VerifyContents(gobj, ["IngMashedPotatoes", "IngEgg", "IngCupOfFlour"])) {
+					matchConsole.Write("Player 1 combined the ingredients into dough!");
+					gobj.Contains.length = 0;
+					gobj.AddTo(new gameIngredient("IngDough", "Dough", ""));
+				} else if (actionHandler.VerifyContents(gobj, ["IngDough"])) {
+					matchConsole.Write("Player 1 kneaded the dough into a ball!");
+					gobj.Contains.length = 0;
+					gobj.AddTo(new gameIngredient("IngDoughBall", "Ball of Dough", ""));
+				} else if (actionHandler.VerifyContents(gobj, ["IngDoughBall"])) {
+					matchConsole.Write("Player 1 shaped the dough into snakes!");
+					gobj.Contains.length = 0;
+					gobj.AddTo(new gameIngredient("IngDoughSnakes", "Snakes of Dough", ""));
+				}
+				break;
+				
+			case "ContCuttingBoard":
+				if (actionHandler.VerifyContents(gobj, ["IngCupOfFlour"])) {
+					matchConsole.Write("Player 1 floured the cutting board!");
+					gobj.Contains.length = 0;
+					inventoryGrid.GameObjects[slot] = gameObjects["ContCuttingBoardFloured"];
+				}
+				break;
+				
+			case "ContCuttingBoardFloured":
+				if (actionHandler.VerifyContents(gobj, ["IngDoughSnakes"])) {
+					matchConsole.Write("Player 1 cut the snakes into half-inch pieces of raw gnocchi!");
+					gobj.Contains.length = 0;
+					gobj.AddTo(new gameIngredient("IngRawGnocchi", "Raw Gnocchi", ""));
+				}
 				break;
 		}
 	},
 	
-	DualActions: function(obj1, obj2) {
-		throw ("Dual actions not yet implemented!");
-	},
-	
-	AddActionButton: function(id, name, handler) {
-		$(this.CommandDiv).append("<button id='"+id+"' type='button'>"+name+"</button>");
-		$("#"+id).click(handler.Handler);
-	}
-};
-
-function ActionHandler(obj1, obj2, handler)
-{
-	this.GameObject1 = obj1;
-	this.GameObject2 = obj2;
-	this.Handler = handler;
-}
-
-
-////////////
-//Selector//
-////////////
-/*
-Selection Rules: Only 2 selections allowed at a time.
-*/
-var tileSelector = {
-	TileSelected: [],
-	Selections: [],
-	
-	Init: function(slotenum) {
-		console.log("Tile Selector -> Initializing...");
-		for (var i = 0; i < slotenum.length; i++) {
-			//console.log(slotenum[i]+" = false");
-			this.TileSelected[slotenum[i]] = false;
-		}
-	},
-
-	AttemptSelect: function(tileName)
-	{
-		this.SelectObject(tileName);		
-	},
-	
-	SelectObject: function(tileName)
-	{
-		//Unpackage slot
-		gameObj = inventoryGrid.GameObjects[tileName];
-		if (this.TileSelected[tileName]) {
-			//De-select
-			//matchConsole.Write("Player 1 deselected "+gameObj.Name+"...");
-			this.TileSelected[tileName] = false;
-			var index = this.Selections.indexOf(gameObj)
-			this.Selections.splice(index, 1);
-			$("#"+tileName+"sel").setAnimation();
-		} else {
-			//Check for selection max
-			if (this.Selections.length === 1) {
-				//matchConsole.Write("You cannot have more than 1 object selected!");
-				return false;
+	UpdateAppliances: function() {
+		//Check stove top
+		try {
+			if (gameObjects["AppStoveTopOn"].Contains.length > 0) {
+				//console.log("Stove top on!");
+				//console.log(actionHandler.VerifyContents(inventoryGrid.GameObjects["app2"].Contains[0], ["IngSaltedWater", "IngPotatoesPeeled"]));
+				if (actionHandler.VerifyContents(gameObjects["AppStoveTopOn"].Contains[0], ["IngSaltedWater", "IngPotatoesPeeled"])) {
+					matchConsole.Write("The potatoes boiled in the salted water!  Now they are nice and tender.");
+					gameObjects["AppStoveTopOn"].Contains[0].Contains.length = 0;
+					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngTenderPotatoes", "Tender Potatoes", ""));
+					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngSaltedWater", "Salted Water", ""));
+				} else if (actionHandler.VerifyContents(gameObjects["AppStoveTopOn"].Contains[0], ["IngSaltedWaterLight", "IngRawGnocchi"])) {
+					matchConsole.Write("The gnocchi cooked until they rose to the top!");
+					gameObjects["AppStoveTopOn"].Contains[0].Contains.length = 0;
+					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngCookedGnocchi", "Cooked Gnocchi", ""));
+					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngSaltedWaterLight", "Lightly Salted Water", ""));
+				}
 			}
-			this.TileSelected[tileName] = true;
-			//matchConsole.Write("Player 1 selected "+gameObj.Name+"...");
-			this.Selections.push(gameObj);
-			$("#"+tileName+"sel").setAnimation(gameAnimations.overSelectionP1);
+		} catch(err) {
+			console.log("Error: " + err.message);
 		}
-		actionManager.Update(this.Selections);
 	},
 	
-	Clear: function ()
-	{
-		var slotenum = inventoryGrid.SlotsEnum;
-		
-		for (var i = 0; i < slotenum.length; i++) {
-			this.TileSelected[slotenum[i]] = false;
-			$("#"+slotenum[i]+"sel").setAnimation();
+	SwapAppliances: function(slot, oapp, napp) {
+		oapp.TransferTo(napp);
+		inventoryGrid.GameObjects[slot] = napp;
+		inventoryGrid.ChangeSlotAnim(slot, napp.Anim);
+	},
+	
+	VerifyContents: function(gobj, arr) {
+		if (gobj.Contains.length !== arr.length) return false;
+		for (var i=0; i<arr.length; i++) {
+			var found = false;
+			for (var j=0; j<gobj.Contains.length; j++) {
+				console.log(gobj.Contains[j].ID + " vs " + arr[i]);
+				if (gobj.Contains[j].ID === arr[i]) {
+					console.log("Match!");
+					found = true;
+				}
+			}
+			if (!found) return false;
 		}
-		this.Selections.length = 0;
-		actionManager.Update(this.Selections);
+		return true;
 	}
-};
+};*/
