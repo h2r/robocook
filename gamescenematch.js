@@ -1,5 +1,8 @@
 var actionHandler = null;
 var gameRecipe = null;
+var gameIngList = null;
+var gameTitle = null;
+var winFlag = false;
 
 var gameSceneMatch = {
 	GameMode: 0,	
@@ -7,28 +10,15 @@ var gameSceneMatch = {
 	Init: function() {
 		console.log("Match Scene -> Initializing.");
 		
-		//Load recipe
-		actionHandler = gnocchiHandler;
-		gameRecipe = recipeGnocchi;
-		
 		//Load kitchen
 		inventoryGrid.Init();
 		
 		var j=0;
-		//Initialize groups, add tiles as sprites
+		//Initialize groups, add tiles as sprite
 		$.playground()
+			.pauseGame().clearScenegraph().startGame()
 			.addGroup("background", {width: gameConfig.StageWidth, height: gameConfig.StageHeight})
 				.addSprite("background", {animation: gameAnimations.background1, width: gameConfig.StageWidth, height: gameConfig.StageHeight})
-				.end()
-			.addGroup("infoDiv",{width: 768, height: 64, posx: 0, posy: 0})
-				.css({"background-color":"red", "font-size":"8pt", "color":"black"})
-				.append("ROBOCOOK<br/>Prototype v0.3<br />Recipe: Gnocchi")
-				.end()
-			.addGroup(matchConsole.DisplayDiv, {width: 384, height: 192, posx: 0, posy: 64})
-				.css({"background-color":"black", "font-size":"8pt", "color":"green"})
-				.end()
-			.addGroup("commandDiv", {width: 384, height: 192, posx: 384, posy: 64})
-				.css({"background-color":"blue"})
 				.end()
 			.addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 256})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 128, height: 128})
@@ -86,14 +76,42 @@ var gameSceneMatch = {
 				//.click(mouseTracker.RegisterClick)
 				.mousedown(mouseTracker.RegisterDown)
 				.mouseup(mouseTracker.RegisterUp)
+				.end()
+			.addGroup("infoDiv",{width: 768, height: 64, posx: 0, posy: 0})
+				.css({"background-color":"red", "font-size":"8pt", "color":"black"})
+				.append("ROBOCOOK<br/>Prototype v0.3<br />Recipe: " + gameTitle)
+				.append("<button id='matchResetBtn' type='button'>Reset</button>")
+				.end()
+			.addGroup("recipeDiv", {width: 384, height: 192, posx: 384, posy: 64})
+				.css({"background-color":"blue", "font-size":"8pt", "color":"red", "overflow":"auto"})
+				.end()
+			.addGroup(matchConsole.DisplayDiv, {width: 384, height: 192, posx: 0, posy: 64})
+				.css({"background-color":"black", "font-size":"8pt", "color":"green", "overflow":"auto"})
 				.end();
-		
+				
+		//Configure reset button
+		$("#matchResetBtn").css({
+			"position":"absolute",
+			"top":16,
+			"left":700})
+			.click(function(event) {
+				event.preventDefault();
+				console.log("Match Scene -> Reset button clicked!");
+				RegisterCommand(gameConfig.SceneMatchName, EnumGameCommands.MatchReset);
+			});		
 		
 		//Init console
 		matchConsole.Display();
 		
 		//Init mouse tracker
 		mouseTracker.Init();
+		
+		//Init recipe display
+		$("#recipeDiv").append("<ol>");
+		for (var i=0; i<gameRecipe.length; i++) {
+				$("#recipeDiv").append("<li id='rlist"+i+"'>"+gameRecipe[i]+"</li>");
+		}
+		$("#recipeDiv").append("</ol>");
 		
 		//Advance game state to intro
 		console.log("Match Scene -> Transitioning out of init to intro.");
@@ -107,8 +125,15 @@ var gameSceneMatch = {
 	
 	Active: function () {
 		//console.log("Match Scene -> Entering active state.");
-		mouseTracker.Update();
-		actionHandler.UpdateAppliances();
+		if (!winFlag) {
+			mouseTracker.Update();
+			actionHandler.UpdateAppliances();
+		} else {
+			$.playground()
+				.addGroup("endgame", {width: gameConfig.StageWidth, height: gameConfig.StageHeight})
+				.addSprite("victory", {animation: gameAnimations.victoryScreen, width: gameConfig.StageWidth, height: gameConfig.StageHeight})
+				.end();
+		}
 	},
 	
 	Trans: function() {
@@ -169,10 +194,19 @@ var inventoryGrid = {
 		inventoryGrid.GameObjects["cont1"] = gameObjects["ContBowlLarge"];
 		inventoryGrid.GameObjects["cont2"] = gameObjects["ContPotLarge"];
 		inventoryGrid.GameObjects["cont3"] = gameObjects["ContCuttingBoard"];
+		inventoryGrid.GameObjects["cont4"] = gameObjects["ContBakingDish"];
+		inventoryGrid.GameObjects["cont5"] = gameObjects["ContSaucepanLarge"];
+		
+		//Empty gameobjects
+		$.each(gameObjects, function(key, value) {
+			if (value.Contains) {
+				value.Contains.length = 0;
+			}
+		});
 		
 		//Load recipe
-		for (var i=0; i<(gameRecipe.length/3); i++) {
-			inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i+15]] = new gameIngredient(gameRecipe[i*3], gameRecipe[(i*3)+1], gameRecipe[i*3]+".PNG", gameRecipe[(i*3)+3]);
+		for (var i=0; i<(gameIngList.length/3); i++) {
+			inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i+15]] = new gameIngredient(gameIngList[i*3], gameIngList[(i*3)+1], gameIngList[i*3]+".PNG", gameIngList[(i*3)+2]);
 		}
 	},
 	
@@ -392,17 +426,18 @@ var matchConsole = {
 	],
 	
 	Write: function(line) {
-		this.Lines.shift();
+		//this.Lines.shift();
 		this.Lines.push(line);
 		this.Display();
 	},
 	
 	Display: function() {
-		$("#"+this.DisplayDiv).empty();
+		/*$("#"+this.DisplayDiv).empty();
 		$("#"+this.DisplayDiv).append("<br/>");
 		for (var i=0; i<this.Lines.length; i++) {
 			$("#"+this.DisplayDiv).append(this.Lines[i] + "<br/>");
-		}
+		}*/
+		$("#"+this.DisplayDiv).prepend(this.Lines[this.Lines.length-1] + "<br/>");
 	}
 };
 

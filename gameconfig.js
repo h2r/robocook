@@ -64,8 +64,13 @@ gameObjects["AppStoveTopOn"] = new gameAppliance("AppStoveTopOn", "Stove Top wit
 gameObjects["AppCounterTop"] = new gameAppliance("AppCounterTop", "Kitchen Counter", "AppCounterTop.PNG");
 gameObjects["ContBowlLarge"] = new gameContainer("ContBowlLarge", "Large Bowl", "ContBowlLarge.PNG");
 gameObjects["ContPotLarge"] = new gameContainer("ContPotLarge", "Large Pot", "ContPotLarge.PNG");
+gameObjects["ContSaucepanLarge"] = new gameContainer("ContSaucepanLarge", "Large Saucepan", "ContSaucepanLarge.PNG");
 gameObjects["ContCuttingBoard"] = new gameContainer("ContCuttingBoard", "Cutting Board", "ContCuttingBoard.PNG");
 gameObjects["ContCuttingBoardFloured"] = new gameContainer("ContCuttingBoardFloured", "Floured Cutting Board", "ContCuttingBoard.PNG");
+gameObjects["ContBakingDish"] = new gameContainer("ContBakingDish", "Baking Dish", "ContBakingDish.PNG");
+gameObjects["ContBakingDishGreased"] = new gameContainer("ContBakingDishGreased", "Greased Baking Dish", "ContBakingDish.PNG");
+gameObjects["ContBakingDishFloured"] = new gameContainer("ContBakingDishFloured", "Floured Baking Dish", "ContBakingDish.PNG");
+gameObjects["ContBakingDishGreasedFloured"] = new gameContainer("ContBakingDishGreasedFloured", "Greased and Floured Baking Dish", "ContBakingDish.PNG");
 //gameObjects["ToolMasher"] = new gameObject("ToolMasher", "Masher", EnumGOType.Tool, "ToolMasher.PNG");
 //gameObjects["ToolPeeler"] = new gameObject("ToolPeeler", "Peeler", EnumGOType.Tool, "ToolPeeler.PNG");
 //gameObjects["ToolKnife"] = new gameObject("ToolKnife", "Knife", EnumGOType.Tool, "ToolKnife.PNG");
@@ -76,8 +81,10 @@ gameObjects["ContCuttingBoardFloured"] = new gameContainer("ContCuttingBoardFlou
 var gameSprites = {};
 gameSprites["MatchBackground"] = "./Sprites/MatchBackground_PH.JPG";
 gameSprites["OverlaySelectionP1"] = "./Sprites/OverlaySelectionP1.PNG";
+gameSprites["VictoryScreen"] = "./Sprites/Win.PNG";
 
 var gameAnimations = {
 	background1: new $.gameQuery.Animation({imageURL: gameSprites["MatchBackground"]}),
-	overSelectionP1: new $.gameQuery.Animation({imageURL: gameSprites["OverlaySelectionP1"]})
+	overSelectionP1: new $.gameQuery.Animation({imageURL: gameSprites["OverlaySelectionP1"]}),
+	victoryScreen: new $.gameQuery.Animation({imageURL: gameSprites["VictoryScreen"]})
 };

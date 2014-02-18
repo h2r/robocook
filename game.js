@@ -212,17 +212,29 @@ function fnSceneMatch() {
 			gameSceneMatch.Intro();
 			//Command monitoring code
 			while(gameCommandQueue.IsEmpty() === false) {
-				console.log("Main Menu Scene -> Fetching command!");
+				console.log("Match Scene -> Fetching command!");
 				var command = FetchNextCommand();
-				console.log("Main Menu Scene -> Processing command "+command.Command+" for target "+command.Target);
+				console.log("Match Scene -> Processing command "+command.Command+" for target "+command.Target);
 				if (command.Target === gameConfig.SceneMatchName) {
-					//Process commands here
+					//Process commands
 				}
 			}
 			break;
 			
 		case EnumGameState.MatchActive:
-			gameSceneMatch.Active();
+			if (gameCommandQueue.IsEmpty()) { gameSceneMatch.Active(); }
+			else {
+				while(!gameCommandQueue.IsEmpty()) {
+					console.log("Match Scene -> Fetching command!");
+					var command = FetchNextCommand();
+					console.log("Match Scene -> Processing command "+command.Command+" for target "+command.Target);
+					if (command.Target === gameConfig.SceneMatchName) {
+						if (command.Command === EnumGameCommands.MatchReset) {
+							CurrentGameState = EnumGameState.MatchInit;
+						}
+					}
+				}
+			}
 			break;
 			
 		case EnumGameState.MatchEnd:

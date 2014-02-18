@@ -1,0 +1,8 @@
+1. Reset button
+v/ 2. Recipe in blue div area
+v/ 3. Scrolling on text console
+v/ 4. Greasing first then flouring
+5. Reset empty containers to container area
+6. Implemented victory
+7. Investigate selection problem with console (try text box)
+8. Replace countertop with microwave

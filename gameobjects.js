@@ -195,10 +195,17 @@ function gameAppliance(id, name, sprite)
 			return this.Contains[0];
 	}
 	
+	this.IsEmpty = function() {
+		return (this.Contains.length === 0 || !this.Contains);
+	}
+	
 	//Transfer contents of container to new container
 	this.TransferTo = function(cont) {
-		cont.AddTo(this.Contains[0]);
-		this.Contains.length = 0;
+		if (!this.IsEmpty())
+		{ 	
+			cont.AddTo(this.Contains[0]);
+			this.Contains.length = 0;
+		}
 	}
 	
 	this.Activate = function() {

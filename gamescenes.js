@@ -60,7 +60,8 @@ var gameSceneMainMenu = {
 			"top":gamePos.MainTitleY,
 			"left":gamePos.MainTitleX});
 		console.log("Main Menu Scene -> Generating Singleplayer button at " + gamePos.MainSPBtnY + " " + gamePos.MainSPBtnX);
-		$("#"+gameConfig.SceneMainMenuName).append("<button id='mainSPBtn' type='button'> "+gameConfig.SPBtn+" </button>");
+		//$("#"+gameConfig.SceneMainMenuName).append("<button id='mainSPBtn' type='button'> "+gameConfig.SPBtn+" </button>");
+		$("#"+gameConfig.SceneMainMenuName).append("<button id='mainSPBtn' type='button'>Make Brownies</button>");
 		$("#mainSPBtn").css({
 			"position":"absolute",
 			"top":gamePos.MainSPBtnY,
@@ -71,7 +72,8 @@ var gameSceneMainMenu = {
 				RegisterCommand(gameConfig.SceneMainMenuName, EnumGameCommands.Singleplayer);
 			});
 				console.log("Main Menu Scene -> Generating Multiplayer button at " + gamePos.MainMPBtnY + " " + gamePos.MainMPBtnX);
-		$("#"+gameConfig.SceneMainMenuName).append("<button id='mainMPBtn' type='button'> "+gameConfig.MPBtn+" </button>");
+		//$("#"+gameConfig.SceneMainMenuName).append("<button id='mainMPBtn' type='button'> "+ gameConfig.MPBtn +" </button>");
+		$("#"+gameConfig.SceneMainMenuName).append("<button id='mainMPBtn' type='button'>Make Gnocchi</button>");
 		$("#mainMPBtn").css({
 			"position":"absolute",
 			"top":gamePos.MainMPBtnY,
@@ -97,6 +99,11 @@ var gameSceneMainMenu = {
 	},
 	
 	Singleplayer: function () {
+		actionHandler = brownieHandler;
+		gameRecipe = recipeBrownies;
+		gameIngList = ingListBrownies;
+		gameTitle = "Brownies";
+		
 		console.log("Main Menu Scene -> Processing singleplayer command...");
 		gameSceneMatch.GameMode = EnumGameMode.Singleplayer;	//Set game mode to SP
 		console.log("Main Menu Scene -> Setting game mode to singleplayer.");
@@ -105,6 +112,16 @@ var gameSceneMainMenu = {
 	},
 	
 	Multiplayer: function () {
+		actionHandler = gnocchiHandler;
+		gameRecipe = recipeGnocchi;
+		gameIngList = ingListGnocchi;
+		gameTitle = "Gnocchi";
+		
+		console.log("Main Menu Scene -> Processing singleplayer command...");
+		gameSceneMatch.GameMode = EnumGameMode.Singleplayer;	//Set game mode to SP
+		console.log("Main Menu Scene -> Setting game mode to singleplayer.");
+		CurrentGameState = EnumGameState.MainMenuTrans;		
+		console.log("Main Menu Scene -> Setting game state to transition.");
 	},
 	
 	Exit: function () {
