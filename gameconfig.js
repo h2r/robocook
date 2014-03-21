@@ -62,6 +62,7 @@ gameObjects["AppOvenOn"] = new gameAppliance("AppOvenOn", "Heated Oven", "AppOve
 gameObjects["AppStoveTop"] = new gameAppliance("AppStoveTop", "Stove Top", "AppStoveTop.PNG");
 gameObjects["AppStoveTopOn"] = new gameAppliance("AppStoveTopOn", "Stove Top with Burner On", "AppStoveTopOn.PNG");
 gameObjects["AppCounterTop"] = new gameAppliance("AppCounterTop", "Kitchen Counter", "AppCounterTop.PNG");
+gameObjects["AppMicrowave"] = new gameAppliance("AppMicrowave", "Microwave Oven", "AppMicrowave.PNG");
 gameObjects["ContBowlLarge"] = new gameContainer("ContBowlLarge", "Large Bowl", "ContBowlLarge.PNG");
 gameObjects["ContPotLarge"] = new gameContainer("ContPotLarge", "Large Pot", "ContPotLarge.PNG");
 gameObjects["ContSaucepanLarge"] = new gameContainer("ContSaucepanLarge", "Large Saucepan", "ContSaucepanLarge.PNG");
@@ -82,9 +83,25 @@ var gameSprites = {};
 gameSprites["MatchBackground"] = "./Sprites/MatchBackground_PH.JPG";
 gameSprites["OverlaySelectionP1"] = "./Sprites/OverlaySelectionP1.PNG";
 gameSprites["VictoryScreen"] = "./Sprites/Win.PNG";
+gameSprites["ActUse"] = "./Sprites/ActUse.PNG";
+gameSprites["ActMix"] = "./Sprites/ActMix.PNG";
+gameSprites["ActSpread"] = "./Sprites/ActSpread.PNG";
+gameSprites["ActTurnOnOff"] = "./Sprites/ActTurnOnOff.PNG";
+gameSprites["ActLook"] = "./Sprites/ActLook.PNG";
+gameSprites["ActCut"] = "./Sprites/ActCut.PNG";
+gameSprites["ActShape"] = "./Sprites/ActShape.PNG";
+gameSprites["ActPeel"] = "./Sprites/ActPeel.PNG";
 
 var gameAnimations = {
 	background1: new $.gameQuery.Animation({imageURL: gameSprites["MatchBackground"]}),
 	overSelectionP1: new $.gameQuery.Animation({imageURL: gameSprites["OverlaySelectionP1"]}),
-	victoryScreen: new $.gameQuery.Animation({imageURL: gameSprites["VictoryScreen"]})
+	victoryScreen: new $.gameQuery.Animation({imageURL: gameSprites["VictoryScreen"]}),
+	actUse: new $.gameQuery.Animation({imageURL: gameSprites["ActUse"]}),
+	actMix: new $.gameQuery.Animation({imageURL: gameSprites["ActMix"]}),
+	actSpread: new $.gameQuery.Animation({imageURL: gameSprites["ActSpread"]}),
+	actTurnOnOff: new $.gameQuery.Animation({imageURL: gameSprites["ActTurnOnOff"]}),
+	actLook: new $.gameQuery.Animation({imageURL: gameSprites["ActLook"]}),
+	actCut: new $.gameQuery.Animation({imageURL: gameSprites["ActCut"]}),
+	actShape: new $.gameQuery.Animation({imageURL: gameSprites["ActShape"]}),
+	actPeel: new $.gameQuery.Animation({imageURL: gameSprites["ActPeel"]})
 };

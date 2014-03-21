@@ -213,3 +213,13 @@ function gameAppliance(id, name, sprite)
 	}
 }
 
+//////////
+//Action//
+//////////
+function gameAction(name, sprite, cmdstr)
+{
+	this.Name = name;	//This is the display name of the command
+	this.Sprite = sprite;  //The sprite to display
+	this.Cmd = cmdstr;	//The string used for issuing commands
+}
+

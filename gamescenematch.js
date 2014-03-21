@@ -3,6 +3,7 @@ var gameRecipe = null;
 var gameIngList = null;
 var gameTitle = null;
 var winFlag = false;
+var activeAction = 0;
 
 var gameSceneMatch = {
 	GameMode: 0,	
@@ -12,6 +13,7 @@ var gameSceneMatch = {
 		
 		//Load kitchen
 		inventoryGrid.Init();
+		matchConsole.Init();
 		
 		var j=0;
 		//Initialize groups, add tiles as sprite
@@ -20,12 +22,12 @@ var gameSceneMatch = {
 			.addGroup("background", {width: gameConfig.StageWidth, height: gameConfig.StageHeight})
 				.addSprite("background", {animation: gameAnimations.background1, width: gameConfig.StageWidth, height: gameConfig.StageHeight})
 				.end()
-			.addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 256})
+			.addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 192})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 128, height: 128})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 128, height: 128, posx: 128})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 128, height: 128, posx: 256})
 				.end()
-			.addGroup("containers", {width: 384, height: 128, posx: 384, posy: 256})
+			.addGroup("containers", {width: 384, height: 128, posx: 384, posy: 192})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 128})
@@ -39,7 +41,7 @@ var gameSceneMatch = {
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 256, posy: 64})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 320, posy: 64})
 				.end()
-			.addGroup("ingredients", {width: 768, height: 128, posx: gamePos.MatchDivIngsX, posy: gamePos.MatchDivIngsY})
+			.addGroup("ingredients", {width: 768, height: 128, posx: gamePos.MatchDivIngsX, posy: gamePos.MatchDivIngsY-64})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 0, posy: 0})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64, posy: 0})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64*2, posy: 0})
@@ -66,10 +68,10 @@ var gameSceneMatch = {
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64*11, posy: 64})
 				.end()
 			.addGroup("holding", {width: 756, height: 512, posx: 0, posy: 0})
-				.addSprite("app1Box",{animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 32, posy: 288})
-				.addSprite("app2Box",{animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 160, posy: 288})
-				.addSprite("app3Box",{animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 288, posy: 288})
-				.addSprite("holdingBox",{animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 0, posy: 0})
+				.addSprite("app1Box",{width: 64, height: 64, posx: 32, posy: 288-64})
+				.addSprite("app2Box",{width: 64, height: 64, posx: 160, posy: 288-64})
+				.addSprite("app3Box",{width: 64, height: 64, posx: 288, posy: 288-64})
+				.addSprite("holdingBox",{width: 64, height: 64, posx: 0, posy: 0})
 				.end()
 			.addGroup("selectionDiv", {width: 756, height: 512, posx: 0, posy: 0})
 				.mousemove(mouseTracker.RecordMousePos)
@@ -77,26 +79,53 @@ var gameSceneMatch = {
 				.mousedown(mouseTracker.RegisterDown)
 				.mouseup(mouseTracker.RegisterUp)
 				.end()
+			/*
 			.addGroup("infoDiv",{width: 768, height: 64, posx: 0, posy: 0})
 				.css({"background-color":"red", "font-size":"8pt", "color":"black"})
 				.append("ROBOCOOK<br/>Prototype v0.3<br />Recipe: " + gameTitle)
-				.append("<button id='matchResetBtn' type='button'>Reset</button>")
-				.end()
-			.addGroup("recipeDiv", {width: 384, height: 192, posx: 384, posy: 64})
+				.end()*/
+			.addGroup("recipeDiv", {width: 384, height: 192, posx: 384, posy: 0})
 				.css({"background-color":"blue", "font-size":"8pt", "color":"red", "overflow":"auto"})
 				.end()
-			.addGroup(matchConsole.DisplayDiv, {width: 384, height: 192, posx: 0, posy: 64})
+			.addGroup(matchConsole.DisplayDiv, {width: 384, height: 192, posx: 0, posy: 0})
 				.css({"background-color":"black", "font-size":"8pt", "color":"green", "overflow":"auto"})
+				.end()
+			.addGroup(actionBar.DisplayDiv,{width: 768, height: 64, posx: 0, posy: 448})
+				.css({"background-color":"purple", "font-size":"8pt", "color":"yellow", "overflow":"auto"})
+				.addSprite("act1", {animation: gameAnimations.actLook, width: 64, height: 64, posx: 0})
+				.addSprite("act2", {animation: gameAnimations.actTurnOnOff, width: 64, height: 64, posx: 64})
+				.addSprite("act3", {animation: gameAnimations.actMix, width: 64, height: 64, posx: 128})
+				.addSprite("act4", {animation: gameAnimations.actSpread, width: 64, height: 64, posx: 192})
+				.addSprite("act5", {animation: gameAnimations.actCut, width: 64, height: 64, posx: 256})
+				.addSprite("act6", {animation: gameAnimations.actShape, width: 64, height: 64, posx: 320})
+				.addSprite("act7", {animation: gameAnimations.actPeel, width: 64, height: 64, posx: 384})
+				.addSprite("actSelector", {animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 0})
+				.append("<button id='matchResetBtn' type='button'>Reset</button>")
+				.end()
+			.addGroup(actionText.DisplayDiv, {width: 256, height: 64, posx: 448, posy: 448})
 				.end();
+
+		//Initialize action bars
+		actionBar.Init([
+			EnumActions.Look,
+			EnumActions.TurnOnOff,
+			EnumActions.Mix,
+			EnumActions.Spread,
+			EnumActions.Cut,
+			EnumActions.Shape,
+			EnumActions.Peel,
+		]);
+		actionText.Init();
+		activeAction = EnumActions.Look;
 				
 		//Configure reset button
 		$("#matchResetBtn").css({
 			"position":"absolute",
 			"top":16,
-			"left":700})
+			"left":708})
 			.click(function(event) {
 				event.preventDefault();
-				console.log("Match Scene -> Reset button clicked!");
+				//console.log("Match Scene -> Reset button clicked!");
 				RegisterCommand(gameConfig.SceneMatchName, EnumGameCommands.MatchReset);
 			});		
 		
@@ -107,9 +136,10 @@ var gameSceneMatch = {
 		mouseTracker.Init();
 		
 		//Init recipe display
+		$("#recipeDiv").append("<u>"+gameRecipe[0]+"</u>");
 		$("#recipeDiv").append("<ol>");
-		for (var i=0; i<gameRecipe.length; i++) {
-				$("#recipeDiv").append("<li id='rlist"+i+"'>"+gameRecipe[i]+"</li>");
+		for (var i=1; i<gameRecipe.length; i++) {
+				$("#recipeDiv").append("<li id='rlist"+(i-1)+"'>"+gameRecipe[i]+"</li>");
 		}
 		$("#recipeDiv").append("</ol>");
 		
@@ -156,7 +186,6 @@ var inventoryGrid = {
 	],
 
 	Grid: [
-		"","","","","","","","","","","","",		//row1
 		"","","","","","","","","","","","",		//row2
 		"","","","","","","","","","","","",		//row3
 		"","","","","","","","","","","","",		//row4
@@ -164,6 +193,7 @@ var inventoryGrid = {
 		"app1","app1","app2","app2","app3","app3","cont7","cont8","cont9","cont10","cont11","cont12",		//row6
 		"ing1","ing2","ing3","ing4","ing5","ing6","ing7","ing8","ing9","ing10","ing11","ing12",				//row7
 		"ing13","ing14","ing15","ing16","ing17","ing18","ing19","ing20","ing21","ing22","ing23","ing24",	//row8
+		"","","","","","","","","","","","",		//row1
 	],
 	
 	GameObjects: {},
@@ -184,11 +214,11 @@ var inventoryGrid = {
 		
 		//Initialize
 		for (var i=0; i<inventoryGrid.SlotsEnum.length; i++) { 
-			inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i]] = gameObjects["Empty"]; 
+			inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i]] = gameObjects["Empty"];
 		}
 		
 		//Load defaults
-		inventoryGrid.GameObjects["app1"] = gameObjects["AppCounterTop"];
+		inventoryGrid.GameObjects["app1"] = gameObjects["AppMicrowave"];
 		inventoryGrid.GameObjects["app2"] = gameObjects["AppStoveTop"];
 		inventoryGrid.GameObjects["app3"] = gameObjects["AppOven"];
 		inventoryGrid.GameObjects["cont1"] = gameObjects["ContBowlLarge"];
@@ -221,7 +251,7 @@ var inventoryGrid = {
 	},
 	
 	FetchObj: function(slot) {
-		console.log("Fetching object in " + slot);
+		//console.log("Fetching object in " + slot);
 		if (!inventoryGrid.IsSlotApp(slot)) {
 			var obj = inventoryGrid.GameObjects[slot];
 			inventoryGrid.GameObjects[slot] = gameObjects["Empty"];
@@ -263,6 +293,10 @@ var inventoryGrid = {
 	GetObjType: function(slot) {
 		var obj = inventoryGrid.GameObjects[slot];
 		return (inventoryGrid.IsSlotEmpty(slot)) ? false : obj.Type;
+	},
+	GetObjName: function(slot) {
+		var obj = inventoryGrid.GameObjects[slot];
+		return (inventoryGrid.IsSlotEmpty(slot)) ? false : obj.Name;
 	}
 };
 
@@ -290,7 +324,7 @@ var mouseTracker = {
 
 	
 	RegisterClick: function() {
-		console.log("Click at " + mouseTracker.X + " " + mouseTracker.Y);
+		/*console.log("Click at " + mouseTracker.X + " " + mouseTracker.Y);
 		if (mouseTracker.Clicked) {
 			mouseTracker.Clicked = false;
 			mouseTracker.DoubleClick(mouseTracker.GridX, mouseTracker.GridY);
@@ -298,11 +332,13 @@ var mouseTracker = {
 			mouseTracker.ClickTicks = 0;
 			mouseTracker.Clicked = true;
 		}
-		console.log("Grid coords: " + mouseTracker.GridX + "x" + mouseTracker.GridY);
+		console.log("Grid coords: " + mouseTracker.GridX + "x" + mouseTracker.GridY);*/
+		mouseTracker.Down = false;
+		mouseTracker.SingleClick(mouseTracker.GridX, mouseTracker.GridY);
 	},
 	
 	RegisterDown: function() {
-		console.log("Mouse down!");		
+		//console.log("Mouse down!");		
 		if (!mouseTracker.Dragging) {
 			mouseTracker.DownX = mouseTracker.GridX;
 			mouseTracker.DownY = mouseTracker.GridY;
@@ -332,14 +368,30 @@ var mouseTracker = {
 	},
 	
 	Update: function() {	
+		//Mouse over tracking
+		actionText.Clear();
+		if (!mouseTracker.Down && !mouseTracker.Dragging) {
+			try  {
+				if (!inventoryGrid.IsSlotEmpty(inventoryGrid.GetSlot(mouseTracker.GridX, mouseTracker.GridY))) {
+					text = EnumActions.ToString(activeAction);
+					text += " ";
+					var slot = inventoryGrid.GetSlot(mouseTracker.GridX, mouseTracker.GridY);
+					text += inventoryGrid.GetObjName(slot);
+					actionText.WriteTo(text);
+				}
+			} catch (error) {
+				//console.log(error);
+			}
+		}
+		
 		//Drag tracking
 		if (mouseTracker.Down && !mouseTracker.Dragging) { mouseTracker.DragTicks++;
-			if (mouseTracker.DragTicks >= 3) {
+			if (mouseTracker.DragTicks >= 6) {
 				mouseTracker.DragTicks = 0;
 				mouseTracker.MouseDrag();
 			}
 		}
-		
+		/*
 		//Click tracking
 		if (mouseTracker.Clicked) {mouseTracker.ClickTicks++;
 			console.log("" + mouseTracker.ClickTicks);
@@ -348,7 +400,7 @@ var mouseTracker = {
 				mouseTracker.Clicked = false;
 				mouseTracker.SingleClick(mouseTracker.GridX, mouseTracker.GridY);
 			}
-		}
+		}*/
 		
 		//Update holding box position
 		$("#holdingBox").x(mouseTracker.X-32).y(mouseTracker.Y-32);
@@ -381,15 +433,25 @@ var mouseTracker = {
 	//Mouse actions
 	SingleClick: function(gx, gy) {
 		var slot = inventoryGrid.GetSlot(gx, gy);
-		var desc = inventoryGrid.GetObjDesc(slot);
-		if (desc) matchConsole.Write(desc);
+		if (activeAction === EnumActions.Look) {
+			var desc = inventoryGrid.GetObjDesc(slot);
+			if (desc) matchConsole.Write(desc);
+		} else {
+			var obj = inventoryGrid.GameObjects[slot];
+			if (obj !== gameObjects["Empty"]) {
+				RegisterCommand(obj, activeAction, slot);
+			}
+			//actionHandler.HandleAction(obj, slot, activeAction);
+		}
 	},
 	
+	/*
+	//Deprecated
 	DoubleClick: function(gx, gy) {
 		var slot = inventoryGrid.GetSlot(gx, gy);
 		var obj = inventoryGrid.GameObjects[slot];
 		actionHandler.HandleAction(obj, slot);
-	},
+	},*/
 	
 	MouseDrag: function() {
 		var slot = inventoryGrid.GetSlot(mouseTracker.DownX, mouseTracker.DownY);
@@ -413,17 +475,21 @@ var mouseTracker = {
 ///////////
 var matchConsole = {
 	DisplayDiv: "consoleDiv",
-	Lines: [ 
-		"Welcome to ROBOCOOK!", 
-		"-", 
-		"-", 
-		"-", 
-		"-",
-		"-",
-		"-",
-		"-",
-		"-",
-	],
+	Lines: [],
+	
+	Init: function() {
+		matchConsole.Lines = [
+			"Welcome to ROBOCOOK!", 
+			"-", 
+			"-", 
+			"-", 
+			"-",
+			"-",
+			"-",
+			"-",
+			"-",
+		];
+	},
 	
 	Write: function(line) {
 		//this.Lines.shift();
@@ -441,140 +507,149 @@ var matchConsole = {
 	}
 };
 
-//////////////////
-//Action Handler//
-//////////////////
-/*
-var actionHandler = {
-	HandleAction: function(gobj, slot)	{
-		switch (gobj.ID) {
-			case "IngPotatoes":
-				matchConsole.Write("Player 1 peeled the potatoes.");
-				var nobj = new gameIngredient("IngPotatoesPeeled", "Peeled Potatoes", "IngPotatoesPeeled.PNG");
-				inventoryGrid.GameObjects[slot] = nobj;
-				inventoryGrid.ChangeSlotAnim(slot, nobj.Anim);
+//////////////
+//Action Bar//
+//////////////
+
+var EnumActions = {
+	Look: 70,
+	Use: 71,
+	Mix: 72,
+	Spread: 73,
+	TurnOnOff: 74,
+	Peel: 75,
+	Shape: 76,
+	Cut: 77,
+	
+	ToString: function(cmd) {
+		switch(cmd) {
+			case EnumActions.Look:
+				return "Look At";
 				break;
-				
-			case "AppOven":
-				matchConsole.Write("Player 1 turned the oven on.");
-				actionHandler.SwapAppliances(slot, gameObjects["AppOven"], gameObjects["AppOvenOn"]);
+			case EnumActions.Use:
+				return "Use";
 				break;
-				
-			case "AppOvenOn":
-				matchConsole.Write("Player 1 turned the oven off.");
-				actionHandler.SwapAppliances(slot, gameObjects["AppOvenOn"], gameObjects["AppOven"]);
+			case EnumActions.Mix:
+				return "Mix";
 				break;
-				
-			case "AppStoveTop":
-				matchConsole.Write("Player 1 turned the stove top on.");
-				actionHandler.SwapAppliances(slot, gameObjects["AppStoveTop"], gameObjects["AppStoveTopOn"]);
+			case EnumActions.Spread:
+				return "Spread";
 				break;
-				
-			case "AppStoveTopOn":
-				matchConsole.Write("Player 1 turned the stove top off.");
-				actionHandler.SwapAppliances(slot, gameObjects["AppStoveTopOn"], gameObjects["AppStoveTop"]);
+			case EnumActions.TurnOnOff:
+				return "Turn On/Off";
 				break;
-				
-			case "ContPotLarge":
-				if (actionHandler.VerifyContents(gobj, ["IngWater", "IngSaltTbsp"])) {
-					matchConsole.Write("Player 1 mixed salted water in the large pot!");
-					gobj.Contains.length = 0;
-					gobj.AddTo(new gameIngredient("IngSaltedWater", "Salted Water", ""));
-				} else if (actionHandler.VerifyContents(gobj, ["IngWater", "IngSaltDash"])) {
-					matchConsole.Write("Player 1 mixed lightly salted water in the large pot!");
-					gobj.Contains.length = 0;
-					gobj.AddTo(new gameIngredient("IngSaltedWaterLight", "Lightly Salted Water", ""));
-				} else if (actionHandler.VerifyContents(gobj, ["IngTenderPotatoes", "IngSaltedWater"])) {
-					matchConsole.Write("Player 1 drained the water from the pot!");
-					gobj.Contains.length = 0;
-					gobj.AddTo(new gameIngredient("IngTenderPotatoes", "Tender Potatoes", ""));
-				} else if (actionHandler.VerifyContents(gobj, ["IngCookedGnocchi", "IngSaltedWaterLight"])) {
-					matchConsole.Write("Player 1 drained the water from the pot!");
-					gobj.Contains.length = 0;
-					gobj.AddTo(new gameIngredient("IngCookedGnocchi", "Cooked Gnocchi", ""));
-				} else if (actionHandler.VerifyContents(gobj, ["IngTenderPotatoes"])) {
-					matchConsole.Write("Player 1 mashed the tender potatoes!");
-					gobj.Contains.length = 0;
-					gobj.AddTo(new gameIngredient("IngMashedPotatoes", "Mashed Potatoes", ""));
-				}
+			case EnumActions.Peel:
+				return "Peel";
 				break;
-				
-			case "ContBowlLarge":
-				if (actionHandler.VerifyContents(gobj, ["IngMashedPotatoes", "IngEgg", "IngCupOfFlour"])) {
-					matchConsole.Write("Player 1 combined the ingredients into dough!");
-					gobj.Contains.length = 0;
-					gobj.AddTo(new gameIngredient("IngDough", "Dough", ""));
-				} else if (actionHandler.VerifyContents(gobj, ["IngDough"])) {
-					matchConsole.Write("Player 1 kneaded the dough into a ball!");
-					gobj.Contains.length = 0;
-					gobj.AddTo(new gameIngredient("IngDoughBall", "Ball of Dough", ""));
-				} else if (actionHandler.VerifyContents(gobj, ["IngDoughBall"])) {
-					matchConsole.Write("Player 1 shaped the dough into snakes!");
-					gobj.Contains.length = 0;
-					gobj.AddTo(new gameIngredient("IngDoughSnakes", "Snakes of Dough", ""));
-				}
+			case EnumActions.Shape:
+				return "Shape";
 				break;
-				
-			case "ContCuttingBoard":
-				if (actionHandler.VerifyContents(gobj, ["IngCupOfFlour"])) {
-					matchConsole.Write("Player 1 floured the cutting board!");
-					gobj.Contains.length = 0;
-					inventoryGrid.GameObjects[slot] = gameObjects["ContCuttingBoardFloured"];
-				}
-				break;
-				
-			case "ContCuttingBoardFloured":
-				if (actionHandler.VerifyContents(gobj, ["IngDoughSnakes"])) {
-					matchConsole.Write("Player 1 cut the snakes into half-inch pieces of raw gnocchi!");
-					gobj.Contains.length = 0;
-					gobj.AddTo(new gameIngredient("IngRawGnocchi", "Raw Gnocchi", ""));
-				}
+			case EnumActions.Cut:
+				return "Cut";
 				break;
 		}
+		return "";
 	},
 	
-	UpdateAppliances: function() {
-		//Check stove top
-		try {
-			if (gameObjects["AppStoveTopOn"].Contains.length > 0) {
-				//console.log("Stove top on!");
-				//console.log(actionHandler.VerifyContents(inventoryGrid.GameObjects["app2"].Contains[0], ["IngSaltedWater", "IngPotatoesPeeled"]));
-				if (actionHandler.VerifyContents(gameObjects["AppStoveTopOn"].Contains[0], ["IngSaltedWater", "IngPotatoesPeeled"])) {
-					matchConsole.Write("The potatoes boiled in the salted water!  Now they are nice and tender.");
-					gameObjects["AppStoveTopOn"].Contains[0].Contains.length = 0;
-					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngTenderPotatoes", "Tender Potatoes", ""));
-					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngSaltedWater", "Salted Water", ""));
-				} else if (actionHandler.VerifyContents(gameObjects["AppStoveTopOn"].Contains[0], ["IngSaltedWaterLight", "IngRawGnocchi"])) {
-					matchConsole.Write("The gnocchi cooked until they rose to the top!");
-					gameObjects["AppStoveTopOn"].Contains[0].Contains.length = 0;
-					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngCookedGnocchi", "Cooked Gnocchi", ""));
-					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngSaltedWaterLight", "Lightly Salted Water", ""));
-				}
-			}
-		} catch(err) {
-			console.log("Error: " + err.message);
+	IsAction: function(cmd) {
+		switch(cmd) {
+			case EnumActions.Look:
+				return true;
+				break;
+			case EnumActions.Use:
+				return true;
+				break;
+			case EnumActions.Mix:
+				return true;
+				break;
+			case EnumActions.Spread:
+				return true;
+				break;
+			case EnumActions.TurnOnOff:
+				return true;
+				break;
+			case EnumActions.Peel:
+				return true;
+				break;
+			case EnumActions.Shape:
+				return true;
+				break;
+			case EnumActions.Cut:
+				return true;
+				break;
 		}
-	},
-	
-	SwapAppliances: function(slot, oapp, napp) {
-		oapp.TransferTo(napp);
-		inventoryGrid.GameObjects[slot] = napp;
-		inventoryGrid.ChangeSlotAnim(slot, napp.Anim);
-	},
-	
-	VerifyContents: function(gobj, arr) {
-		if (gobj.Contains.length !== arr.length) return false;
-		for (var i=0; i<arr.length; i++) {
-			var found = false;
-			for (var j=0; j<gobj.Contains.length; j++) {
-				console.log(gobj.Contains[j].ID + " vs " + arr[i]);
-				if (gobj.Contains[j].ID === arr[i]) {
-					console.log("Match!");
-					found = true;
-				}
-			}
-			if (!found) return false;
-		}
-		return true;
+		return false;
 	}
-};*/
+};
+
+var actionBar = {
+	DisplayDiv: "actionDiv",
+	Actions: [],
+	
+	Init: function(actions) {
+		actionBar.Actions = actions;
+		//Reset selector
+		activeAction = actionBar.Actions[0];
+		$("#actSelector").x(0);
+		
+		$("#act1").click(function(event) 
+		{
+			activeAction = actionBar.Actions[0];
+			$("#actSelector").x(0);
+		});
+		$("#act2").click(function(event) 
+		{
+			activeAction = actionBar.Actions[1];
+			$("#actSelector").x(64);
+		});
+		$("#act3").click(function(event) 
+		{
+			activeAction = actionBar.Actions[2];
+			$("#actSelector").x(128);
+		});
+		$("#act4").click(function(event) 
+		{
+			activeAction = actionBar.Actions[3];
+			$("#actSelector").x(192);
+		});
+		$("#act5").click(function(event) 
+		{
+			activeAction = actionBar.Actions[4];
+			$("#actSelector").x(256);
+		});
+		$("#act6").click(function(event) 
+		{
+			activeAction = actionBar.Actions[5];
+			$("#actSelector").x(320);
+		});
+		$("#act7").click(function(event) 
+		{
+			activeAction = actionBar.Actions[6];
+			$("#actSelector").x(384);
+		});
+	}
+};
+
+var actionText = {
+	DisplayDiv: "actionTextDiv",
+	
+	Init: function() {
+		$("#"+actionText.DisplayDiv)
+			.css({
+				"background-color":"gray", 
+				"font-size":"10pt", 
+				"color":"black", 
+				"overflow":"auto",
+				"vertical-align":"middle"
+				});
+	},
+	
+	WriteTo: function(text) {
+		$("#"+actionText.DisplayDiv)
+			.append(""+text);
+	},
+	
+	Clear: function() {
+		$("#"+actionText.DisplayDiv).empty();
+	}
+};

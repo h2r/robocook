@@ -6,13 +6,21 @@ var EnumGameCommands = {
 	Exit: 30,
 	Clear: 40,
 	Write: 50,
-	MatchReset: 60
+	MatchReset: 60,
+	Look: 70,
+	Use: 71,
+	Mix: 72,
+	Spread: 73,
+	TurnOnOff: 74,
+	Move: 80,
+	Transfer: 81
 };
 
 //Command object
-function GameCommand(enumCommand, target) {
+function GameCommand(enumCommand, target, predicate) {
 	this.Command = enumCommand;
 	this.Target = target;
+	this.Predicate = predicate;
 }
 
 function ComQueue() {
@@ -36,7 +44,13 @@ var gameCommandQueue = new ComQueue();
 
 function RegisterCommand(target, command) {
 	console.log("Command -> Registering command "+command+" for target "+target);
-	gameCommandQueue.Enqueue(new GameCommand(command, target));
+	gameCommandQueue.Enqueue(new GameCommand(command, target, ""));
+	console.log("Command -> "+gameCommandQueue.Length()+" commands in queue.");
+}
+
+function RegisterCommand(target, command, predicate) {
+	console.log("Command -> Registering command "+command+" for target "+target+" with predicate "+predicate);
+	gameCommandQueue.Enqueue(new GameCommand(command, target, predicate));
 	console.log("Command -> "+gameCommandQueue.Length()+" commands in queue.");
 }
 

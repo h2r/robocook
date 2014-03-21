@@ -232,6 +232,9 @@ function fnSceneMatch() {
 						if (command.Command === EnumGameCommands.MatchReset) {
 							CurrentGameState = EnumGameState.MatchInit;
 						}
+					} else if (EnumActions.IsAction(command.Command)) {
+							console.log("Command is action!");
+							actionHandler.HandleAction(command.Target, command.Predicate, command.Command)
 					}
 				}
 			}
