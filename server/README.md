@@ -1,7 +1,7 @@
 The robocook server.
 
 INSTALLATION
-————————
+---------------------------------------------------------
 
 Download jwebsocket server at
 https://jwebsocket.org/downloads/jwebsocket-latest-versions
@@ -12,7 +12,7 @@ http://www.mongodb.org/downloads
 There does not exist a build script for now. Open the server code in Eclipse or something.
 
 RUNNING
-—————————
+----------------------------------------------------------
 Start mongo server. Change dbpath to a directory where you want your db stored
 ./path_to_mongo/bin/mongod --dbpath=$HOME
 
