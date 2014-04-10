@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.jwebsocket.config.JWebSocketCommonConstants;
 import org.jwebsocket.config.JWebSocketServerConstants;
 import org.jwebsocket.console.JWebSocketTokenListenerSample;
+import org.jwebsocket.factory.JWebSocketFactory;
 import org.jwebsocket.kit.BroadcastOptions;
 import org.jwebsocket.kit.CloseReason;
 import org.jwebsocket.kit.WebSocketException;
@@ -15,6 +16,7 @@ import org.jwebsocket.kit.WebSocketServerEvent;
 import org.jwebsocket.kit.WebSocketSession;
 import org.jwebsocket.listener.WebSocketServerTokenEvent;
 import org.jwebsocket.logging.Logging;
+import org.jwebsocket.server.TokenServer;
 import org.jwebsocket.token.Token;
 import org.jwebsocket.api.IPacketDeliveryListener;
 import org.jwebsocket.api.ServerConfiguration;
@@ -54,7 +56,13 @@ public class RobocookServer implements WebSocketServerListener{
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
-		this.db = this.mongo.getDB(dbName);		
+		this.db = this.mongo.getDB(dbName);	
+		
+		TokenServer tokenServer = (TokenServer)JWebSocketFactory.getServer("ts0");
+		if( tokenServer != null ) {
+		  // and add the sample listener to the server's listener chain
+		  tokenServer.addListener(this);
+		}
 	}
 	
 	public String getNewCollectionID()
@@ -102,30 +110,50 @@ public class RobocookServer implements WebSocketServerListener{
 		String lNS = aToken.getNS();
 		String lType = aToken.getType();
 		
-		// check if token has a type and a matching namespace
-		if (lType != null && "my.namespace".equals(lNS)) {
-			// create a response token
-			Token lResponse = aEvent.createResponse(aToken);
-			if ("getInfo".equals(lType)) {
-			// if type is "getInfo" return some server information
-			lResponse.setString("vendor", JWebSocketCommonConstants.VENDOR_CE);
-			lResponse.setString("version", JWebSocketServerConstants.VERSION_STR);
-			lResponse.setString("copyright", JWebSocketCommonConstants.COPYRIGHT_CE);
-			lResponse.setString("license", JWebSocketCommonConstants.LICENSE_CE);
-		} else {
-			// if unknown type in this namespace, return corresponding error message
-			lResponse.setInteger("code", -1);
-			lResponse.setString("msg", "Token type '" + lType + "' not supported in namespace '" + lNS + "'.");
+		Token response = aEvent.createResponse(aToken);
+		String action = aToken.getString("action");
+		if (action.equals("new_game"))
+		{
+			Token msg = aToken.getToken("msg");
+			String id = this.initializeGame(msg.getString("type"));
+			response.setString("id", id);
 		}
-		aEvent.sendToken(lResponse);
-	    
+		else if (action.equals("take_action"))
+		{
+			Token msg = aToken.getToken("msg");
+			String id = aToken.getString("id");
+			String gameAction = msg.getString("action");
+			
+			//TODO this needs to parse correctly
+			List params = msg.getList("params");
+			
+			this.takeAction(id, gameAction, params, response);
 		}
+		else if (action.equals("ping"))
+		{
+			response.setString("msg", "hello");
+		}
+		
+		aEvent.sendToken(response);
 	}
 
 	public void processClosed(WebSocketServerEvent aEvent) {
 		log.info("Client '" + aEvent.getSessionId() + "' disconnected.");
 	}
 
+	public String initializeGame(String type)
+	{
+		// TODO Initialize new game
+		String id = this.getNewCollectionID();
+		return id;
+	}
+	
+	public Token takeAction(String id, String action, List<String> params, Token responseToken)
+	{
+		// TODO take action here
+		// TODO get new state in form of json/Token response
+		return responseToken;
+	}
 	
 	public static void main(String[] args) {
 		RobocookServer server = new RobocookServer("localhost", 27017, "myDB");
@@ -142,7 +170,5 @@ public class RobocookServer implements WebSocketServerListener{
 		{
 			System.out.println(object.toString());
 		}
-	}
-
-	
+	}	
 }
