@@ -16,6 +16,7 @@ import org.jwebsocket.kit.WebSocketServerEvent;
 import org.jwebsocket.kit.WebSocketSession;
 import org.jwebsocket.listener.WebSocketServerTokenEvent;
 import org.jwebsocket.logging.Logging;
+import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.server.TokenServer;
 import org.jwebsocket.token.Token;
 import org.jwebsocket.api.IPacketDeliveryListener;
@@ -43,10 +44,14 @@ import com.mongodb.ServerAddress;
 import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 
+import edu.brown.cs.h2r.baking.Experiments.BasicKitchen;
+import edu.brown.cs.h2r.baking.Recipes.Brownies;
+
 public class RobocookServer implements WebSocketServerListener{
 	private MongoClient mongo;
 	private DB db;
 	private static Logger log = Logging.getLogger(JWebSocketTokenListenerSample.class);
+	private Map<String, BasicKitchen> gameLookup;
 	
 	public RobocookServer(String ip, int port, String dbName)
 	{
@@ -145,13 +150,22 @@ public class RobocookServer implements WebSocketServerListener{
 	{
 		// TODO Initialize new game
 		String id = this.getNewCollectionID();
+		BasicKitchen kitchen = new BasicKitchen(new Brownies());
+		this.gameLookup.put(id,  kitchen);
 		return id;
 	}
 	
 	public Token takeAction(String id, String action, List<String> params, Token responseToken)
 	{
-		// TODO take action here
-		// TODO get new state in form of json/Token response
+		BasicKitchen kitchen = this.gameLookup.get(id);
+		String[] paramsArray = (String[])params.toArray();
+		String result = kitchen.takeAction(action, paramsArray);
+		
+		responseToken.setBoolean("failed", kitchen.getIsBotched());
+		responseToken.setBoolean("success", kitchen.getIsSuccess());
+		
+		Token token = JSONProcessor.JSONStringToToken(result);
+		responseToken.setToken("msg", token);
 		return responseToken;
 	}
 	
