@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Robocook</title>
+    <title>JWS Test</title>
  
     <!-- CSS -->
     <style></style>
@@ -12,14 +12,30 @@
 
     <!-- Preload Scripts -->
     <script src="jquery.js"></script>
+	<script src=".\res\js\jWebSocket.js"></script>
 	<script src="jwsplugin.js"></script>
 	
 	<!-- Main Game Scripts -->
-
 	<script>
-		//var lTokenClient = new jws.jWebSocketJSONClient();
-		//var lMyServerURL = "ws://jwebsocket.org/jWebSocket/jWebSocket";
-		$.jws.open();
+		$.jws.bind({
+			open: function(){
+				console.log("connection opened");
+			},
+			welcome: function(aWelcomeToken){
+				console.log(aWelcomeToken);
+			},
+			logon: function(){
+				console.log("Logged on jWebSocket Server");
+			},
+			logoff: function(){
+				console.log("logged off");
+			},
+			close: function(){
+				console.log("Connection closed");
+			}
+		});
+		var lMyServerURL = "ws://localhost:8787";
+		$.jws.open(lMyServerURL);
 	</script>
 </body>
 </html>
