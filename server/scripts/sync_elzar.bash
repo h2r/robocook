@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-cd ~/workspace/robocook
+cd ../..
 git pull
-rsync -avz -e ssh ~/workspace/robocook/ brawner@elzar:~/workspace/robocook/
+rsync -avz -e ssh ./ elzar:~/workspace/robocook/
