@@ -25,3 +25,10 @@ Start jwebsocket server
 ./path_to_jwebsocket/bin/jWebSocketServer.sh
 ```
 Start the Robocook server
+
+This expects an executable jar in the robocook/server directory. Build the project first
+
+```
+cd /path_to_robocook/server
+./scripts/launch.bash
+```
