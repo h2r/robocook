@@ -148,7 +148,6 @@ public class RobocookServer implements WebSocketServerListener{
 
 	public String initializeGame(String type)
 	{
-		// TODO Initialize new game
 		String id = this.getNewCollectionID();
 		BasicKitchen kitchen = new BasicKitchen(new Brownies());
 		this.gameLookup.put(id,  kitchen);
