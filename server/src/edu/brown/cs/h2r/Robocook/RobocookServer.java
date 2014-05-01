@@ -1,3 +1,5 @@
+package edu.brown.cs.h2r.Robocook;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -5,47 +7,27 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.jwebsocket.config.JWebSocketCommonConstants;
-import org.jwebsocket.config.JWebSocketServerConstants;
+import org.jwebsocket.api.WebSocketPacket;
+import org.jwebsocket.api.WebSocketServerListener;
 import org.jwebsocket.console.JWebSocketTokenListenerSample;
 import org.jwebsocket.factory.JWebSocketFactory;
-import org.jwebsocket.kit.BroadcastOptions;
-import org.jwebsocket.kit.CloseReason;
-import org.jwebsocket.kit.WebSocketException;
 import org.jwebsocket.kit.WebSocketServerEvent;
-import org.jwebsocket.kit.WebSocketSession;
 import org.jwebsocket.listener.WebSocketServerTokenEvent;
 import org.jwebsocket.logging.Logging;
 import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.server.TokenServer;
 import org.jwebsocket.token.Token;
-import org.jwebsocket.api.IPacketDeliveryListener;
-import org.jwebsocket.api.ServerConfiguration;
-import org.jwebsocket.api.WebSocketConnector;
-import org.jwebsocket.api.WebSocketEngine;
-import org.jwebsocket.api.WebSocketFilter;
-import org.jwebsocket.api.WebSocketFilterChain;
-import org.jwebsocket.api.WebSocketPacket;
-import org.jwebsocket.api.WebSocketPlugIn;
-import org.jwebsocket.api.WebSocketPlugInChain;
-import org.jwebsocket.api.WebSocketServer;
-import org.jwebsocket.api.WebSocketServerListener;
-import org.jwebsocket.async.IOFuture;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
-import com.mongodb.WriteConcern;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.DBCursor;
-import com.mongodb.ServerAddress;
-import com.mongodb.WriteResult;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
 
 import edu.brown.cs.h2r.baking.Experiments.BasicKitchen;
 import edu.brown.cs.h2r.baking.Recipes.Brownies;
+
 
 public class RobocookServer implements WebSocketServerListener{
 	private MongoClient mongo;
@@ -182,6 +164,17 @@ public class RobocookServer implements WebSocketServerListener{
 		for (DBObject object: objects)
 		{
 			System.out.println(object.toString());
+		}
+		
+		while(true)
+		{
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				System.out.println("Exiting due to interrupted sleep");
+				System.exit(0);
+				
+			}
 		}
 	}	
 }
