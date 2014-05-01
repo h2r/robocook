@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-cd ../
+cd ../java
 java -jar robocook_server.jar
