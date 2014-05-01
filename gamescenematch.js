@@ -216,10 +216,18 @@ var inventoryGrid = {
 	},
 	
 	
-	//The state array indicies need to match up with the indicies in the SlotsEnum
-	//So 1-3 appliances, 4-15 containers, 16-41 ingredients
-	LoadState: function(stateArray)
+	
+	//state should be a collection with the following parameters
+	// keys -> are the name ids of objects (e.g. "AppOven" for the oven)
+	// values -> are the indicies in SlotsEnum which hold the name of the slot the object belongs in
+	LoadState: function(state)
 	{
+		//Empty gameobjects
+		$.each(gameObjects, function(key, value) {
+			if (value.Contains) {
+				value.Contains.length = 0;
+			}
+		});
 		
 	},
 	

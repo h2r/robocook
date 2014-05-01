@@ -63,6 +63,7 @@ function gameIngredient(id, name, sprite, infinite, fnDesc)
 		if (gobj.Type === EnumGOType.Cont) {			
 			console.log(this.Name + " acted on " + gobj.Name);
 			matchConsole.Write("Player 1 transferred " + this.Name + " to the " + gobj.Name);
+			//Report to server here
 			gobj.AddTo(this);
 			if (this.Infinite) throw "Ingredient is infinite!";
 		} else if (gobj.Type === EnumGOType.App) {
@@ -123,6 +124,7 @@ function gameContainer(id, name, sprite)
 			console.log(this.Name + " acted on " + gobj.Name);
 			try {
 				gobj.AddTo(this);
+				//Report action to server here
 				matchConsole.Write("Player 1 moved " + this.Name + " to the " + gobj.Name);
 				inventoryGrid.ChangeSlotAnim(slot + "Box", this.Anim);
 			} catch(err) {
@@ -131,6 +133,7 @@ function gameContainer(id, name, sprite)
 			//throw "test";
 		} else if (gobj.Type === EnumGOType.Cont) {
 			this.TransferTo(gobj);
+			//Report action to server here
 			matchConsole.Write("Player 1 transferred the contents of " + this.Name + " to the " + gobj.Name);
 			throw "Do not delete container!";
 		} else {
