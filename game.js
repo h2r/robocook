@@ -36,6 +36,24 @@ var EnumGameState = {
 	PostMatch: 80	//Post main play conditions, restart?
 };
 
+$.jws.bind({
+	open: function(){
+		console.log("Connection to server opened.");
+	},
+	welcome: function(aWelcomeToken){
+		console.log(aWelcomeToken);
+	},
+	logon: function(){
+		console.log("Logged on jWebSocket Server");
+	},
+	logoff: function(){
+		console.log("logged off of server");
+	},
+	close: function(){
+		console.log("Connection to server closed");
+	}
+});
+
 var CurrentGameState = EnumGameState.GameInit;
 
 function fnMain(jQuery){
@@ -198,8 +216,8 @@ function fnSceneMatchmaking() {
 			gameSceneSplash.Trans();
 			break;
 	}
-}*/
-
+}
+*/
 
 function fnSceneMatch() {
 	switch(CurrentGameState)
