@@ -215,6 +215,14 @@ var inventoryGrid = {
 		$("#"+slot).setAnimation();
 	},
 	
+	
+	//The state array indicies need to match up with the indicies in the SlotsEnum
+	//So 1-3 appliances, 4-15 containers, 16-41 ingredients
+	LoadState: function(stateArray)
+	{
+		
+	},
+	
 	Init: function() {
 		
 		//Initialize
