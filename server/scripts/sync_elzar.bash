@@ -2,4 +2,4 @@
 
 cd ../..
 git pull
-rsync -avz -e ssh ./ elzar:~/workspace/robocook/
+rsync -avz --exclude '.git' -e ssh ./ elzar:~/workspace/robocook/
