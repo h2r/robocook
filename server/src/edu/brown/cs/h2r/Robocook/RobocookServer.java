@@ -13,6 +13,7 @@ import org.jwebsocket.console.JWebSocketTokenListenerSample;
 import org.jwebsocket.factory.JWebSocketFactory;
 import org.jwebsocket.kit.WebSocketServerEvent;
 import org.jwebsocket.listener.WebSocketServerTokenEvent;
+import org.jwebsocket.listener.WebSocketServerTokenListener;
 import org.jwebsocket.logging.Logging;
 import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.server.TokenServer;
@@ -29,7 +30,7 @@ import edu.brown.cs.h2r.baking.Experiments.BasicKitchen;
 import edu.brown.cs.h2r.baking.Recipes.Brownies;
 
 
-public class RobocookServer implements WebSocketServerListener{
+public class RobocookServer implements WebSocketServerTokenListener{
 	private MongoClient mongo;
 	private DB db;
 	private static Logger log = Logging.getLogger(JWebSocketTokenListenerSample.class);
