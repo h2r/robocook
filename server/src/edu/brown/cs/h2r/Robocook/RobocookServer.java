@@ -33,7 +33,7 @@ import edu.brown.cs.h2r.baking.Recipes.Brownies;
 public class RobocookServer implements WebSocketServerTokenListener{
 	private MongoClient mongo;
 	private DB db;
-	private static Logger log = Logging.getLogger(JWebSocketTokenListenerSample.class);
+	private static Logger log = Logging.getLogger(WebSocketServerTokenListener.class);
 	private Map<String, BasicKitchen> gameLookup;
 	
 	public RobocookServer(String ip, int port, String dbName)
