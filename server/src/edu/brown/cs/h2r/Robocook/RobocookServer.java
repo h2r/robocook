@@ -8,8 +8,6 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.jwebsocket.api.WebSocketPacket;
-import org.jwebsocket.api.WebSocketServerListener;
-import org.jwebsocket.console.JWebSocketTokenListenerSample;
 import org.jwebsocket.factory.JWebSocketFactory;
 import org.jwebsocket.kit.WebSocketServerEvent;
 import org.jwebsocket.listener.WebSocketServerTokenEvent;
@@ -33,7 +31,7 @@ import edu.brown.cs.h2r.baking.Recipes.Brownies;
 public class RobocookServer implements WebSocketServerTokenListener{
 	private MongoClient mongo;
 	private DB db;
-	private static Logger log = Logging.getLogger(WebSocketServerTokenListener.class);
+	private static Logger log = Logging.getLogger(RobocookServer.class);
 	private Map<String, BasicKitchen> gameLookup;
 	
 	public RobocookServer(String ip, int port, String dbName)
@@ -155,6 +153,7 @@ public class RobocookServer implements WebSocketServerTokenListener{
 	}
 	
 	public static void main(String[] args) {
+		JWebSocketFactory.start();
 		RobocookServer server = new RobocookServer("localhost", 27017, "myDB");
 		String id = server.getNewCollectionID();
 		
@@ -176,9 +175,11 @@ public class RobocookServer implements WebSocketServerTokenListener{
 				Thread.sleep(10);
 			} catch (InterruptedException e) {
 				System.out.println("Exiting due to interrupted sleep");
+				JWebSocketFactory.stop();
 				System.exit(0);
 				
 			}
 		}
+		
 	}	
 }
