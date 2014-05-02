@@ -9,7 +9,7 @@ function fnMain(){
 	var lMsg = jws.MSG_WS_NOT_SUPPORTED;
 	alert( lMsg );
 	}
-    var lURL = "ws://128.148.36.93:8787";
+    var lURL = "ws://127.0.0.1:8787";
     var gUsername = "guest";
 	var lPassword = "guest";
 				

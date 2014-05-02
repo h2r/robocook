@@ -151,11 +151,11 @@ public class RobocookServer implements WebSocketServerTokenListener{
 	public static void main(String[] args) {
 		try {  
 			// the following line must not be removed due to GNU LGPL 3.0 license!  
-			JWebSocketFactory.printCopyrightToConsole();  
+			//JWebSocketFactory.printCopyrightToConsole();  
 			// check if home, config or bootstrap path are passed by command line  
-			JWebSocketConfig.initForConsoleApp(args); 
+			//JWebSocketConfig.initForConsoleApp(args); 
 			
-		    JWebSocketFactory.start();  
+		    //JWebSocketFactory.start();  
 		  
 		    RobocookServer server = new RobocookServer("localhost", 27017, "myDB");
 			String id = server.getNewCollectionID();
@@ -190,7 +190,7 @@ public class RobocookServer implements WebSocketServerTokenListener{
 		    System.out.println(lEx.getClass().getSimpleName() + " on starting jWebsocket server: " + lEx.getMessage());  
 		    lEx.printStackTrace();  
 		} finally {  
-		    JWebSocketFactory.stop();  
+		    //JWebSocketFactory.stop();  
 		}  
 	}	
 }
