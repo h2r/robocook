@@ -9,6 +9,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.jwebsocket.api.WebSocketPacket;
 import org.jwebsocket.factory.JWebSocketFactory;
+import org.jwebsocket.instance.JWebSocketInstance;
 import org.jwebsocket.kit.WebSocketServerEvent;
 import org.jwebsocket.listener.WebSocketServerTokenEvent;
 import org.jwebsocket.listener.WebSocketServerTokenListener;
@@ -153,33 +154,43 @@ public class RobocookServer implements WebSocketServerTokenListener{
 	}
 	
 	public static void main(String[] args) {
-		JWebSocketFactory.start();
-		RobocookServer server = new RobocookServer("localhost", 27017, "myDB");
-		String id = server.getNewCollectionID();
-		
-		String data1 = "{\"hello\": \"world\"}";
-		server.logData(id, data1);
-		
-		String data2 = "{\"goodbye\": \"world\"}";
-		server.logData(id, data2);
-		
-		List<DBObject> objects = server.getCollectionItems(id);
-		for (DBObject object: objects)
-		{
-			System.out.println(object.toString());
-		}
-		
-		while(true)
-		{
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
-				System.out.println("Exiting due to interrupted sleep");
-				JWebSocketFactory.stop();
-				System.exit(0);
-				
+		try {  
+		    JWebSocketFactory.start();  
+		  
+		    RobocookServer server = new RobocookServer("localhost", 27017, "myDB");
+			String id = server.getNewCollectionID();
+			
+			String data1 = "{\"hello\": \"world\"}";
+			server.logData(id, data1);
+			
+			String data2 = "{\"goodbye\": \"world\"}";
+			server.logData(id, data2);
+			
+			List<DBObject> objects = server.getCollectionItems(id);
+			for (DBObject object: objects)
+			{
+				System.out.println(object.toString());
 			}
-		}
-		
+		    // get the token server  
+		    TokenServer lTS0 = (TokenServer) JWebSocketFactory.getServer("ts0");  
+		    if (lTS0 != null) {  
+		        // and add the sample listener to the server's listener chain  
+		        lTS0.addListener(server);  
+		    }  
+		  
+		    // remain here until shut down request  
+		    while (JWebSocketInstance.getStatus() != JWebSocketInstance.SHUTTING_DOWN) {  
+		        try {  
+		            Thread.sleep(250);  
+		        } catch (InterruptedException lEx) {  
+		            // no handling required here  
+		        }  
+		    }  
+		} catch (Exception lEx) {  
+		    System.out.println(lEx.getClass().getSimpleName() + " on starting jWebsocket server: " + lEx.getMessage());  
+		    lEx.printStackTrace();  
+		} finally {  
+		    JWebSocketFactory.stop();  
+		}  
 	}	
 }
