@@ -8,6 +8,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.jwebsocket.api.WebSocketPacket;
+import org.jwebsocket.config.JWebSocketConfig;
 import org.jwebsocket.factory.JWebSocketFactory;
 import org.jwebsocket.instance.JWebSocketInstance;
 import org.jwebsocket.kit.WebSocketServerEvent;
@@ -44,12 +45,6 @@ public class RobocookServer implements WebSocketServerTokenListener{
 			e.printStackTrace();
 		}
 		this.db = this.mongo.getDB(dbName);	
-		
-		TokenServer tokenServer = (TokenServer)JWebSocketFactory.getServer("ts0");
-		if( tokenServer != null ) {
-		  // and add the sample listener to the server's listener chain
-		  tokenServer.addListener(this);
-		}
 	}
 	
 	public String getNewCollectionID()
@@ -155,6 +150,11 @@ public class RobocookServer implements WebSocketServerTokenListener{
 	
 	public static void main(String[] args) {
 		try {  
+			// the following line must not be removed due to GNU LGPL 3.0 license!  
+			JWebSocketFactory.printCopyrightToConsole();  
+			// check if home, config or bootstrap path are passed by command line  
+			JWebSocketConfig.initForConsoleApp(args); 
+			
 		    JWebSocketFactory.start();  
 		  
 		    RobocookServer server = new RobocookServer("localhost", 27017, "myDB");
