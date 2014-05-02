@@ -85,6 +85,7 @@ public class RobocookServer implements WebSocketServerListener{
 	
 	public void processOpened(WebSocketServerEvent aEvent) {
 		log.info("Client '" + aEvent.getSessionId() + "' connected.");
+		System.out.println("Client '" + aEvent.getSessionId() + "' connected.");
 	}
 
 	public void processPacket(WebSocketServerEvent aEvent, WebSocketPacket aPacket) {
@@ -93,6 +94,8 @@ public class RobocookServer implements WebSocketServerListener{
 
 	public void processToken(WebSocketServerTokenEvent aEvent, Token aToken) {
 		log.info("Client '" + aEvent.getSessionId() + "' sent Token: '" + aToken.toString() + "'.");
+		System.out.println("Client '" + aEvent.getSessionId() + "' sent Token: '" + aToken.toString() + "'.");
+		
 		// here you can interpret the token type sent from the client according to your needs.
 		String lNS = aToken.getNS();
 		String lType = aToken.getType();
