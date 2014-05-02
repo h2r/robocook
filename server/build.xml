@@ -22,14 +22,22 @@
     <target name="compile" description="Compiles">
         <mkdir dir="${classes.dir}"/>
         <javac srcdir="${src.dir}" destdir="${classes.dir}">
-            <classpath refid="external.classpath" />
+            <classpath>
+                <pathelement path="${lib.dir}/h2r-baking.jar" />
+                <pathelement path="${lib.dir}/jWebSocketServer-1.0.jar" />
+                <pathelement path="${lib.dir}/jWebSocketServerAPI-1.0.jar" />
+                <pathelement path="${lib.dir}/mongo-java-driver-2.12.0-rc3.jar" />
+            </classpath>
         </javac>
     </target>
     
     <target name="robocook_server" description="Creates Robocook Server jar" depends="compile">
         <jar destfile="${ant.project.name}.jar" basedir="${classes.dir}">
+            <zipgroupfileset dir="${lib.dir}">
+                
+            </zipgroupfileset>
             <manifest>
-                <attribute name="Main-Class" value="edu.brown.cs.h2r.Robocook.RobocookServer"/>
+                <attribute name="Main-Class" value="RobocookServer"/>
             </manifest>
         </jar>
     </target>

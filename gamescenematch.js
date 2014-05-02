@@ -215,6 +215,22 @@ var inventoryGrid = {
 		$("#"+slot).setAnimation();
 	},
 	
+	
+	
+	//state should be a collection with the following parameters
+	// keys -> are the name ids of objects (e.g. "AppOven" for the oven)
+	// values -> are the indicies in SlotsEnum which hold the name of the slot the object belongs in
+	LoadState: function(state)
+	{
+		//Empty gameobjects
+		$.each(gameObjects, function(key, value) {
+			if (value.Contains) {
+				value.Contains.length = 0;
+			}
+		});
+		
+	},
+	
 	Init: function() {
 		
 		//Initialize

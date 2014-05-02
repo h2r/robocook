@@ -55,10 +55,12 @@ var ingListBrownies = [
 //////////////////
 var gnocchiHandler = {
 	HandleAction: function(gobj, slot, action)	{
+		var succ = false;
 		switch (gobj.ID) {
 			case "IngPotatoes":
 				if (action === EnumActions.Peel) {
 					matchConsole.Write("Player 1 peeled the potatoes.");
+					succ = true;
 					var nobj = new gameIngredient("IngPotatoesPeeled", "Peeled Potatoes", "IngPotatoesPeeled.PNG", true);
 					inventoryGrid.GameObjects[slot] = nobj;
 					inventoryGrid.ChangeSlotAnim(slot, nobj.Anim);
@@ -70,6 +72,7 @@ var gnocchiHandler = {
 			case "AppOven":
 				if (action === EnumActions.TurnOnOff) {
 					matchConsole.Write("Player 1 turned the oven on.");
+					succ = true;
 					actionHandler.SwapAppliances(slot, gameObjects["AppOven"], gameObjects["AppOvenOn"]);
 				} else {
 					matchConsole.Write("Command " + EnumActions.ToString(action) + " is invalid for that!");
@@ -79,6 +82,7 @@ var gnocchiHandler = {
 			case "AppOvenOn":
 				if (action === EnumActions.TurnOnOff) {
 					matchConsole.Write("Player 1 turned the oven off.");
+					succ = true;
 					actionHandler.SwapAppliances(slot, gameObjects["AppOvenOn"], gameObjects["AppOven"]);
 				} else {
 					matchConsole.Write("Command " + EnumActions.ToString(action) + " is invalid for that!");
@@ -88,6 +92,7 @@ var gnocchiHandler = {
 			case "AppStoveTop":
 				if (action === EnumActions.TurnOnOff) {
 					matchConsole.Write("Player 1 turned the stove top on.");
+					succ = true;
 					actionHandler.SwapAppliances(slot, gameObjects["AppStoveTop"], gameObjects["AppStoveTopOn"]);
 				} else {
 					matchConsole.Write("Command " + EnumActions.ToString(action) + " is invalid for that!");
@@ -97,6 +102,7 @@ var gnocchiHandler = {
 			case "AppStoveTopOn":
 				if (action === EnumActions.TurnOnOff) {
 					matchConsole.Write("Player 1 turned the stove top off.");
+					succ = true;
 					actionHandler.SwapAppliances(slot, gameObjects["AppStoveTopOn"], gameObjects["AppStoveTop"]);
 				} else {
 					matchConsole.Write("Command " + EnumActions.ToString(action) + " is invalid for that!");
@@ -107,10 +113,12 @@ var gnocchiHandler = {
 				if (action === EnumActions.Use) {
 					if (actionHandler.VerifyContents(gobj, ["IngTenderPotatoes", "IngSaltedWater"])) {
 						matchConsole.Write("Player 1 drained the water from the pot!");
+						succ = true;
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngTenderPotatoes", "Tender Potatoes", ""));
 					} else if (actionHandler.VerifyContents(gobj, ["IngCookedGnocchi", "IngSaltedWaterLight"])) {
 						matchConsole.Write("Player 1 drained the water from the pot!");
+						succ = true;
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngCookedGnocchi", "Cooked Gnocchi", ""));
 					} else {
@@ -119,6 +127,7 @@ var gnocchiHandler = {
 				} else if (action === EnumActions.Mix) {
 					if (actionHandler.VerifyContents(gobj, ["IngTenderPotatoes"])) {
 						matchConsole.Write("Player 1 mashed the tender potatoes!");
+						succ = true;
 						$("#rlist2").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngMashedPotatoes", "Mashed Potatoes", ""));
@@ -134,6 +143,7 @@ var gnocchiHandler = {
 				if (action === EnumActions.Mix) {
 					if (actionHandler.VerifyContents(gobj, ["IngMashedPotatoes", "IngEgg", "IngCupOfFlour"])) {
 						matchConsole.Write("Player 1 combined the ingredients into dough!");
+						succ = true;
 						$("#rlist3").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngDough", "Dough", ""));
@@ -143,11 +153,13 @@ var gnocchiHandler = {
 				} else if (action === EnumActions.Shape) {
 					if (actionHandler.VerifyContents(gobj, ["IngDough"])) {
 						matchConsole.Write("Player 1 kneaded the dough into a ball!");
+						succ = true;
 						$("#rlist4").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngDoughBall", "Ball of Dough", ""));
 					} else if (actionHandler.VerifyContents(gobj, ["IngDoughBall"])) {
 						matchConsole.Write("Player 1 shaped the dough into snakes!");
+						succ = true;
 						$("#rlist5").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngDoughSnakes", "Snakes of Dough", ""));
@@ -163,6 +175,7 @@ var gnocchiHandler = {
 				if (action === EnumActions.Spread) {
 					if (actionHandler.VerifyContents(gobj, ["IngCupOfFlour"])) {
 						matchConsole.Write("Player 1 floured the cutting board!");
+						succ = true;
 						gobj.Contains.length = 0;
 						inventoryGrid.GameObjects[slot] = gameObjects["ContCuttingBoardFloured"];
 					} else {
@@ -177,6 +190,7 @@ var gnocchiHandler = {
 				if (action === EnumActions.Cut) {
 					if (actionHandler.VerifyContents(gobj, ["IngDoughSnakes"])) {
 						matchConsole.Write("Player 1 cut the snakes into half-inch pieces of raw gnocchi!");
+						succ = true;
 						$("#rlist6").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngRawGnocchi", "Raw Gnocchi", ""));
@@ -187,6 +201,9 @@ var gnocchiHandler = {
 					matchConsole.Write("Command " + EnumActions.ToString(action) + " is invalid for that!");
 				}
 				break;
+		}
+		if (succ) {
+			ReportCmdSucc(gobj.ID, slot, action, matchConsole.Lines[matchConsole.length-1]);
 		}
 	},
 	
@@ -251,10 +268,12 @@ var brownieHandler = {
 	ColdOvenFlag: false,
 
 	HandleAction: function(gobj, slot, action)	{
+		var succ = false;
 		switch (gobj.ID) {				
 			case "AppOven":
 				if (action === EnumActions.TurnOnOff) {
 					matchConsole.Write("Player 1 turned the oven on.");
+					succ = true;
 					if (gameObjects["AppOven"].IsEmpty()) 
 					{
 						$("#rlist0").css({"color":"orange"});
@@ -268,6 +287,7 @@ var brownieHandler = {
 			case "AppOvenOn":
 				if (action === EnumActions.TurnOnOff) {
 					matchConsole.Write("Player 1 turned the oven off.");
+					succ = true;
 					actionHandler.SwapAppliances(slot, gameObjects["AppOvenOn"], gameObjects["AppOven"]);
 				} else {
 					matchConsole.Write("Command " + EnumActions.ToString(action) + " is invalid for that!");
@@ -277,6 +297,7 @@ var brownieHandler = {
 			case "AppStoveTop":
 				if (action === EnumActions.TurnOnOff) {
 					matchConsole.Write("Player 1 turned the stove top on.");
+					succ = true;
 					actionHandler.SwapAppliances(slot, gameObjects["AppStoveTop"], gameObjects["AppStoveTopOn"]);
 				} else {
 					matchConsole.Write("Command " + EnumActions.ToString(action) + " is invalid for that!");
@@ -286,6 +307,7 @@ var brownieHandler = {
 			case "AppStoveTopOn":
 				if (action === EnumActions.TurnOnOff) {
 					matchConsole.Write("Player 1 turned the stove top off.");
+					succ = true;
 					actionHandler.SwapAppliances(slot, gameObjects["AppStoveTopOn"], gameObjects["AppStoveTop"]);
 				} else {
 					matchConsole.Write("Command " + EnumActions.ToString(action) + " is invalid for that!");
@@ -316,11 +338,13 @@ var brownieHandler = {
 				if (action === EnumActions.Mix) {
 					if (actionHandler.VerifyContents(gobj, ["IngButterMelted", "IngEgg", "IngSugar", "IngVanillaExtract"])) {
 						matchConsole.Write("Player 1 stirred Eggs, Sugar and Vanilla into the Melted Butter!");
+						succ = true;
 						$("#rlist3").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngBatterPrecursor", "Partially Completed Batter", ""));
 					} else if (actionHandler.VerifyContents(gobj, ["IngBatterPrecursor", "IngCocoaPowder", "IngBakingPowder", "IngCupOfFlour", "IngSalt"])) {
 						matchConsole.Write("Player 1 beat Cocoa, Baking Powder, Flour and Salt into the Batter!");
+						succ = true;
 						$("#rlist4").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngBatter", "Brownie Batter", ""));
@@ -340,11 +364,13 @@ var brownieHandler = {
 				if (action === EnumActions.Mix) {
 					if (actionHandler.VerifyContents(gobj, ["IngButterMelted", "IngEgg", "IngSugar", "IngVanillaExtract"])) {
 						matchConsole.Write("Player 1 stirred Eggs, Sugar and Vanilla into the Melted Butter!");
+						succ = true;
 						$("#rlist3").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngBatterPrecursor", "Partially Completed Batter", ""));
 					} else if (actionHandler.VerifyContents(gobj, ["IngBatterPrecursor", "IngCocoaPowder", "IngBakingPowder", "IngCupOfFlour", "IngSalt"])) {
 						matchConsole.Write("Player 1 beat Cocoa, Baking Powder, Flour and Salt into the Batter!");
+						succ = true;
 						$("#rlist4").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngBatter", "Brownie Batter", ""));
@@ -354,6 +380,7 @@ var brownieHandler = {
 				} else if (action === EnumActions.Spread) {
 					if (actionHandler.VerifyContents(gobj, ["IngButter"])) {
 						matchConsole.Write("Player 1 greased the baking dish!");
+						succ = true;
 						gobj.Contains.length = 0;
 						inventoryGrid.GameObjects[slot] = gameObjects["ContBakingDishGreased"];
 					} else {
@@ -369,6 +396,7 @@ var brownieHandler = {
 					if (actionHandler.VerifyContents(gobj, ["IngCupOfFlour"])) {
 						$("#rlist1").css({"color":"orange"});
 						matchConsole.Write("Player 1 floured the baking dish!");
+						succ = true;
 						gobj.Contains.length = 0;
 						inventoryGrid.GameObjects[slot] = gameObjects["ContBakingDishGreasedFloured"];
 					} else {
@@ -383,6 +411,7 @@ var brownieHandler = {
 				if (action === EnumActions.Spread) {
 					if (actionHandler.VerifyContents(gobj, ["IngBatter"])) {
 							matchConsole.Write("Player 1 spread the batter in the baking dish!");
+							succ = true;
 							$("#rlist5").css({"color":"orange"});
 							gobj.Contains.length = 0;
 							gobj.AddTo(new gameIngredient("IngBatterSpread", "Spread Brownie Batter", ""));
@@ -398,11 +427,13 @@ var brownieHandler = {
 				if (action === EnumActions.Mix) {
 					if (actionHandler.VerifyContents(gobj, ["IngButterMelted", "IngEgg", "IngSugar", "IngVanillaExtract"])) {
 						matchConsole.Write("Player 1 stirred Eggs, Sugar and Vanilla into the Melted Butter!");
+						succ = true;
 						$("#rlist3").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngBatterPrecursor", "Partially Completed Batter", ""));
 					} else if (actionHandler.VerifyContents(gobj, ["IngBatterPrecursor", "IngCocoaPowder", "IngBakingPowder", "IngCupOfFlour", "IngSalt"])) {
 						matchConsole.Write("Player 1 beat Cocoa, Baking Powder, Flour and Salt into the Batter!");
+						succ = true;
 						$("#rlist4").css({"color":"orange"});
 						gobj.Contains.length = 0;
 						gobj.AddTo(new gameIngredient("IngBatter", "Brownie Batter", ""));
@@ -413,6 +444,9 @@ var brownieHandler = {
 					matchConsole.Write("Command " + EnumActions.ToString(action) + " is invalid for that!");
 				}
 				break;
+		}
+		if (succ) {
+			ReportCmdSucc(gobj.ID, slot, action, matchConsole.Lines[matchConsole.length-1]);
 		}
 	},
 	
