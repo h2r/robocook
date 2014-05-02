@@ -6,6 +6,39 @@
 	<classpathentry kind="lib" path="lib/jWebSocketServer-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/jWebSocketServerAPI-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/h2r-baking.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-annotations-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-client-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-continuation-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-deploy-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-http-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-io-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-jaas-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-jaspi-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-jmx-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-jndi-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-plus-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-proxy-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-rewrite-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-schemas-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-security-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-server-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-servlet-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-servlets-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-util-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-webapp-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-xml-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/annotations/asm-4.1.jar"/>
+	<classpathentry kind="lib" path="lib/annotations/asm-commons-4.1.jar"/>
+	<classpathentry kind="lib" path="lib/annotations/javax.annotation-api-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/websocket/javax-websocket-client-impl-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/websocket/javax-websocket-server-impl-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/websocket/javax.websocket-api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/websocket/websocket-api-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/websocket/websocket-client-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/websocket/websocket-common-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/websocket/websocket-server-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/websocket/websocket-servlet-9.1.4.v20140401.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

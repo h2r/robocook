@@ -19,6 +19,7 @@ import org.jwebsocket.packetProcessors.JSONProcessor;
 import org.jwebsocket.server.TokenServer;
 import org.jwebsocket.token.Token;
 
+
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -84,6 +85,7 @@ public class RobocookServer implements WebSocketServerTokenListener{
 	}
 
 	public void processPacket(WebSocketServerEvent aEvent, WebSocketPacket aPacket) {
+		System.out.println("Packet: " + aPacket);
 		// here you can process any non-token low level message, if desired
 	}
 

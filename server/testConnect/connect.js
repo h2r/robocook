@@ -14,16 +14,20 @@ function fnMain(){
 	var lPassword = "guest";
 				
 	console.log( "Connecting to " + lURL + " and logging in as '" + gUsername + "'..." );
+	id = "null";
 	var oRes = jWebSocketClient.open(lURL, {
 	
 		// OnOpen callback
 		OnOpen: function( aEvent ) {
 			console.log("jWebSocket connection established." );
-			
 		},
 		// OnMessage callback
 		OnMessage: function( aEvent, aToken ) {
 			console.log( "jWebSocket '" + aToken.type + "' token received, full message: '" + aEvent.data + "'" );
+			if (aToken.type == "welcome")
+			{
+				id = aToken.sourceId;
+			}
 		},
 		// OnClose callback
 		OnClose: function( aEvent ) {
@@ -33,27 +37,37 @@ function fnMain(){
 
 	console.log( jWebSocketClient.resultToString( oRes ) );
 	
-	var opened = false
+	window.setTimeout(function(){
+		sendMessage(jWebSocketClient, id)
+	})
 	
-	//console.log( jWebSocketClient.resultToString( lRes ) );
-	sendMessage(jWebSocketClient)
 }
 
-function sendMessage(client)
+function sendMessage(client, id)
 {
 	var lToken = {
 	  ns: "my.namespace",
-	  type: "send",
-	  action: "ping"
+	  data: {action: "ping"},
+	  sourceId: id
 	};
 	if (client.isConnected())
 	{
 		console.log("Sending token");
-		jWebSocketClient.sendToken( lToken, {
+		client.sendToken( lToken, {
 		  OnResponse: function( aToken ) {
-		    log("Server responded: "
-		      + aToken.msg
-		    );
+		    console.log("Server responded: " + aToken.msg);
+		  },
+
+		  OnSuccess: function(aEvent, aToken) {
+		  	console.log("Sending token succeeded " + aToken.msg);
+		  },
+
+		  OnFailure: function(aEvent, aToken) {
+		  	console.log("Sending token failed " + aToken.msg);
+		  },
+
+		  OnTimeout: function(aEvent) {
+		  	console.log("Timeout exceeded " + aEvent.data);
 		  }
 		});
 	}
@@ -61,4 +75,9 @@ function sendMessage(client)
 	{
 		console.log("Not Connected");
 	}
+	window.setTimeout(function(){
+		sendMessage(client, id);
+
+
+	},1000);
 }
