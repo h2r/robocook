@@ -203,7 +203,7 @@ var gnocchiHandler = {
 				break;
 		}
 		if (succ) {
-			ReportCmdSucc(gobj.ID, slot, action, matchConsole.Lines[matchConsole.length-1]);
+			gameConnect.ReportCmdSucc(gobj.ID, gobj.ID, EnumActions.ToString(action), matchConsole.Peek());
 		}
 	},
 	
@@ -215,18 +215,21 @@ var gnocchiHandler = {
 					matchConsole.Write("The salt and water are brought to a boil!");
 					gameObjects["AppStoveTopOn"].Contains[0].Contains.length = 0;
 					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngBoilingSaltedWater", "Boiling Salted Water", ""));
+					gameConnect.ReportTransform("IngWater, IngSalt","AppOvenOn","IngBoilingSaltedWater",matchConsole.Peek());
 					$("#rlist0").css({"color":"orange"});
 					$("#rlist7").css({"color":"orange"});
 				} else if (actionHandler.VerifyContents(gameObjects["AppStoveTopOn"].Contains[0], ["IngBoilingSaltedWater", "IngPotatoesPeeled"])) {
 					matchConsole.Write("The potatoes boiled in the salted water!  Now they are nice and tender.");
 					gameObjects["AppStoveTopOn"].Contains[0].Contains.length = 0;
 					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngTenderPotatoes", "Tender Potatoes", ""));
+					gameConnect.ReportTransform("IngBoilingSaltedWater, IngPotatoesPeeled","AppOvenOn","IngTenderPotatoes",matchConsole.Peek());
 					$("#rlist1").css({"color":"orange"});
 					//gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngSaltedWater", "Salted Water", ""));
 				} else if (actionHandler.VerifyContents(gameObjects["AppStoveTopOn"].Contains[0], ["IngBoilingSaltedWater", "IngRawGnocchi"])) {
 					matchConsole.Write("The gnocchi cooked until they rose to the top!");
 					gameObjects["AppStoveTopOn"].Contains[0].Contains.length = 0;
 					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngCookedGnocchi", "Cooked Gnocchi", ""));
+					gameConnect.ReportTransform("IngBoilingSaltedWater, IngRawGnocchi","AppOvenOn","IngCookedGnocchi",matchConsole.Peek());
 					$("#rlist8").css({"color":"orange"});
 					winFlag = true;
 					//gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngSaltedWater", "Salted Water", ""));
@@ -446,7 +449,7 @@ var brownieHandler = {
 				break;
 		}
 		if (succ) {
-			ReportCmdSucc(gobj.ID, slot, action, matchConsole.Lines[matchConsole.length-1]);
+			gameConnect.ReportCmdSucc(gobj.ID, gobj.ID, EnumActions.ToString(action), matchConsole.Peek());
 		}
 	},
 	
@@ -466,6 +469,8 @@ var brownieHandler = {
 					$("#rlist2").css({"color":"orange"});
 					gameObjects["AppStoveTopOn"].Contains[0].Contains.length = 0;
 					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngButterMelted", "Melted Butter", ""));
+					//Report to server
+					gameConnect.ReportTransform("IngButter","AppStoveTopOn","IngButterMelted",matchConsole.Peek());
 				}
 			}
 			
@@ -475,11 +480,13 @@ var brownieHandler = {
 						matchConsole.Write("The oven was not preheated.  The brownies are undercooked!");
 						gameObjects["AppOvenOn"].Contains[0].Contains.length = 0;
 						gameObjects["AppOvenOn"].Contains[0].AddTo(new gameIngredient("IngFailBrownies", "Chocolate Failure", ""));
+						gameConnect.ReportTransform("IngBatterSpread","AppOvenOn","IngFailBrownies",matchConsole.Peek());
 					} else {
 						matchConsole.Write("The brownies cook perfectly in the preheated oven!");
 						gameObjects["AppOvenOn"].Contains[0].Contains.length = 0;
 						gameObjects["AppOvenOn"].Contains[0].AddTo(new gameIngredient("IngBrownies", "Delicious Brownies", ""));
 						$("#rlist6").css({"color":"orange"});
+						gameConnect.ReportTransform("IngBatterSpread","AppOvenOn","IngBrownies",matchConsole.Peek());
 						winFlag = true;
 					}
 				} else if (actionHandler.VerifyContents(gameObjects["AppOvenOn"].Contains[0], ["IngBatter"])) {
@@ -487,6 +494,7 @@ var brownieHandler = {
 						matchConsole.Write("The batter was not spread out properly so the result is big lump!");
 						gameObjects["AppOvenOn"].Contains[0].Contains.length = 0;
 						gameObjects["AppOvenOn"].Contains[0].AddTo(new gameIngredient("IngFailBrownies", "Chocolate Failure", ""));
+						gameConnect.ReportTransform("IngBatter","AppOvenOn","IngFailBrownies",matchConsole.Peek());
 					}
 				}
 			}
@@ -506,7 +514,7 @@ var brownieHandler = {
 		for (var i=0; i<arr.length; i++) {
 			var found = false;
 			for (var j=0; j<gobj.Contains.length; j++) {
-				console.log(gobj.Contains[j].ID + " vs " + arr[i]);
+				//console.log(gobj.Contains[j].ID + " vs " + arr[i]);
 				if (gobj.Contains[j].ID === arr[i]) {
 					console.log("Match!");
 					found = true;

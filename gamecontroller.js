@@ -65,11 +65,6 @@ function FetchNextCommand() {
 	}
 }
 
-//Please note the functions which report success are contained in either gameobjects.js or gamerecipes.js.
-function ReportCmdSucc(obj, slot, action, log) {
-	//Code here to submit to server
-}
-
 var serverSimulator = {
 	CommandQueue: new ComQueue(),
 

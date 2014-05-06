@@ -296,12 +296,13 @@ var inventoryGrid = {
 			var origin = inventoryGrid.GetSlot(mouseTracker.DownX, mouseTracker.DownY);
 			obj.ActOn(gobj, slot, origin);
 		} else {
-			console.log(slot);
+			//console.log(slot);
 			if ((slot.charAt(0) === "c" ) === (obj.Type === EnumGOType.Ing)) {
 				throw "Placing object in mismatched slot!";
 			} else {
 				inventoryGrid.GameObjects[slot] = obj;
 				$("#"+slot).setAnimation(obj.Anim);
+				gameConnect.ReportCmdSucc(obj.ID, slot, "move", "");
 			}
 		}
 	},
@@ -510,6 +511,10 @@ var matchConsole = {
 			"-",
 			"-",
 		];
+	},
+	
+	Peek: function() {
+		return this.Lines[this.Lines.length-1];
 	},
 	
 	Write: function(line) {
