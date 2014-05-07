@@ -17,6 +17,9 @@
 * Implement tutorial
 */
 
+//Enum game state below tells the game what its current state is
+//To change state set CurrentGameState to the appropriate state
+//Note that game scenes may need to be reset() as well
 var EnumGameState = {
 	GameInit: 0,		//Game initializing, precache
 	SplashInit: 10,		//Splash intro
@@ -36,24 +39,11 @@ var EnumGameState = {
 	PostMatch: 80	//Post main play conditions, restart?
 };
 
-$.jws.bind({
-	open: function(){
-		console.log("Connection to server opened.");
-	},
-	welcome: function(aWelcomeToken){
-		console.log(aWelcomeToken);
-	},
-	logon: function(){
-		console.log("Logged on jWebSocket Server");
-	},
-	logoff: function(){
-		console.log("logged off of server");
-	},
-	close: function(){
-		console.log("Connection to server closed");
-	}
-});
+//Connect to server here
+//gameConnect.wsurl="ws://127.0.0.1:8080";
+gameConnect.Init();
 
+//Set initial game state
 var CurrentGameState = EnumGameState.GameInit;
 
 function fnMain(jQuery){

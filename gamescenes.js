@@ -1,3 +1,13 @@
+/////////////////////////////////////////////////
+//gamescenes.js
+//-----------------------------------------------
+//File contains code for all miscellaneous
+//	scenes that are not large enough to merit
+//	their own files.
+//-----------------------------------------------
+//Note:
+/////////////////////////////////////////////////
+
 var EnumGameMode = {
 	None: 0,
 	Singleplayer: 1,
@@ -107,6 +117,13 @@ var gameSceneMainMenu = {
 		console.log("Main Menu Scene -> Processing singleplayer command...");
 		gameSceneMatch.GameMode = EnumGameMode.Singleplayer;	//Set game mode to SP
 		console.log("Main Menu Scene -> Setting game mode to singleplayer.");
+		var msg = {
+			msgtype: "newgame",
+			mode: "singleplayer",
+			recipe: "brownies"
+		};
+		gameConnect.Send(msg);
+		console.log("Main Menu Scene -> Paging server...");
 		CurrentGameState = EnumGameState.MainMenuTrans;		
 		console.log("Main Menu Scene -> Setting game state to transition.");
 	},
@@ -120,6 +137,13 @@ var gameSceneMainMenu = {
 		console.log("Main Menu Scene -> Processing singleplayer command...");
 		gameSceneMatch.GameMode = EnumGameMode.Singleplayer;	//Set game mode to SP
 		console.log("Main Menu Scene -> Setting game mode to singleplayer.");
+		var msg = {
+			msgtype: "newgame",
+			mode: "singleplayer",
+			recipe: "gnocchi"
+		};
+		gameConnect.Send(msg);
+		console.log("Main Menu Scene -> Paging server...");
 		CurrentGameState = EnumGameState.MainMenuTrans;		
 		console.log("Main Menu Scene -> Setting game state to transition.");
 	},
