@@ -31,6 +31,8 @@
                 <pathelement path="${lib.dir}/websocket/websocket-servlet-9.1.4.v20140401.jar" />
                 <pathelement path="${lib.dir}/jetty-server-9.1.4.v20140401.jar" />
                 <pathelement path="${lib.dir}/jetty-util-9.1.4.v20140401.jar" />
+                <pathelement path="${lib.dir}/jetty-http-9.1.4.v20140401.jar" />
+                <pathelement path="${lib.dir}/jetty-io-9.1.4.v20140401.jar" />
                 <pathelement path="${lib.dir}/servlet-api-3.1.jar" />
             </classpath>
         </javac>

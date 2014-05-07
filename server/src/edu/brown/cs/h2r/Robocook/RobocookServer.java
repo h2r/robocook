@@ -206,7 +206,7 @@ public class RobocookServer{
 
 	
 	public static void main(String[] args) {
-	    RobocookServer server = new RobocookServer("localhost", 27017, "myDB");
+	    RobocookServer robocookServer = new RobocookServer("localhost", 27017, "myDB");
 	    Server webSocketServer = new Server(8787);
 	    WebSocketHandler handeler = new WebSocketHandler() {
 	    	@Override
@@ -228,15 +228,15 @@ public class RobocookServer{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		String id = server.getNewCollectionID();
+		String id = robocookServer.getNewCollectionID();
 		
 		String data1 = "{\"hello\": \"world\"}";
-		server.logData(id, data1);
+		robocookServer.logData(id, data1);
 		
 		String data2 = "{\"goodbye\": \"world\"}";
-		server.logData(id, data2);
+		robocookServer.logData(id, data2);
 		
-		List<DBObject> objects = server.getCollectionItems(id);
+		List<DBObject> objects = robocookServer.getCollectionItems(id);
 		for (DBObject object: objects)
 		{
 			System.out.println(object.toString());
