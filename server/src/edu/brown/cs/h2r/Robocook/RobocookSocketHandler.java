@@ -15,7 +15,7 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 import com.mongodb.util.JSON;
 
 @WebSocket
-public class MyWebSocketHandler {
+public class RobocookSocketHandler {
 
     @OnWebSocketClose
     public void onClose(int statusCode, String reason) {
@@ -40,10 +40,10 @@ public class MyWebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(String message) {
     	Object obj = JSON.parse(message);
-    	HashMap<String, Object> map = (HashMap<String, Object>)obj;
-    	if (!map.isEmpty()) 
+    	RobocookServerToken token = (RobocookServerToken)obj;
+    	if (!token.isEmpty()) 
     	{
-    		Object msgObject = map.get("msg");
+    		Object msgObject = token.get("msg");
     		String msg = (String)msgObject;
     	}
         System.out.println("Message: " + message);
