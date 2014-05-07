@@ -9,6 +9,4 @@ public class TokenCastException extends Exception {
 	public TokenCastException(ClassCastException e) {
 		this.setStackTrace(e.getStackTrace());
 	}
-	
-	
 }

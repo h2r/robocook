@@ -24,9 +24,14 @@
         <javac srcdir="${src.dir}" destdir="${classes.dir}">
             <classpath>
                 <pathelement path="${lib.dir}/h2r-baking.jar" />
-                <pathelement path="${lib.dir}/jWebSocketServer-1.0.jar" />
-                <pathelement path="${lib.dir}/jWebSocketServerAPI-1.0.jar" />
                 <pathelement path="${lib.dir}/mongo-java-driver-2.12.0-rc3.jar" />
+                <pathelement path="${lib.dir}/websocket/websocket-api-9.1.4.v20140401.jar" />
+                <pathelement path="${lib.dir}/websocket/websocket-common-9.1.4.v20140401.jar" />
+                <pathelement path="${lib.dir}/websocket/websocket-server-9.1.4.v20140401.jar" />
+                <pathelement path="${lib.dir}/websocket/websocket-servlet-9.1.4.v20140401.jar" />
+                <pathelement path="${lib.dir}/jetty-server-9.1.4.v20140401.jar" />
+                <pathelement path="${lib.dir}/jetty-util-9.1.4.v20140401.jar" />
+                <pathelement path="${lib.dir}/servlet-api-3.1.jar" />
             </classpath>
         </javac>
     </target>
