@@ -39,12 +39,18 @@
     </target>
     
     <target name="robocook_server" description="Creates Robocook Server jar" depends="compile">
+        <jar jarfile="${classes.dir}/external-libs.jar">
+          <zipgroupfileset dir="lib/">
+            <include name="**/*.jar"/>
+          </zipgroupfileset>
+        </jar>
+        <sleep seconds="1"/>
         <jar destfile="${ant.project.name}.jar" basedir="${classes.dir}">
-            <zipgroupfileset dir="${lib.dir}">
-                
-            </zipgroupfileset>
+            <zipfileset src="${classes.dir}/external-libs.jar">
+                <exclude name="META-INF/**/*"/>
+            </zipfileset>
             <manifest>
-                <attribute name="Main-Class" value="RobocookServer"/>
+                <attribute name="Main-Class" value="edu.brown.cs.h2r.Robocook.RobocookServer"/>
             </manifest>
         </jar>
     </target>
