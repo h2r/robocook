@@ -1,20 +1,33 @@
 package edu.brown.cs.h2r.Robocook;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.util.JSON;
 
-public class RobocookServerToken extends HashMap<String, Object> {
+public class RobocookServerToken extends LinkedHashMap<String, Object> {
 
 	private static final String ERROR_KEY = "Error";
+	
+	public RobocookServerToken() {
+		
+	}
+	
+	public RobocookServerToken(LinkedHashMap<String, Object> map) {
+		this.putAll(map);
+	}
+	
 	public String toJSONString() {
 		return JSON.serialize(this);
 	}
 	
 	public static RobocookServerToken tokenFromJSONString(String jsonStr) {
 		Object obj = JSON.parse(jsonStr);
-    	return (RobocookServerToken)obj;
+		BasicDBObject dbObj = (BasicDBObject)obj;
+		
+		return new RobocookServerToken(dbObj);
 	}
 	
 	public Object getObject(String key) {

@@ -3,6 +3,7 @@ package edu.brown.cs.h2r.Robocook;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -14,9 +15,11 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.common.WebSocketSession;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -26,6 +29,7 @@ import com.mongodb.util.JSON;
 
 import edu.brown.cs.h2r.baking.Experiments.BasicKitchen;
 import edu.brown.cs.h2r.baking.Recipes.Brownies;
+import edu.brown.cs.h2r.baking.Recipes.Recipe;
 
 @WebSocket
 public class RobocookServer{
@@ -33,6 +37,19 @@ public class RobocookServer{
 	private MongoClient mongo;
 	private DB db;
 	private Map<String, BasicKitchen> gameLookup;
+	private Session session;
+	public RobocookServer() {
+		try 
+		{
+			this.mongo = new MongoClient("localhost", 27017);
+		} 
+		catch (UnknownHostException e) 
+		{
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		this.db = this.mongo.getDB("myDB");	
+	}
 	
 	public RobocookServer(String ip, int port, String dbName)
 	{
@@ -95,20 +112,21 @@ public class RobocookServer{
         System.out.println("Connect: " + session.getRemoteAddress().getAddress());
         try {
             session.getRemote().sendString("Hello Webbrowser");
+            this.session = session;
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
 	@OnWebSocketMessage
-    public void onText(Session session, String message) {
-    	Object obj = JSON.parse(message);
-    	RobocookServerToken token = (RobocookServerToken)obj;
+    public void onMessage(String message)
+	{		
+    	RobocookServerToken token = RobocookServerToken.tokenFromJSONString(message);
     	RobocookServerToken response = this.processToken(token);
     	if (!response.isEmpty())
     	{
     		try {
-				session.getRemote().sendString(response.toJSONString());
+				this.session.getRemote().sendString(response.toJSONString());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -136,17 +154,17 @@ public class RobocookServer{
 		if (msgtype.equals("init"))
 		{
 			// Get desired new game type from token
-			String gameType;
-			try 
+			String gameType = "single";
+			/*try 
 			{
-				RobocookServerToken msg = token.getToken("msg");
-				gameType = msg.getString("type");
+				//RobocookServerToken msg = token.getToken("msg");
+				gameType = "single";
 			} 
 			catch (TokenCastException e) 
 			{
 				response.setBoolean("Error", true);
 				return response;
-			}
+			}*/
 			
 			String id = this.initializeGame(gameType);
 			response.setString("id", id);
@@ -184,8 +202,12 @@ public class RobocookServer{
 
 	public String initializeGame(String type)
 	{
+		if (this.gameLookup == null) {
+			this.gameLookup = new HashMap<String, BasicKitchen>();
+		}
 		String id = this.getNewCollectionID();
-		BasicKitchen kitchen = new BasicKitchen(new Brownies());
+		Recipe brownies = new Brownies();
+		BasicKitchen kitchen = new BasicKitchen(brownies);
 		this.gameLookup.put(id,  kitchen);
 		return id;
 	}
@@ -208,6 +230,7 @@ public class RobocookServer{
 	public static void main(String[] args) {
 	    RobocookServer robocookServer = new RobocookServer("localhost", 27017, "myDB");
 	    Server webSocketServer = new Server(8787);
+
 	    WebSocketHandler handeler = new WebSocketHandler() {
 	    	@Override
 	        public void configure(WebSocketServletFactory factory)
