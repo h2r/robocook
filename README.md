@@ -6,6 +6,32 @@ Installation
 ============
 Download as archive and place in a directory of your choosing.  Open index.html in a browser of your choice to run.
 
+Implemented Messaging Structure
+===============================
+
+Client is started, sends new game request with info (1 player, 2 player)
+	- Server creates anonymous ID
+	- Server starts mongo collection for epidose, logs request, sends client ID back if needed
+	- If 2 player, specifies type in collection (other human, robot, random robot)
+	- responds with ready message, and anon ID
+
+Client acts, sends ID and requested action
+	- server logs request
+	- server gets gets next action (if applicable)
+	- if game is over, sends message success/failure
+	- if server/client get out of sync send FAIL
+	- if server crashes, send FAIL
+
+Message: New game request
+{
+	clientid: <client sends own id if it knows it from previous sessions>
+	
+}
+
+
+
+
+
 Proposed Messaging Structure
 =============================
 Client is started, sends new game request with info (1 player, 2 player)
