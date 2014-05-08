@@ -1,24 +1,21 @@
 package edu.brown.cs.h2r.Robocook;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
-import org.jwebsocket.api.WebSocketPacket;
-import org.jwebsocket.config.JWebSocketConfig;
-import org.jwebsocket.factory.JWebSocketFactory;
-import org.jwebsocket.instance.JWebSocketInstance;
-import org.jwebsocket.kit.WebSocketServerEvent;
-import org.jwebsocket.listener.WebSocketServerTokenEvent;
-import org.jwebsocket.listener.WebSocketServerTokenListener;
-import org.jwebsocket.logging.Logging;
-import org.jwebsocket.packetProcessors.JSONProcessor;
-import org.jwebsocket.server.TokenServer;
-import org.jwebsocket.token.Token;
-
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.server.WebSocketHandler;
+import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -30,18 +27,21 @@ import com.mongodb.util.JSON;
 import edu.brown.cs.h2r.baking.Experiments.BasicKitchen;
 import edu.brown.cs.h2r.baking.Recipes.Brownies;
 
-
-public class RobocookServer implements WebSocketServerTokenListener{
+@WebSocket
+public class RobocookServer{
+	private static final String MSGTYPE_STRING = "msgtype";
 	private MongoClient mongo;
 	private DB db;
-	private static Logger log = Logging.getLogger(RobocookServer.class);
 	private Map<String, BasicKitchen> gameLookup;
 	
 	public RobocookServer(String ip, int port, String dbName)
 	{
-		try {
+		try 
+		{
 			this.mongo = new MongoClient(ip, port);
-		} catch (UnknownHostException e) {
+		} 
+		catch (UnknownHostException e) 
+		{
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
@@ -79,53 +79,107 @@ public class RobocookServer implements WebSocketServerTokenListener{
 		return objects;
 	}
 	
-	public void processOpened(WebSocketServerEvent aEvent) {
-		log.info("Client '" + aEvent.getSessionId() + "' connected.");
-		System.out.println("Client '" + aEvent.getSessionId() + "' connected.");
-	}
+	@OnWebSocketClose
+    public void onClose(int statusCode, String reason) {
+        System.out.println("Close: statusCode=" + statusCode + ", reason=" + reason);
+    }
 
-	public void processPacket(WebSocketServerEvent aEvent, WebSocketPacket aPacket) {
-		System.out.println("Packet: " + aPacket);
-		// here you can process any non-token low level message, if desired
-	}
+	@OnWebSocketError
+    public void onError(Throwable t) {
+        System.out.println("Error: " + t.getMessage());
 
-	public void processToken(WebSocketServerTokenEvent aEvent, Token aToken) {
-		log.info("Client '" + aEvent.getSessionId() + "' sent Token: '" + aToken.toString() + "'.");
-		System.out.println("Client '" + aEvent.getSessionId() + "' sent Token: '" + aToken.toString() + "'.");
-		
+    }
+
+	@OnWebSocketConnect
+    public void onConnect(Session session) {
+        System.out.println("Connect: " + session.getRemoteAddress().getAddress());
+        try {
+            session.getRemote().sendString("Hello Webbrowser");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+	@OnWebSocketMessage
+    public void onText(Session session, String message) {
+    	Object obj = JSON.parse(message);
+    	RobocookServerToken token = (RobocookServerToken)obj;
+    	RobocookServerToken response = this.processToken(token);
+    	if (!response.isEmpty())
+    	{
+    		try {
+				session.getRemote().sendString(response.toJSONString());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    }
+    
+	public RobocookServerToken processToken(RobocookServerToken token)
+	{
 		// here you can interpret the token type sent from the client according to your needs.
-		String lNS = aToken.getNS();
-		String lType = aToken.getType();
+		RobocookServerToken response = new RobocookServerToken();
 		
-		Token response = aEvent.createResponse(aToken);
-		String action = aToken.getString("action");
-		if (action.equals("new_game"))
+		// Get desired action from token
+		String msgtype;
+		try 
 		{
-			Token msg = aToken.getToken("msg");
-			String id = this.initializeGame(msg.getString("type"));
+			msgtype = token.getString(RobocookServer.MSGTYPE_STRING);
+		} 
+		catch (TokenCastException e) 
+		{
+			response.setBoolean("Error", true);
+			return response;
+		}
+		
+		if (msgtype.equals("init"))
+		{
+			// Get desired new game type from token
+			String gameType;
+			try 
+			{
+				RobocookServerToken msg = token.getToken("msg");
+				gameType = msg.getString("type");
+			} 
+			catch (TokenCastException e) 
+			{
+				response.setBoolean("Error", true);
+				return response;
+			}
+			
+			String id = this.initializeGame(gameType);
 			response.setString("id", id);
 		}
-		else if (action.equals("take_action"))
+		else if (msgtype.equals("action"))
 		{
-			Token msg = aToken.getToken("msg");
-			String id = aToken.getString("id");
-			String gameAction = msg.getString("action");
+			RobocookServerToken msg;
+			String id;
+			String gameAction;
+			List<String> params;
 			
-			//TODO this needs to parse correctly
-			List params = msg.getList("params");
+			// Get msg, id, gameaction and params from token
+			try 
+			{
+				msg = token.getToken("msg");
+				id = token.getString("id");
+				gameAction = msg.getString("action");
+				params = msg.getStringList("params");
+			} 
+			catch (TokenCastException e) 
+			{
+				response.setBoolean("Error", true);
+				return response;
+			}
 			
 			this.takeAction(id, gameAction, params, response);
 		}
-		else if (action.equals("ping"))
+		else if (msgtype.equals("ping"))
 		{
 			response.setString("msg", "hello");
 		}
 		
-		aEvent.sendToken(response);
-	}
-
-	public void processClosed(WebSocketServerEvent aEvent) {
-		log.info("Client '" + aEvent.getSessionId() + "' disconnected.");
+		return response;
 	}
 
 	public String initializeGame(String type)
@@ -136,7 +190,7 @@ public class RobocookServer implements WebSocketServerTokenListener{
 		return id;
 	}
 	
-	public Token takeAction(String id, String action, List<String> params, Token responseToken)
+	public RobocookServerToken takeAction(String id, String action, List<String> params, RobocookServerToken responseToken)
 	{
 		BasicKitchen kitchen = this.gameLookup.get(id);
 		String[] paramsArray = (String[])params.toArray();
@@ -145,54 +199,57 @@ public class RobocookServer implements WebSocketServerTokenListener{
 		responseToken.setBoolean("failed", kitchen.getIsBotched());
 		responseToken.setBoolean("success", kitchen.getIsSuccess());
 		
-		Token token = JSONProcessor.JSONStringToToken(result);
+		RobocookServerToken token = RobocookServerToken.tokenFromJSONString(result);
 		responseToken.setToken("msg", token);
 		return responseToken;
 	}
+
 	
 	public static void main(String[] args) {
-		try {  
-			// the following line must not be removed due to GNU LGPL 3.0 license!  
-			//JWebSocketFactory.printCopyrightToConsole();  
-			// check if home, config or bootstrap path are passed by command line  
-			//JWebSocketConfig.initForConsoleApp(args); 
-			
-		    //JWebSocketFactory.start();  
-		  
-		    RobocookServer server = new RobocookServer("localhost", 27017, "myDB");
-			String id = server.getNewCollectionID();
-			
-			String data1 = "{\"hello\": \"world\"}";
-			server.logData(id, data1);
-			
-			String data2 = "{\"goodbye\": \"world\"}";
-			server.logData(id, data2);
-			
-			List<DBObject> objects = server.getCollectionItems(id);
-			for (DBObject object: objects)
-			{
-				System.out.println(object.toString());
-			}
-		    // get the token server  
-		    TokenServer lTS0 = (TokenServer) JWebSocketFactory.getServer("ts0");  
-		    if (lTS0 != null) {  
-		        // and add the sample listener to the server's listener chain  
-		        lTS0.addListener(server);  
-		    }  
-		  
-		    // remain here until shut down request  
-		    while (JWebSocketInstance.getStatus() != JWebSocketInstance.SHUTTING_DOWN) {  
-		        try {  
-		            Thread.sleep(250);  
-		        } catch (InterruptedException lEx) {  
-		            // no handling required here  
-		        }  
-		    }  
-		} catch (Exception lEx) {  
-		    System.out.println(lEx.getClass().getSimpleName() + " on starting jWebsocket server: " + lEx.getMessage());  
-		    lEx.printStackTrace();  
-		} finally {  
-		    //JWebSocketFactory.stop();  
-		}  
-	}	
+	    RobocookServer robocookServer = new RobocookServer("localhost", 27017, "myDB");
+	    Server webSocketServer = new Server(8787);
+	    WebSocketHandler handeler = new WebSocketHandler() {
+	    	@Override
+	        public void configure(WebSocketServletFactory factory)
+	        {
+	            factory.register(RobocookServer.class);
+	        }		    	
+	    };
+        webSocketServer.setHandler(handeler);
+        try {
+			webSocketServer.start();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        try {
+			webSocketServer.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String id = robocookServer.getNewCollectionID();
+		
+		String data1 = "{\"hello\": \"world\"}";
+		robocookServer.logData(id, data1);
+		
+		String data2 = "{\"goodbye\": \"world\"}";
+		robocookServer.logData(id, data2);
+		
+		List<DBObject> objects = robocookServer.getCollectionItems(id);
+		for (DBObject object: objects)
+		{
+			System.out.println(object.toString());
+		}
+	    
+	    
+		try {
+			while (webSocketServer.isRunning()) {
+				Thread.sleep(10);
+		    }
+		} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		}
+	}
 }
