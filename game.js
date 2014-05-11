@@ -40,8 +40,8 @@ var EnumGameState = {
 };
 
 //Connect to server here
-//gameConnect.wsurl="ws://127.0.0.1:8080";
-gameConnect.wsurl="ws://elzar.cs.brown.edu:8787";
+gameConnect.wsurl="ws://127.0.0.1:8787";
+//gameConnect.wsurl="ws://elzar.cs.brown.edu:8787";
 gameConnect.Init();
 
 //Set initial game state

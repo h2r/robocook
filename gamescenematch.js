@@ -12,9 +12,9 @@ var gameSceneMatch = {
 		console.log("Match Scene -> Initializing.");
 		
 		//Connect to server
-		console.log("Attempting to connect to server.");
-		var lMyServerURL = "ws://elzar.cs.brown.edu:8787";
-		$.jws.open(lMyServerURL);
+		//console.log("Attempting to connect to server.");
+		//var lMyServerURL = "ws://elzar.cs.brown.edu:8787";
+		//$.jws.open(lMyServerURL);
 		
 		//Load kitchen
 		inventoryGrid.Init();

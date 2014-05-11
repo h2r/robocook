@@ -166,8 +166,8 @@ public class RobocookServer{
 				return response;
 			}*/
 			
-			String id = this.initializeGame(gameType);
-			response.setString("id", id);
+			this.initializeGame(gameType, response);
+			
 		}
 		else if (msgtype.equals("action"))
 		{
@@ -180,7 +180,7 @@ public class RobocookServer{
 			try 
 			{
 				msg = token.getToken("msg");
-				id = token.getString("id");
+				id = token.getString("clientId");
 				gameAction = msg.getString("action");
 				params = msg.getStringList("params");
 			} 
@@ -200,7 +200,7 @@ public class RobocookServer{
 		return response;
 	}
 
-	public String initializeGame(String type)
+	public void initializeGame(String type, RobocookServerToken token)
 	{
 		if (this.gameLookup == null) {
 			this.gameLookup = new HashMap<String, BasicKitchen>();
@@ -209,13 +209,16 @@ public class RobocookServer{
 		Recipe brownies = new Brownies();
 		BasicKitchen kitchen = new BasicKitchen(brownies);
 		this.gameLookup.put(id,  kitchen);
-		return id;
+		String newState = kitchen.resetCurrentState();
+		RobocookServerToken newStateToken = RobocookServerToken.tokenFromJSONString(newState);
+		token.setToken("state", newStateToken);
+		token.setString("clientId", id);
 	}
 	
 	public RobocookServerToken takeAction(String id, String action, List<String> params, RobocookServerToken responseToken)
 	{
 		BasicKitchen kitchen = this.gameLookup.get(id);
-		String[] paramsArray = (String[])params.toArray();
+		String[] paramsArray = params.toArray(new String[params.size()]);
 		String result = kitchen.takeAction(action, paramsArray);
 		
 		responseToken.setBoolean("failed", kitchen.getIsBotched());

@@ -1,9 +1,11 @@
 package edu.brown.cs.h2r.Robocook;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.util.JSON;
 
@@ -25,6 +27,17 @@ public class RobocookServerToken extends LinkedHashMap<String, Object> {
 	
 	public static RobocookServerToken tokenFromJSONString(String jsonStr) {
 		Object obj = JSON.parse(jsonStr);
+		if (obj instanceof BasicDBList) {
+			List<Object> tokens = new ArrayList<Object>();
+			BasicDBList list = (BasicDBList)obj;
+			for (Object dbObj : list) {
+				tokens.add(new RobocookServerToken((BasicDBObject)dbObj));
+			}
+			RobocookServerToken token = new RobocookServerToken();
+			token.setList("data", tokens);
+			return token;
+		}
+		
 		BasicDBObject dbObj = (BasicDBObject)obj;
 		
 		return new RobocookServerToken(dbObj);
@@ -106,12 +119,7 @@ public class RobocookServerToken extends LinkedHashMap<String, Object> {
 	}
 	
 	public RobocookServerToken getToken(String key)  throws TokenCastException  {
-		try {
-			return (RobocookServerToken)this.getObject(key);
-		}
-		catch (ClassCastException e) {
-			throw e;
-		}
+		return new RobocookServerToken((LinkedHashMap<String, Object>)this.getObject(key));
 	}
 	
 	public void setToken(String key, RobocookServerToken value) {
@@ -127,9 +135,18 @@ public class RobocookServerToken extends LinkedHashMap<String, Object> {
 		}
 	}
 	
+	public void setList(String key, List<Object> list) {
+		this.setObject(key, list);
+	}
+	
 	public List<String> getStringList(String key)  throws TokenCastException  {
+		BasicDBList oldList = (BasicDBList)this.getObject(key);
+		List<String> list = new ArrayList<String>();
 		try {
-			return (List<String>)this.getObject(key);
+			for (Object obj : oldList) {
+				list.add((String)obj);
+			}
+			return list;
 		}
 		catch (ClassCastException e) {
 			throw e;
