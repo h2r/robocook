@@ -111,7 +111,9 @@ public class RobocookServer{
     public void onConnect(Session session) {
         System.out.println("Connect: " + session.getRemoteAddress().getAddress());
         try {
-            session.getRemote().sendString("Hello Webbrowser");
+        	RobocookServerToken token = new RobocookServerToken();
+        	token.setString("msg", "hello webbrowser");
+            session.getRemote().sendString(token.toJSONString());
             this.session = session;
         } catch (IOException e) {
             e.printStackTrace();
