@@ -269,7 +269,7 @@ var generalHandler = {
 	HandleAction: function(gobj, slot, action)	{
 		var succ = false;
 
-		matchConsole.Write("gobj: " + gobj.ToString() + ", slot: " + slot.ToString() + ", action: " + action.ToString());
+		//matchConsole.Write("gobj: " + gobj.ToString() + ", slot: " + slot.ToString() + ", action: " + action.ToString());
 		gameConnect.ReportCmdSucc(gobj.ID, gobj.ID, EnumActions.ToString(action), matchConsole.Peek());		
 	},
 	

@@ -2,9 +2,10 @@
 EnumGOType = {
 	App: 0,		//Appliances like stove
 	Cont: 1,	//Container
-	Ing: 2,		//Ingredients like eggs
-	Tool: 3,		//Tools like knife
-	Empty: 4
+	IngContainer: 2,
+	Ing: 3,		//Ingredients like eggs
+	Tool: 4,		//Tools like knife
+	Empty: 5
 };
 
 //Game Object
@@ -15,6 +16,7 @@ function gameObject(id, name, type, sprite, fnDesc)
 	this.Type = type;
 	this.Sprite = sprite;
 	this.Slot = "";
+	this.IsMovable = false;
 	
 	if (!this.Sprite) {
 		this.Anim = null;
@@ -42,6 +44,8 @@ function gameIngredient(id, name, sprite, infinite, fnDesc)
 	this.ID = id;
 	this.Type = EnumGOType.Ing;
 	this.Sprite = sprite;
+	this.IsMovable = false;
+	
 	
 	if (infinite) this.Infinite = infinite;
 	else this.Infinite = false;
@@ -65,7 +69,10 @@ function gameIngredient(id, name, sprite, infinite, fnDesc)
 			//Report to server here
 			var logMsg = "Player 1 transferred " + this.Name + " to the " + gobj.Name;
 			matchConsole.Write(logMsg);
-			gameConnect.ReportCmdSucc(this.ID, gobj.ID, "transfer", logMsg);
+			
+			var action = inventoryGrid.GetMoveAction(this.ID, gobj.ID);
+
+			gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
 			gobj.AddTo(this);
 			if (this.Infinite) throw "Ingredient is infinite!";
 		} else if (gobj.Type === EnumGOType.App) {
@@ -91,6 +98,8 @@ function gameContainer(id, name, sprite)
 	this.ID = id;
 	this.Type = EnumGOType.Cont;
 	this.Sprite = sprite;
+	this.IsMovable = true;
+	
 	
 	if (!this.Sprite) {
 		this.Anim = null;
@@ -105,7 +114,7 @@ function gameContainer(id, name, sprite)
 			var str = "This is a " + this.Name + " containing";
 			for (var i=0; i<this.Contains.length; i++) {
 				if (i >= 1) str += ",";
-				str += " " + this.Contains[i].Name;
+				str += " " + this.Contains[i];
 			}
 			return str;
 		}
@@ -113,34 +122,31 @@ function gameContainer(id, name, sprite)
 	
 	this.Contains = [];
 	
-	this.AddTo = function(gobj) {
-		this.Contains.push(gobj);
-	}
-	
-	this.RemoveFrom = function(gobj) {
-		throw "Not yet implemented!";
-	}
-	
 	this.ActOn = function(gobj, slot, origin) {
 		if (gobj.Type === EnumGOType.App) {			
 			console.log(this.Name + " acted on " + gobj.Name);
 			try {
 				gobj.AddTo(this);
 				//Report action to server here
-				var logMsg = "Player 1 moved " + this.Name + " to the " + gobj.Name;
-				matchConsole.Write(logMsg);
-				gameConnect.ReportCmdSucc(this.ID, gobj.ID, "move", logMsg);
+				//var logMsg = "Player 1 moved " + this.Name + " to the " + gobj.Name;
+				//matchConsole.Write(logMsg);
+
+				var action = inventoryGrid.GetMoveAction(this, gobj);
+
+				gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
 				inventoryGrid.ChangeSlotAnim(slot + "Box", this.Anim);
 			} catch(err) {
 				throw "Invalid action!";
 			}
 			//throw "test";
 		} else if (gobj.Type === EnumGOType.Cont) {
-			this.TransferTo(gobj);
+			//this.TransferTo(gobj);
 			//Report action to server here
-			var logMsg = "Player 1 transferred the contents of " + this.Name + " to the " + gobj.Name;
-			matchConsole.Write(logMsg);
-			gameConnect.ReportCmdSucc(this.ID, gobj.ID, "transfer", logMsg);
+			//var logMsg = "Player 1 transferred the contents of " + this.Name + " to the " + gobj.Name;
+			//matchConsole.Write(logMsg);
+			var action = inventoryGrid.GetMoveAction(this, gobj);
+
+			gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
 			throw "Do not delete container!";
 		} else {
 			throw "Invalid action!";
@@ -159,6 +165,51 @@ function gameContainer(id, name, sprite)
 	}
 }
 
+function gameIngredientContainer(id, name, sprite, ingredient) {
+	this.Name = name;
+	this.ID = id;
+	this.Type = EnumGOType.IngContainer;
+	this.Sprite = sprite;
+	this.Ingredient = ingredient;
+	this.IsMovable = true;
+	
+	
+	if (!this.Sprite) {
+		this.Anim = null;
+	} else {
+		this.Anim = new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite});
+	}
+
+	this.Desc = function() {	
+		if (!this.Contains.length) {
+			return "This is an empty " + this.Name;
+		} else {
+			var str = "This is a " + this.Name + " containing " + this.Ingredient;
+			return str;
+		}
+	}
+	
+	this.Contains = [this.Ingredient];
+	
+	this.RemoveFrom = function(gobj) {
+		throw "Not yet implemented!";
+	}
+	
+	this.ActOn = function(gobj, slot, origin) {
+		if (gobj.Type === EnumGOType.Cont) {
+			//this.TransferTo(gobj);
+			//Report action to server here
+			var logMsg = "Player 1 poured the contents of " + this.Name + " to the " + gobj.Name;
+			matchConsole.Write(logMsg);
+			var action = inventoryGrid.GetMoveAction(this, gobj);
+
+			gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
+			throw "Do not delete container!";
+		} else {
+			throw "Invalid action!";
+		}
+	}
+}
 
 //////////////////
 //Game Appliance//
@@ -169,6 +220,8 @@ function gameAppliance(id, name, sprite)
 	this.ID = id;
 	this.Type = EnumGOType.App;
 	this.Sprite = sprite;
+	this.IsMovable = false;
+	
 	
 	if (!this.Sprite) {
 		this.Anim = null;
@@ -230,5 +283,7 @@ function gameAction(name, sprite, cmdstr)
 	this.Name = name;	//This is the display name of the command
 	this.Sprite = sprite;  //The sprite to display
 	this.Cmd = cmdstr;	//The string used for issuing commands
+	this.IsMovable = false;
+	
 }
 

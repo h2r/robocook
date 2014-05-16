@@ -29,6 +29,7 @@ import com.mongodb.util.JSON;
 
 import edu.brown.cs.h2r.baking.Experiments.BasicKitchen;
 import edu.brown.cs.h2r.baking.Recipes.Brownies;
+import edu.brown.cs.h2r.baking.Recipes.MashedPotatoes;
 import edu.brown.cs.h2r.baking.Recipes.Recipe;
 
 @WebSocket
@@ -209,11 +210,15 @@ public class RobocookServer{
 		}
 		String id = this.getNewCollectionID();
 		Recipe brownies = new Brownies();
-		BasicKitchen kitchen = new BasicKitchen(brownies);
+		Recipe mashedPotatoes = new MashedPotatoes();
+		Random random = new Random();
+		Recipe recipe = (random.nextBoolean()) ? brownies : mashedPotatoes;
+		BasicKitchen kitchen = new BasicKitchen(recipe);
 		this.gameLookup.put(id,  kitchen);
 		String newState = kitchen.resetCurrentState();
 		RobocookServerToken newStateToken = RobocookServerToken.tokenFromJSONString(newState);
 		token.setToken("state", newStateToken);
+		token.setString("update", "Welcome to our new cooking game!");
 		token.setString("clientId", id);
 	}
 	
@@ -221,13 +226,26 @@ public class RobocookServer{
 	{
 		BasicKitchen kitchen = this.gameLookup.get(id);
 		String[] paramsArray = params.toArray(new String[params.size()]);
-		String result = kitchen.takeAction(action, paramsArray);
+	
+		boolean didUpdate = kitchen.takeAction(action, paramsArray);
+		String newState = kitchen.getCurrentStateString();
+		
 		
 		responseToken.setBoolean("failed", kitchen.getIsBotched());
 		responseToken.setBoolean("success", kitchen.getIsSuccess());
 		
-		RobocookServerToken token = RobocookServerToken.tokenFromJSONString(result);
-		responseToken.setToken("msg", token);
+		String updatedStatus;
+		if (didUpdate) {
+			updatedStatus = "Successfully performed action " + action;
+		}
+		else
+		{
+			updatedStatus = "Action " + action + " did nothing";
+		}
+		responseToken.setString("update", updatedStatus);
+		RobocookServerToken newStateToken = RobocookServerToken.tokenFromJSONString(newState);
+		responseToken.setToken("state", newStateToken);
+		
 		return responseToken;
 	}
 

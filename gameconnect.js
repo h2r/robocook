@@ -99,14 +99,19 @@ var gameConnect = {
 	//Please note the functions which report success are contained in either gameobjects.js or gamerecipes.js.
 	ReportCmdSucc: function(obj, target, action, log) {
 		var token = {
-			msgtype: "action",
-			msg: {
-			params: [obj, target],
-			action: action,
-			logmsg: log
-			}
-		};
-		gameConnect.Send(token);
+				msgtype: "action",
+				msg: {
+				params: ["human", obj, target],
+				action: action,
+				logmsg: log
+				}
+			};
+		if (action != "") {			
+			gameConnect.Send(token);
+		}
+		else {
+			console.log("Failed to send message: " + JSON.stringify(token));
+		}
 	},
 	
 	//Reports state transformations occurring due to met prereqs
