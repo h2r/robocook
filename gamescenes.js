@@ -116,16 +116,8 @@ var gameSceneMainMenu = {
 		//gameTitle = "Brownies";
 		
 		gameSceneMatch.GameMode = EnumGameMode.Singleplayer;	//Set game mode to SP
-		
-		gameSceneMatch.Init()
-		
 		gameConnect.AddCallback(inventoryGrid);
 
-		var msg = {
-			msgtype: "init",
-			mode: "singleplayer",
-		};
-		gameConnect.Send(msg);
 		console.log("Main Menu Scene -> Paging server...");
 		console.log("Main Menu Scene -> Processing singleplayer command...");
 		

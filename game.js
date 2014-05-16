@@ -215,6 +215,12 @@ function fnSceneMatch() {
 	{
 		case EnumGameState.MatchInit:
 			gameSceneMatch.Init();
+			var msg = {
+				msgtype: "init",
+				mode: "singleplayer",
+			};
+			gameConnect.Send(msg);
+
 			break;
 			
 		case EnumGameState.MatchIntro:

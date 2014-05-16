@@ -28,12 +28,15 @@ var gameSceneMatch = {
 			.addGroup("background", {width: gameConfig.StageWidth, height: gameConfig.StageHeight})
 				.addSprite("background", {animation: gameAnimations.background1, width: gameConfig.StageWidth, height: gameConfig.StageHeight})
 				.end()
-			.addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 192})
+			.addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 192}).end()
+			/*
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 128, height: 128})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 128, height: 128, posx: 128})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 128, height: 128, posx: 256})
 				.end()
-			.addGroup("containers", {width: 384, height: 128, posx: 384, posy: 192})
+			*/
+			.addGroup("containers", {width: 768, height: 128, posx: 0, posy: 320}).end()
+			/*
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 128})
@@ -47,8 +50,10 @@ var gameSceneMatch = {
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 256, posy: 64})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 320, posy: 64})
 				.end()
-			.addGroup("ingredients", {width: 768, height: 128, posx: gamePos.MatchDivIngsX, posy: gamePos.MatchDivIngsY-64})
-				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 0, posy: 0})
+			*/
+			.addGroup("ingredients", {width: 768, height: 128, posx: gamePos.MatchDivIngsX, posy: gamePos.MatchDivIngsY}).end()
+			/*
+			.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 0, posy: 0})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64, posy: 0})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64*2, posy: 0})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64*3, posy: 0})
@@ -72,7 +77,7 @@ var gameSceneMatch = {
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64*9, posy: 64})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64*10, posy: 64})
 				.addSprite(inventoryGrid.SlotsEnum[j], {animation: inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[j++]].Anim, width: 64, height: 64, posx: 64*11, posy: 64})
-				.end()
+			*/
 			.addGroup("holding", {width: 756, height: 512, posx: 0, posy: 0})
 				.addSprite("app1Box",{width: 64, height: 64, posx: 32, posy: 288-64})
 				.addSprite("app2Box",{width: 64, height: 64, posx: 160, posy: 288-64})
@@ -181,6 +186,8 @@ var gameSceneMatch = {
 //Inventory Grid//
 //////////////////
 var inventoryGrid = {
+
+	/*
 	SlotsEnum: [
 		"app1", "app2", "app3",
 		"cont1", "cont2", "cont3", "cont4",	"cont5", "cont6",
@@ -200,20 +207,36 @@ var inventoryGrid = {
 		"ing1","ing2","ing3","ing4","ing5","ing6","ing7","ing8","ing9","ing10","ing11","ing12",				//row7
 		"ing13","ing14","ing15","ing16","ing17","ing18","ing19","ing20","ing21","ing22","ing23","ing24",	//row8
 		"","","","","","","","","","","","",		//row1
+	],*/
+
+	Grid: {
+	},
+
+	ObjectsToIgnore: [
+		"counter","shelf"
+	],
+
+	InfiniteIngredients: [
 	],
 	
 	GameObjects: {},
 	GameObjectCount: 0,
 	
 	GetSlot: function(gx, gy) {
-		return inventoryGrid.Grid[(gy*12)+gx];
+
+		if (typeof inventoryGrid.Grid[gx] != 'undefined' && typeof inventoryGrid.Grid[gx][gy] != 'undefined') {
+			return inventoryGrid.Grid[gx][gy];
+		}
+		return "";
 	},
 	
-	ChangeSlotAnim: function(slot, anim) {
+	ChangeSlotAnim: function(name, anim) {
+		var slot = inventoryGrid.CleanName(name);
 		$("#"+slot).setAnimation(anim);
 	},
 	
-	ClearSlotAnim: function(slot) {
+	ClearSlotAnim: function(name) {
+		var slot = inventoryGrid.CleanName(name);
 		$("#"+slot).setAnimation();
 	},
 	
@@ -235,64 +258,56 @@ var inventoryGrid = {
 
 	Clear: function()
 	{
-		for (var i=0; i<inventoryGrid.SlotsEnum.length; i++) { 
-			inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i]] = gameObjects["Empty"];
-		}
+		//for (var i=0; i<inventoryGrid.SlotsEnum.length; i++) { 
+		//	inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i]] = gameObjects["Empty"];
+		//}
 	},
 
 	LoadStateFromMsg: function(stateMsg)
 	{
 		var objects= stateMsg.data;
-		var startSlot = 0;
 		var appliances = this.GetObjectsOfClassFromMsg(objects, "space");
-		inventoryGrid.LoadAppliancesFromMsg(startSlot, appliances);
+		inventoryGrid.LoadAppliancesFromMsg(appliances);
 
-		startSlot += appliances.length;
 		var containers = this.GetObjectsOfClassFromMsg(objects, "container");
-		inventoryGrid.LoadContainersFromMsg(startSlot, containers);
+		inventoryGrid.LoadContainersFromMsg(containers);
 
-		startSlot += containers.length;
-		var ingredients = this.GetObjectsOfClassFromMsg(objects, "ingredient");
-		inventoryGrid.LoadContainersFromMsg(startSlot, ingredients);
+		var ingredients = this.GetObjectsOfClassFromMsg(objects, "simple_ingredient");
+		inventoryGrid.LoadIngredientsFromMsg(ingredients);
 
 		inventoryGrid.UpdateAnimations();
 	},
 
-	LoadAppliancesFromMsg: function(startSlot, appliances)
+	LoadAppliancesFromMsg: function(appliances)
 	{
 		for (var i=0; i < appliances.length; i++) {
-			var slot = i + startSlot;
-			var slotEnum = inventoryGrid.SlotsEnum[slot];
-			var appliance = appliances[i].name;
+			var appliance = appliances[i];
 			var applianceObj = inventoryGrid.GetNewApplianceFromMsg(appliance);
-			inventoryGrid.InsertObject(slotEnum, applianceObj);
+			inventoryGrid.InsertObject(applianceObj.Name, applianceObj);
 		}
 	},
 
-	LoadContainersFromMsg: function(startSlot, containers)
+	LoadContainersFromMsg: function(containers)
 	{
 		for (var i = 0; i < containers.length; i++) {
-			var slot = i + startSlot;
-			var slotEnum = inventoryGrid.SlotsEnum[slot];
 			var container = containers[i];
 			var containerObj = inventoryGrid.GetNewContainerFromMsg(container);
-			inventoryGrid.InsertObject(slotEnum, containerObj);
+			inventoryGrid.InsertObject(containerObj.Name, containerObj);
 		}
 	},
 
-	LoadIngredientsFromMsg: function(startSlot, ingredients)
+	LoadIngredientsFromMsg: function(ingredients)
 	{
 		for (var i = 0; i < ingredients.length; i++) {
-			var lot = i + startSlot;
-			var slotEnum = inventoryGrid.SlotsEnum[slot];
 			var ingredient = ingredients[i];
 			var ingredientObj = inventoryGrid.GetNewIngredientFromMsg(ingredient);
-			inventoryGrid.InsertObject(slotEnum, ingredientObj);
+			inventoryGrid.InsertObject(ingredientObj.Name, ingredientObj);
 		}
 	},
 
-	InsertObject: function(slot, object)
+	InsertObject: function(name, object)
 	{
+		var slot = inventoryGrid.CleanName(name);
 		inventoryGrid.GameObjects[slot] = object;
 		inventoryGrid.GameObjectCount++;
 	},
@@ -304,112 +319,130 @@ var inventoryGrid = {
 			var object = objects[i];
 			if (object.class == classStr)
 			{
-				classObjects.push(object);
+				if ($.inArray(object.name, inventoryGrid.ObjectsToIgnore) == -1) {
+					classObjects.push(object);
+				}
 			}
 		}
 		return classObjects;
 	},
 
-	GetNewApplianceFromMsg: function(applianceMsg)
+	GetNewApplianceFromMsg: function(appliance)
 	{
-		var name = applianceMsg.name;
-		var id = applianceMsg.id;
+		var name = appliance.name;
+		var id = appliance.name;
 		var sprite = name + ".PNG";
 		return new gameAppliance(id, name, sprite);
 	},
 
-	GetNewContainerFromMsg: function(containerMsg)
+	GetNewContainerFromMsg: function(container)
 	{
-		var name = containerMsg.name;
-		var id = containerMsg.id;
+		var name = container.name;
+		var id = container.name;
 		var sprite = name + ".PNG";
 		return new gameContainer(id, name, sprite);
 	},
 
-	GetNewIngredientFromMsg: function(ingredientMsg)
+	GetNewIngredientFromMsg: function(ingredient)
 	{
-		var name = ingredientMsg.name;
-		var id = ingredientMsg.id;
+		var name = ingredient.name;
+		var id = ingredient.name;
 		var sprite = name + ".PNG";
-		var isInfinite = ingredientMsg.isInfinite;
+		var isInfinite = ($.inArray(name, inventoryGrid.InfiniteIngredients) > -1);
 		return new gameIngredient(id, name, sprite, isInfinite);
 	},
 
 	UpdateAnimations: function()
 	{
-		$.playground().pauseGame().clearScenegraph().startGame();
 		var applianceX = 0;
-		var applianceY = 192;
-		var containerX = 384;
-		var containerY = 192;
-		var ingredientX = gamePos.MatchDivIngsX;
-		var ingredientY = gamePos.MatchDivIngsY-64;
+		var applianceY = 0;
+		var containerX = 0;
+		var containerY = 0;
+		var ingredientX = 0;
+		var ingredientY = 0;
 
-		for (var i = 0; i < inventoryGrid.GameObjectCount; i++)
+		for (var key in inventoryGrid.GameObjects)
 		{
-			var slotEnum = inventoryGrid.SlotsEnum[i];
-			var object = inventoryGrid.GameObjects[slotEnum];
-			var anim = object.Anim;
-
+			var object = inventoryGrid.GameObjects[key];
+			
 			if (object instanceof gameAppliance) {
-				$.playground().addSprite(slotEnum, {animation: anim, width: 128, height: 128, posx: applianceX, posY: applianceY});
+				inventoryGrid.UpdateAnimation("appliances", object, 128, 128, applianceX, applianceY);
 				applianceX += 128;
 			}
 			else if (object instanceof gameContainer) {
-				$.playground().addSprite(slotEnum, {animation: anim, width: 64, height: 64, posx: containerX, posY: containerY});
+				inventoryGrid.UpdateAnimation("containers", object, 64, 64, containerX, containerY);
 				containerX += 64;
-				if (containerX > 64*5 ) {
+				if (containerX > 64*11 ) {
 					containerX = 0;
 					containerY += 64;
 				}
 			}
 			else if (object instanceof gameIngredient) {
-				$.playground().addSprite(slotEnum, {animation: anim, width: 64, height: 64, posx: ingredientX, posY: ingredientY});
+				inventoryGrid.UpdateAnimation("ingredients", object, 64, 64, ingredientX, ingredientY);
 				ingredientX += 64;
 				if (ingredientX > 64*11 ) {
 					ingredientX = 0;
 					ingredientY += 64;
 				}
-			}	
+			}
 		}
-		$.playground()
-			.addGroup("holding", {width: 756, height: 512, posx: 0, posy: 0})
-				.addSprite("app1Box",{width: 64, height: 64, posx: 32, posy: 288-64})
-				.addSprite("app2Box",{width: 64, height: 64, posx: 160, posy: 288-64})
-				.addSprite("app3Box",{width: 64, height: 64, posx: 288, posy: 288-64})
-				.addSprite("holdingBox",{width: 64, height: 64, posx: 0, posy: 0})
-				.end()
-			.addGroup("selectionDiv", {width: 756, height: 512, posx: 0, posy: 0})
-				.mousemove(mouseTracker.RecordMousePos)
-				//.click(mouseTracker.RegisterClick)
-				.mousedown(mouseTracker.RegisterDown)
-				.mouseup(mouseTracker.RegisterUp)
-				.end()
-			/*
-			.addGroup("infoDiv",{width: 768, height: 64, posx: 0, posy: 0})
-				.css({"background-color":"red", "font-size":"8pt", "color":"black"})
-				.append("ROBOCOOK<br/>Prototype v0.3<br />Recipe: " + gameTitle)
-				.end()*/
-			.addGroup("recipeDiv", {width: 384, height: 192, posx: 384, posy: 0})
-				.css({"background-color":"blue", "font-size":"8pt", "color":"red", "overflow":"auto"})
-				.end()
-			.addGroup(matchConsole.DisplayDiv, {width: 384, height: 192, posx: 0, posy: 0})
-				.css({"background-color":"black", "font-size":"8pt", "color":"green", "overflow":"auto"})
-				.end()
-			.addGroup(actionBar.DisplayDiv,{width: 768, height: 64, posx: 0, posy: 448})
-				.css({"background-color":"purple", "font-size":"8pt", "color":"yellow", "overflow":"auto"})
-				.addSprite("act1", {animation: gameAnimations.actLook, width: 64, height: 64, posx: 0})
-				.addSprite("act2", {animation: gameAnimations.actTurnOnOff, width: 64, height: 64, posx: 64})
-				.addSprite("act3", {animation: gameAnimations.actMix, width: 64, height: 64, posx: 128})
-				.addSprite("act4", {animation: gameAnimations.actSpread, width: 64, height: 64, posx: 192})
-				.addSprite("act5", {animation: gameAnimations.actCut, width: 64, height: 64, posx: 256})
-				.addSprite("act6", {animation: gameAnimations.actShape, width: 64, height: 64, posx: 320})
-				.addSprite("act7", {animation: gameAnimations.actPeel, width: 64, height: 64, posx: 384})
-				.addSprite("actSelector", {animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 0})
-				.append("<button id='matchResetBtn' type='button'>Reset</button>")
-				.end()
-			.addGroup(actionText.DisplayDiv, {width: 256, height: 64, posx: 448, posy: 448})
-				.end();
+		$.gameQuery.resourceManager.refresh();
+	},
+
+	UpdateAnimation: function(group, object, width, height, x, y)
+	{
+		var name = inventoryGrid.CleanName(object.Name);
+		var poundSlot = "#" + name;
+		var sprite = $(poundSlot);
+		var anim = object.Anim;
+		var groupObj = $("#" + group);
+		var groupX = groupObj.x();
+		var groupY = groupObj.y();
+
+		if (sprite.length == 0) {
+			$("#" + group).addSprite(name, {animation: anim, width: width, height: height, posx: x, posy: y});
+			inventoryGrid.UpdateGrid(name, -1, -1, x+groupX, y+groupY, width, height);
+		}
+		else
+		{
+			var oldX = sprite.x();
+			var oldY = sprite.y();
+			sprite.x(x);
+			sprite.y(y);
+			inventoryGrid.UpdateGrid(name, oldX + groupX, oldY+groupY, x+groupX, y+groupY, width, height);
+		}
+
+	},
+
+	UpdateGrid: function(name, oldX, oldY, x, y, width, height) {
+		//Checking if this needs to clear it's old position
+		if (oldX > -1 && oldY > -1) {
+			//Iterate over grid with tiles 64x64
+			for (var i = oldX; i < oldX + width; i+= 64) {
+				for (var j = oldY; j < oldY + height; i += 64) {
+					//If the name in this spot is actually the object's name, clean it up
+					if (inventoryGrid.Grid[i][j] == name) {
+						inventoryGrid.Grid[i][j] = "";
+					}
+				}
+			}
+		}
+		//Iterate over grid
+		for (var i = x; i < x + width; i+= 64) {
+			// Do we need to add a new row to the map?
+			if (typeof inventoryGrid.Grid[i] == 'undefined') {
+				inventoryGrid.Grid[i] = {};
+			}
+			// Add the name to all the spots in this map
+			for (var j = y; j < y + height; j += 64) {
+				inventoryGrid.Grid[i][j] = name;
+			}
+		}
+
+	},
+
+	CleanName: function (name) {
+		return name.replace(/\s+/g, '_');
 	},
 
 	onOpen: function() {
@@ -436,13 +469,14 @@ var inventoryGrid = {
 
 		inventoryGrid.Clear();	
 		//inventoryGrid.LoadStateFromMsg(state);	
-		/*
+		
 		//Initialize
-		for (var i=0; i<inventoryGrid.SlotsEnum.length; i++) { 
-			inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i]] = gameObjects["Empty"];
-		}
+		//for (var i=0; i<inventoryGrid.SlotsEnum.length; i++) { 
+		//	inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i]] = gameObjects["Empty"];
+		//}
 		
 		//Load defaults
+		/*
 		inventoryGrid.GameObjects["app1"] = gameObjects["AppMicrowave"];
 		inventoryGrid.GameObjects["app2"] = gameObjects["AppStoveTop"];
 		inventoryGrid.GameObjects["app3"] = gameObjects["AppOven"];
@@ -451,7 +485,7 @@ var inventoryGrid = {
 		inventoryGrid.GameObjects["cont3"] = gameObjects["ContCuttingBoard"];
 		inventoryGrid.GameObjects["cont4"] = gameObjects["ContBakingDish"];
 		inventoryGrid.GameObjects["cont5"] = gameObjects["ContSaucepanLarge"];
-		
+		*/
 		//Empty gameobjects
 		$.each(gameObjects, function(key, value) {
 			if (value.Contains) {
@@ -459,6 +493,7 @@ var inventoryGrid = {
 			}
 		});
 		
+		/*
 		//Load recipe
 		for (var i=0; i<(gameIngList.length/3); i++) {
 			inventoryGrid.GameObjects[inventoryGrid.SlotsEnum[i+15]] = new gameIngredient(gameIngList[i*3], gameIngList[(i*3)+1], gameIngList[i*3]+".PNG", gameIngList[(i*3)+2]);
@@ -468,21 +503,29 @@ var inventoryGrid = {
 
 
 	
-	IsSlotEmpty: function(slot) {
-		var obj = inventoryGrid.GameObjects[slot];
-		if (!obj) throw "Error retrieving object in " + slot;
-		else return (obj === gameObjects["Empty"]);
+	IsSlotEmpty: function(name) {
+		var slot = inventoryGrid.CleanName(name);
+		if (slot == "") {
+			return true;
+		}
+		return false;
+		//var obj = inventoryGrid.GameObjects[slot];
+		//if (!obj) throw "Error retrieving object in " + slot;
+		//else return (obj === gameObjects["Empty"]);
 	},
 	
-	IsSlotApp: function(slot) {
+	IsSlotApp: function(name) {
+		var slot = inventoryGrid.CleanName(name);
 		return (inventoryGrid.GameObjects[slot].Type === EnumGOType.App);
 	},
 	
-	FetchObj: function(slot) {
+	FetchObj: function(name) {
+		var slot = inventoryGrid.CleanName(name);
 		//console.log("Fetching object in " + slot);
 		if (!inventoryGrid.IsSlotApp(slot)) {
 			var obj = inventoryGrid.GameObjects[slot];
-			inventoryGrid.GameObjects[slot] = gameObjects["Empty"];
+			delete inventoryGrid.GameObjects[slot];
+			//inventoryGrid.GameObjects[slot] = gameObjects["Empty"];
 			$("#"+slot).setAnimation();
 		} else {
 			if (inventoryGrid.GameObjects[slot].Contains.length === 0) throw "Appliance empty!";
@@ -495,7 +538,8 @@ var inventoryGrid = {
 		return obj;
 	},
 	
-	PlaceObj: function(obj, slot) {
+	PlaceObj: function(obj, name) {
+		var slot = inventoryGrid.CleanName(name);
 		if (!slot) throw "Attempted to place in non slot!";
 		//Place in non empty slot
 		if (!inventoryGrid.IsSlotEmpty(slot)) { 
@@ -515,15 +559,18 @@ var inventoryGrid = {
 	},
 	
 	//Gets the description of the gameObject in slot
-	GetObjDesc: function(slot) {
+	GetObjDesc: function(name) {
+		var slot = inventoryGrid.CleanName(name);
 		var obj = inventoryGrid.GameObjects[slot];
 		return (inventoryGrid.IsSlotEmpty(slot)) ? false : obj.Desc();
 	},
-	GetObjType: function(slot) {
+	GetObjType: function(name) {
+		var slot = inventoryGrid.CleanName(name);
 		var obj = inventoryGrid.GameObjects[slot];
 		return (inventoryGrid.IsSlotEmpty(slot)) ? false : obj.Type;
 	},
-	GetObjName: function(slot) {
+	GetObjName: function(name) {
+		var slot = inventoryGrid.CleanName(name);
 		var obj = inventoryGrid.GameObjects[slot];
 		return (inventoryGrid.IsSlotEmpty(slot)) ? false : obj.Name;
 	}
@@ -668,8 +715,8 @@ var mouseTracker = {
 			var desc = inventoryGrid.GetObjDesc(slot);
 			if (desc) matchConsole.Write(desc);
 		} else {
-			var obj = inventoryGrid.GameObjects[slot];
-			if (obj !== gameObjects["Empty"]) {
+			if (slot != "") {
+				var obj = inventoryGrid.GameObjects[slot];
 				RegisterCommand(obj, activeAction, slot);
 			}
 			//actionHandler.HandleAction(obj, slot, activeAction);
@@ -686,7 +733,7 @@ var mouseTracker = {
 	
 	MouseDrag: function() {
 		var slot = inventoryGrid.GetSlot(mouseTracker.DownX, mouseTracker.DownY);
-		if (slot) {
+		if (slot != "") {
 			var gotype = inventoryGrid.GetObjType(slot);
 			if (gotype === EnumGOType.Ing || gotype === EnumGOType.Cont) {
 				mouseTracker.Dragging = true;
