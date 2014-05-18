@@ -109,21 +109,20 @@ var gameSceneMainMenu = {
 	},
 	
 	Singleplayer: function () {
-		actionHandler = brownieHandler;
-		gameRecipe = recipeBrownies;
-		gameIngList = ingListBrownies;
-		gameTitle = "Brownies";
+
+		actionHandler = generalHandler;
+		//gameRecipe = recipeBrownies;
+		//gameIngList = ingListBrownies;
+		//gameTitle = "Brownies";
 		
-		console.log("Main Menu Scene -> Processing singleplayer command...");
 		gameSceneMatch.GameMode = EnumGameMode.Singleplayer;	//Set game mode to SP
-		console.log("Main Menu Scene -> Setting game mode to singleplayer.");
-		var msg = {
-			msgtype: "newgame",
-			mode: "singleplayer",
-			recipe: "brownies"
-		};
-		gameConnect.Send(msg);
+		gameConnect.AddCallback(inventoryGrid);
+
 		console.log("Main Menu Scene -> Paging server...");
+		console.log("Main Menu Scene -> Processing singleplayer command...");
+		
+		console.log("Main Menu Scene -> Setting game mode to singleplayer.");
+
 		CurrentGameState = EnumGameState.MainMenuTrans;		
 		console.log("Main Menu Scene -> Setting game state to transition.");
 	},

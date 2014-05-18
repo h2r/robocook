@@ -263,6 +263,89 @@ var gnocchiHandler = {
 	}
 };
 
+var generalHandler = {
+	ColdOvenFlag: false,
+
+	HandleAction: function(gobj, slot, action)	{
+		var succ = false;
+
+		//matchConsole.Write("gobj: " + gobj.ToString() + ", slot: " + slot.ToString() + ", action: " + action.ToString());
+		gameConnect.ReportCmdSucc(gobj.ID, gobj.ID, EnumActions.ToString(action), matchConsole.Peek());		
+	},
+	
+	UpdateAppliances: function() {
+		//Check stove top
+		try {
+			//Cold oven checking for preheat purposes
+			if (gameObjects["AppOven"].IsEmpty() && gameObjects["AppOvenOn"].IsEmpty())
+				actionHandler.ColdOvenFlag = false;
+			else if (!gameObjects["AppOven"].IsEmpty())
+				actionHandler.ColdOvenFlag = true;
+				
+			//Stovetop
+			if (!gameObjects["AppStoveTopOn"].IsEmpty()) {
+				if (actionHandler.VerifyContents(gameObjects["AppStoveTopOn"].Contains[0], ["IngButter"])) {
+					matchConsole.Write("The butter melted in the saucepan!");
+					$("#rlist2").css({"color":"orange"});
+					gameObjects["AppStoveTopOn"].Contains[0].Contains.length = 0;
+					gameObjects["AppStoveTopOn"].Contains[0].AddTo(new gameIngredient("IngButterMelted", "Melted Butter", ""));
+					//Report to server
+					gameConnect.ReportTransform("IngButter","AppStoveTopOn","IngButterMelted",matchConsole.Peek());
+				}
+			}
+			
+			if (!gameObjects["AppOvenOn"].IsEmpty()) {
+				if (actionHandler.VerifyContents(gameObjects["AppOvenOn"].Contains[0], ["IngBatterSpread"])) {
+					if (actionHandler.ColdOvenFlag) {
+						matchConsole.Write("The oven was not preheated.  The brownies are undercooked!");
+						gameObjects["AppOvenOn"].Contains[0].Contains.length = 0;
+						gameObjects["AppOvenOn"].Contains[0].AddTo(new gameIngredient("IngFailBrownies", "Chocolate Failure", ""));
+						gameConnect.ReportTransform("IngBatterSpread","AppOvenOn","IngFailBrownies",matchConsole.Peek());
+					} else {
+						matchConsole.Write("The brownies cook perfectly in the preheated oven!");
+						gameObjects["AppOvenOn"].Contains[0].Contains.length = 0;
+						gameObjects["AppOvenOn"].Contains[0].AddTo(new gameIngredient("IngBrownies", "Delicious Brownies", ""));
+						$("#rlist6").css({"color":"orange"});
+						gameConnect.ReportTransform("IngBatterSpread","AppOvenOn","IngBrownies",matchConsole.Peek());
+						winFlag = true;
+					}
+				} else if (actionHandler.VerifyContents(gameObjects["AppOvenOn"].Contains[0], ["IngBatter"])) {
+					if (actionHandler.ColdOvenFlag) {
+						matchConsole.Write("The batter was not spread out properly so the result is big lump!");
+						gameObjects["AppOvenOn"].Contains[0].Contains.length = 0;
+						gameObjects["AppOvenOn"].Contains[0].AddTo(new gameIngredient("IngFailBrownies", "Chocolate Failure", ""));
+						gameConnect.ReportTransform("IngBatter","AppOvenOn","IngFailBrownies",matchConsole.Peek());
+					}
+				}
+			}
+		} catch(err) {
+			console.log("Error: " + err.message);
+		}
+	},
+	
+	SwapAppliances: function(slot, oapp, napp) {
+		oapp.TransferTo(napp);
+		inventoryGrid.GameObjects[slot] = napp;
+		inventoryGrid.ChangeSlotAnim(slot, napp.Anim);
+	},
+	
+	VerifyContents: function(gobj, arr) {
+		if (gobj.Contains.length !== arr.length) return false;
+		for (var i=0; i<arr.length; i++) {
+			var found = false;
+			for (var j=0; j<gobj.Contains.length; j++) {
+				//console.log(gobj.Contains[j].ID + " vs " + arr[i]);
+				if (gobj.Contains[j].ID === arr[i]) {
+					console.log("Match!");
+					found = true;
+				}
+			}
+			if (!found) return false;
+		}
+		return true;
+	}
+}
+
 
 /////////////
 //BROWNIES!//
