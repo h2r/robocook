@@ -150,7 +150,7 @@ var gameSceneMainMenu = {
 		gameSceneMatch.GameMode = EnumGameMode.Singleplayer;	//Set game mode to SP
 		gameConnect.AddCallback(inventoryGrid);
 
-		console.log("Main Menu Scene -> Paging server...");
+		//console.log("Main Menu Scene -> Paging server...");
 		console.log("Main Menu Scene -> Processing singleplayer command...");
 		
 		console.log("Main Menu Scene -> Setting game mode to singleplayer.");
@@ -171,7 +171,8 @@ var gameSceneMainMenu = {
 		var msg = {
 			msgtype: "newgame",
 			mode: "singleplayer",
-			recipe: "gnocchi"
+			recipe: "gnocchi",
+			playername: PlayerName
 		};
 		gameConnect.Send(msg);
 		console.log("Main Menu Scene -> Paging server...");
