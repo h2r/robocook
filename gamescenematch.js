@@ -96,13 +96,13 @@ var gameSceneMatch = {
 				.append("ROBOCOOK<br/>Prototype v0.3<br />Recipe: " + gameTitle)
 				.end()*/
 			.addGroup("recipeDiv", {width: 384, height: 192, posx: 384, posy: 0})
-				.css({"background-color":"blue", "font-size":"8pt", "color":"red", "overflow":"auto"})
+				.css({"background-image":"url('./sprites/RecipeDivBG.PNG')", "font-size":"8pt", "color":"red", "overflow":"auto"})
 				.end()
 			.addGroup(matchConsole.DisplayDiv, {width: 384, height: 192, posx: 0, posy: 0})
-				.css({"background-color":"black", "font-size":"8pt", "color":"green", "overflow":"auto"})
+				.css({"background-image":"url('./sprites/TerminalDivBG.PNG')", "font-size":"8pt", "color":"green", "overflow":"auto"})
 				.end()
 			.addGroup(actionBar.DisplayDiv,{width: 768, height: 64, posx: 0, posy: 448})
-				.css({"background-color":"purple", "font-size":"8pt", "color":"yellow", "overflow":"auto"})
+				.css({"font-size":"8pt", "color":"yellow", "overflow":"auto"})
 				.addSprite("act1", {animation: gameAnimations.actLook, width: 64, height: 64, posx: 0})
 				.addSprite("act2", {animation: gameAnimations.actTurnOnOff, width: 64, height: 64, posx: 64})
 				.addSprite("act3", {animation: gameAnimations.actMix, width: 64, height: 64, posx: 128})
@@ -1014,7 +1014,6 @@ var actionText = {
 	Init: function() {
 		$("#"+actionText.DisplayDiv)
 			.css({
-				"background-color":"gray", 
 				"font-size":"10pt", 
 				"color":"black", 
 				"overflow":"auto",

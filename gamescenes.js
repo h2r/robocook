@@ -17,7 +17,9 @@ var EnumGameMode = {
 var gameSceneSplash = {
 	Init : function() {
 		console.log("Splash Scene -> Initializing.");
-		$("body").append("<div id='"+gameConfig.SceneSplashName+"'></div>");
+		$("#stage").append("<div id='"+gameConfig.SceneSplashName+"'></div>");
+		
+		//Title
 		$("#"+gameConfig.SceneSplashName).append("<h1 id='splashTitle'>" + gameConfig.Title + "</h1>");
 		console.log("Splash Scene -> Generating Title at " + gamePos.TitleY + " " + gamePos.TitleX);
 		$("#splashTitle").css({
@@ -26,6 +28,17 @@ var gameSceneSplash = {
 			"position":"absolute",
 			"top":gamePos.TitleY,
 			"left":gamePos.TitleX});
+		
+		//Name input
+		$("#"+gameConfig.SceneSplashName).append("<input id='playerName' type='text'>");
+		console.log("Splash Scene -> Generating Player Name text input at...");
+		$("#playerName").css({
+			"width":256,
+			"position":"relative",
+			"top":240,
+			"left":228}).val('Enter thy name Chef!');
+		
+		//Start button
 		console.log("Splash Scene -> Generating Start button at " + gamePos.StartY + " " + gamePos.StartX);
 		$("#"+gameConfig.SceneSplashName).append("<button id='splashButton' type='button'>" + gameConfig.StartButton + "</button>");
 		$("#splashButton").css({
@@ -35,7 +48,22 @@ var gameSceneSplash = {
 			.click(function(event) {
 				event.preventDefault();
 				console.log("Splash Scene -> Start button clicked!");
-				RegisterCommand(gameConfig.SceneSplashName, EnumGameCommands.Start);
+				var name = $("#playerName").val();
+				if (!name) {
+					$("#playerName").val('Something appears to be missing here');
+				} else if (name === 'Enter thy name Chef!') {
+					$("#playerName").val('Some creativity might be required')
+				} else if (name === 'Some creativity might be required') {
+					$("#playerName").val('Go fish...')
+				} else if (name === 'Something appears to be missing here') {
+					$("#playerName").val('Go fish...')
+				} else if (name === 'Go fish...') {
+					$("#playerName").val('Enter thy name Chef!')
+				} else {
+					PlayerName = $("#playerName").val().replace(" ","");
+					console.log("PlayerName: " + PlayerName);
+					RegisterCommand(gameConfig.SceneSplashName, EnumGameCommands.Start);
+				}
 			});
 		//Game state change
 		CurrentGameState = EnumGameState.SplashIdle;
@@ -52,7 +80,7 @@ var gameSceneSplash = {
 		console.log("Splash Scene -> Transitioning to Main Menu.");
 		//Destroy existing scene
 		$("#"+gameConfig.SceneSplashName).remove();
-		CurrentGameState = EnumGameState.MainMenuInit;
+		CurrentGameState = EnumGameState.MatchInit;
 	}
 };
 
@@ -61,7 +89,10 @@ var gameSceneMainMenu = {
 	Init: function() {
 		console.log("Main Menu Scene -> Initializing.");
 		$("body").append("<div id='"+gameConfig.SceneMainMenuName+"'></div>");
-		$("#"+gameConfig.SceneMainMenuName).append("<h1 id='mainTitle'>" + gameConfig.Title + "</h1>");
+		
+				
+		
+		/*$("#"+gameConfig.SceneMainMenuName).append("<h1 id='mainTitle'>" + gameConfig.Title + "</h1>");
 		console.log("Main Menu Scene -> Generating Title at " + gamePos.MainTitleY + " " + gamePos.MainTitleX);
 		$("#mainTitle").css({
 			"color": gameConfig.TitleColor,
@@ -103,7 +134,8 @@ var gameSceneMainMenu = {
 				event.preventDefault();
 				console.log("Main Menu Scene -> Exit button clicked!");
 				RegisterCommand(gameConfig.SceneMainMenuName, EnumGameCommands.Exit);
-			});
+			});*/
+			
 		//Change state
 		CurrentGameState = EnumGameState.MainMenuIdle;
 	},

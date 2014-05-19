@@ -40,21 +40,23 @@ var EnumGameState = {
 };
 
 //Connect to server here
-gameConnect.wsurl="ws://127.0.0.1:8787";
+//gameConnect.wsurl="ws://127.0.0.1:8787";
 //gameConnect.wsurl="ws://elzar.cs.brown.edu:8787";
 gameConnect.Init();
 
 //Set initial game state
 var CurrentGameState = EnumGameState.GameInit;
+var PlayerName = "";
 
 function fnMain(jQuery){
 	//Configure game
-	$("title").html(gameConfig.Title);
+	//$("title").html(gameConfig.Title);
 	
 	//Stage config
 	$("#stage").height(gameConfig.StageHeight).width(gameConfig.StageWidth)
 		.css({
 			"background-color":""+gameConfig.StageBgColor,
+			"background-image":"url('./sprites/MatchBackground_PH.JPG')",
 			"position":"absolute",
 			"top":"10px",
 			"left":"10px"
