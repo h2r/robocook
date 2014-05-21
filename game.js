@@ -56,7 +56,7 @@ function fnMain(jQuery){
 	$("#stage").height(gameConfig.StageHeight).width(gameConfig.StageWidth)
 		.css({
 			"background-color":""+gameConfig.StageBgColor,
-			"background-image":"url('./sprites/MatchBackground_PH.JPG')",
+			"background-image":"url('./Sprites/MatchBackground_PH.JPG')",
 			"position":"absolute",
 			"top":"10px",
 			"left":"10px"
