@@ -21,7 +21,7 @@ var gameConnect = {
 		
 		gameConnect.ws.onopen = function() {gameConnect.OnOpen()};
 		gameConnect.ws.onmessage = function(evt) {gameConnect.OnMessage(evt) };
-		gameConnect.ws.onclose = function() {gameConnect.OnClose()};
+		gameConnect.ws.onclose = function(evt) {gameConnect.OnClose(evt)};
 		gameConnect.ws.onerror = function(err) {gameConnect.OnError(err)};
 	},
 
@@ -73,18 +73,18 @@ var gameConnect = {
 
 	},
 	
-	OnClose: function() {
+	OnClose: function(evt) {
 		console.log("Connection to websocket closed!");
 		for (var i = 0; i < this.callbacks.length; i++) {
-			this.callbacks[i].onClose();
+			this.callbacks[i].onClose(evt);
 		}
 			
 	},
 
-	OnError: function() {
+	OnError: function(err) {
 		console.log("Websocket Error: " + err);
 		for (var i = 0; i < this.callbacks.length; i++) {
-			this.callbacks[i].onError();
+			this.callbacks[i].onError(err);
 		}
 	},
 
