@@ -96,10 +96,10 @@ var gameSceneMatch = {
 				.append("ROBOCOOK<br/>Prototype v0.3<br />Recipe: " + gameTitle)
 				.end()*/
 			.addGroup("recipeDiv", {width: 384, height: 192, posx: 384, posy: 0})
-				.css({"background-image":"url('./sprites/RecipeDivBG.PNG')", "font-size":"8pt", "color":"red", "overflow":"auto"})
+				.css({"background-image":"url('./Sprites/RecipeDivBG.PNG')", "font-size":"8pt", "color":"red", "overflow":"auto"})
 				.end()
 			.addGroup(matchConsole.DisplayDiv, {width: 384, height: 192, posx: 0, posy: 0})
-				.css({"background-image":"url('./sprites/TerminalDivBG.PNG')", "font-size":"8pt", "color":"green", "overflow":"auto"})
+				.css({"background-image":"url('./Sprites/TerminalDivBG.PNG')", "font-size":"8pt", "color":"green", "overflow":"auto"})
 				.end()
 			.addGroup(actionBar.DisplayDiv,{width: 768, height: 64, posx: 0, posy: 448})
 				.css({"font-size":"8pt", "color":"yellow", "overflow":"auto"})
