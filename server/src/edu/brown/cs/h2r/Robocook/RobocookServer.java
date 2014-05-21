@@ -82,6 +82,7 @@ public class RobocookServer{
 		DBCollection collection = this.db.getCollection(id);
 		DBObject data = (DBObject) JSON.parse(json);
 		collection.insert(data);
+		System.out.println("Robocook server: " + json);
 	}
 	
 	public List<DBObject> getCollectionItems(String id)
@@ -126,6 +127,10 @@ public class RobocookServer{
 	{		
     	RobocookServerToken token = RobocookServerToken.tokenFromJSONString(message);
     	RobocookServerToken response = this.processToken(token);
+    	if (response.containsKey("clientId")) {
+    		this.logData((String)response.get("clientId"), message);
+        	
+    	}
     	if (!response.isEmpty())
     	{
     		try {
@@ -200,6 +205,9 @@ public class RobocookServer{
 			response.setString("msg", "hello");
 		}
 		
+		if (response.containsKey("clientId") && response.containsKey("state")) {
+			this.logData((String)response.get("clientId"), response.toJSONString());
+		}
 		return response;
 	}
 
@@ -217,6 +225,7 @@ public class RobocookServer{
 		this.gameLookup.put(id,  kitchen);
 		String newState = kitchen.resetCurrentState();
 		RobocookServerToken newStateToken = RobocookServerToken.tokenFromJSONString(newState);
+		token.setStringList("recipe", recipe.getRecipeProcedures());
 		token.setToken("state", newStateToken);
 		token.setString("update", "Welcome to our new cooking game!");
 		token.setString("clientId", id);
@@ -243,6 +252,7 @@ public class RobocookServer{
 			updatedStatus = "Action " + action + " did nothing";
 		}
 		responseToken.setString("update", updatedStatus);
+		responseToken.setString("clientId", id);
 		RobocookServerToken newStateToken = RobocookServerToken.tokenFromJSONString(newState);
 		responseToken.setToken("state", newStateToken);
 		

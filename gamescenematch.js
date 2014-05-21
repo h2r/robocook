@@ -96,7 +96,7 @@ var gameSceneMatch = {
 				.append("ROBOCOOK<br/>Prototype v0.3<br />Recipe: " + gameTitle)
 				.end()*/
 			.addGroup("recipeDiv", {width: 384, height: 192, posx: 384, posy: 0})
-				.css({"background-image":"url('./Sprites/RecipeDivBG.PNG')", "font-size":"8pt", "color":"red", "overflow":"auto"})
+				.css({"background-image":"url('./Sprites/RecipeDivBG.PNG')", "font-size":"8pt", "color":"black", "overflow":"auto"})
 				.end()
 			.addGroup(matchConsole.DisplayDiv, {width: 384, height: 192, posx: 0, posy: 0})
 				.css({"background-image":"url('./Sprites/TerminalDivBG.PNG')", "font-size":"8pt", "color":"green", "overflow":"auto"})
@@ -262,6 +262,7 @@ var inventoryGrid = {
 
 	LoadStateFromMsg: function(stateMsg)
 	{
+
 		var objects= stateMsg.data;
 		var startSlot = inventoryGrid.GetSlot($("#appliances").x(), $("#appliances").y())
 		var appliances = this.GetObjectsOfClassFromMsg(objects, "space");
@@ -502,6 +503,16 @@ var inventoryGrid = {
 
 	},
 
+	updateRecipe: function(recipe) {
+		$("#recipeDiv").html("");
+		$("#recipeDiv").append("<u>"+recipe[0]+"</u>");
+		$("#recipeDiv").append("<ol>");
+		for (var i=1; i<recipe.length; i++) {
+				$("#recipeDiv").append("<li id='rlist"+(i-1)+"'>"+recipe[i]+"</li>");
+		}
+		$("#recipeDiv").append("</ol>");
+	},
+
 	CleanName: function (name) {
 		return name.replace(/\s+/g, '_');
 	},
@@ -512,6 +523,10 @@ var inventoryGrid = {
 	// WebSocket handler interface methods
 	onMessage: function(msg) {
 		matchConsole.Write(msg.update);
+		if ('recipe' in msg) {
+			this.updateRecipe(msg.recipe);
+		}
+
 		this.LoadStateFromMsg(msg.state);
 		winFlag = msg.success;
 	},
