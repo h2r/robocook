@@ -1,6 +1,6 @@
 var gameConfig = {
 	//Title config
-	Title: "Robocook",
+	Title: "",
 	TitleColor: "red",
 	TitleFont: "Arial", //Not used yet
 	TitleSize: 60,
@@ -30,10 +30,10 @@ gamePos.StageX = gameConfig.StageX + "px";
 gamePos.StageY = gameConfig.StageY + "px";
 gamePos.StageCenterX = (gameConfig.StageX + (gameConfig.StageWidth/2)) + "px";
 gamePos.StageCenterY = (gameConfig.StageY + (gameConfig.StageHeight/2)) + "px";
-gamePos.TitleX = "250px";
-gamePos.TitleY = "150px";
-gamePos.StartX = "350px";
-gamePos.StartY = "270px";
+gamePos.TitleX = "150px";
+gamePos.TitleY = "120px";
+gamePos.StartX = "326px";
+gamePos.StartY = "280px";
 gamePos.MainTitleX = "250px";
 gamePos.MainTitleY = "50px";
 gamePos.MainSPBtnX = "327px";
