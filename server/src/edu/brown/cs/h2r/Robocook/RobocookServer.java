@@ -253,7 +253,7 @@ public class RobocookServer{
 	public static void main(String[] args) {
 	    RobocookServer robocookServer = new RobocookServer("localhost", 27017, "myDB");
 	    Server webSocketServer = new Server(8787);
-
+	    System.out.println("Starting server at " + webSocketServer.getURI());
 	    WebSocketHandler handeler = new WebSocketHandler() {
 	    	@Override
 	        public void configure(WebSocketServletFactory factory)
