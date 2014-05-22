@@ -36,7 +36,22 @@ var gameSceneSplash = {
 			"width":256,
 			"position":"relative",
 			"top":240,
-			"left":228}).val('Enter thy name Chef!');
+			"left":228}).val('Enter thy name Chef!')
+			.click(function() {
+				var name = $("#playerName").val();
+				if (name === 'Enter thy name Chef!') {
+					$("#playerName").val('');
+				}
+				if (name === 'Some creativity might be required') {
+					$("#playerName").val('');
+				}
+				if (name === 'Go fish...') {
+					$("#playerName").val('');
+				}
+				if (name === 'Something appears to be missing here') {
+					$("#playerName").val('');
+				}
+			});
 		
 		//Start button
 		console.log("Splash Scene -> Generating Start button at " + gamePos.StartY + " " + gamePos.StartX);
