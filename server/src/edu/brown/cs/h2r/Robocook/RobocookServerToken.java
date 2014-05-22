@@ -152,4 +152,8 @@ public class RobocookServerToken extends LinkedHashMap<String, Object> {
 			throw e;
 		}
 	}
+	
+	public void setStringList(String key, List<String> list) {
+		this.setObject(key, list);
+	}
 }
