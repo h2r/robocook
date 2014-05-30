@@ -1,15 +1,16 @@
 Stuff To Do
 ======================================
-Match console needs to scroll up
+v/ Match console needs to scroll up
 Stove disappears
 Appliances are mispositioned
-Remove spread action
+v/ Remove spread action
 Finish sprites
 Get AMT setup
 ======================================
 
 
 
+OLD STUFF
 
 v/ 1. Reset button
 v/ 2. Recipe in blue div area

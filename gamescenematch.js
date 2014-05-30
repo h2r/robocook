@@ -111,10 +111,10 @@ var gameSceneMatch = {
 				.addSprite("act1", {animation: gameAnimations.actLook, width: 64, height: 64, posx: 0})
 				.addSprite("act2", {animation: gameAnimations.actTurnOnOff, width: 64, height: 64, posx: 64})
 				.addSprite("act3", {animation: gameAnimations.actMix, width: 64, height: 64, posx: 128})
-				.addSprite("act4", {animation: gameAnimations.actSpread, width: 64, height: 64, posx: 192})
-				.addSprite("act5", {animation: gameAnimations.actCut, width: 64, height: 64, posx: 256})
-				.addSprite("act6", {animation: gameAnimations.actShape, width: 64, height: 64, posx: 320})
-				.addSprite("act7", {animation: gameAnimations.actPeel, width: 64, height: 64, posx: 384})
+				.addSprite("act4", {animation: gameAnimations.actCut, width: 64, height: 64, posx: 192})
+				.addSprite("act5", {animation: gameAnimations.actShape, width: 64, height: 64, posx: 256})
+				.addSprite("act6", {animation: gameAnimations.actPeel, width: 64, height: 64, posx: 320})
+				//.addSprite("act7", {animation: gameAnimations.actPeel, width: 64, height: 64, posx: 384})
 				.addSprite("actSelector", {animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 0})
 				.append("<button id='matchResetBtn' type='button'>Reset</button>")
 				.end()
@@ -126,7 +126,7 @@ var gameSceneMatch = {
 			EnumActions.Look,
 			EnumActions.TurnOnOff,
 			EnumActions.Mix,
-			EnumActions.Spread,
+			//EnumActions.Spread,
 			EnumActions.Cut,
 			EnumActions.Shape,
 			EnumActions.Peel,
@@ -895,13 +895,15 @@ var matchConsole = {
 		this.Display();
 	},
 	
+	//Auto scroll down
 	Display: function() {
 		/*$("#"+this.DisplayDiv).empty();
 		$("#"+this.DisplayDiv).append("<br/>");
 		for (var i=0; i<this.Lines.length; i++) {
 			$("#"+this.DisplayDiv).append(this.Lines[i] + "<br/>");
 		}*/
-		$("#"+this.DisplayDiv).prepend(this.Lines[this.Lines.length-1] + "<br/>");
+		$("#"+this.DisplayDiv).append(this.Lines[this.Lines.length-1] + "<br/>")
+			.scrollTop($("#"+this.DisplayDiv)[0].scrollHeight);
 	}
 };
 
@@ -1020,11 +1022,11 @@ var actionBar = {
 			activeAction = actionBar.Actions[5];
 			$("#actSelector").x(320);
 		});
-		$("#act7").click(function(event) 
+		/*$("#act7").click(function(event) 
 		{
 			activeAction = actionBar.Actions[6];
 			$("#actSelector").x(384);
-		});
+		});*/
 	}
 };
 
