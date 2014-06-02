@@ -97,7 +97,7 @@ var gameSceneMatch = {
 				.end()*/
 			.addGroup("recipeBackground", {width: 384, height: 192, posx: 384, posy: 0})
 				.css({"background-image":"url('./Sprites/RecipeDivBG.PNG')", "overflow":"visible"})
-				.addGroup("recipeDiv", {width: 374, height: 186, posx: 394, posy: 6})
+				.addGroup("recipeDiv", {width: 374, height: 186, posx: 10, posy: 6})
 					.css({"font-size":"10pt", "color":"black", "overflow":"auto"})
 					.end().end()
 			.addGroup("consoleBackground", {width: 384, height: 192, posx: 0, posy: 0})
