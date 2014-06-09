@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
+  <Overview>
+	<Title>Kitchen Simulator Usability Test</Title>
+	<Text>This question requires that you complete the game at the following link: http://elzar.cs.brown.edu When you have done so you will receive a key from the game.</Text>
+  </Overview>
+  
+  <Question>
+   <QuestionIdentifier>1</QuestionIdentifier>
+   <QuestionContent>
+     <Text>Please enter the key you received to answer this question.</Text>
+   </QuestionContent>
+   <AnswerSpecification>
+     <FreeTextAnswer/>
+   </AnswerSpecification>
+  </Question>
+  <Question>
+   <QuestionIdentifier>2</QuestionIdentifier>
+   <QuestionContent>
+     <Text>What did you think of the game?  Was it hard or easy to figure out?  Were the controls confusing?  Good feedback can be rewarded with a bonus.</Text>
+   </QuestionContent>
+   <AnswerSpecification>
+     <FreeTextAnswer/>
+   </AnswerSpecification>
+  </Question>
+</QuestionForm>
