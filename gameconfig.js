@@ -56,27 +56,6 @@ gamePos.MatchDivIngsY = 384;
 //All objects loaded by the game by default
 var gameObjects = {};
 gameObjects["Empty"] = new gameObject("Empty", "Nothing", EnumGOType.Empty, "");
-gameObjects["IngEmpty"] = new gameIngredient("IngEmpty", "Empty Dish", "OverlaySelectionP1.PNG");
-gameObjects["AppOven"] = new gameAppliance("AppOven", "Oven", "AppOven.PNG");
-gameObjects["AppOvenOn"] = new gameAppliance("AppOvenOn", "Heated Oven", "AppOvenOn.PNG");
-gameObjects["AppStoveTop"] = new gameAppliance("AppStoveTop", "Stove Top", "AppStoveTop.PNG");
-gameObjects["AppStoveTopOn"] = new gameAppliance("AppStoveTopOn", "Stove Top with Burner On", "AppStoveTopOn.PNG");
-gameObjects["AppCounterTop"] = new gameAppliance("AppCounterTop", "Kitchen Counter", "AppCounterTop.PNG");
-gameObjects["AppMicrowave"] = new gameAppliance("AppMicrowave", "Microwave Oven", "AppMicrowave.PNG");
-gameObjects["ContBowlLarge"] = new gameContainer("ContBowlLarge", "Large Bowl", "ContBowlLarge.PNG");
-gameObjects["ContPotLarge"] = new gameContainer("ContPotLarge", "Large Pot", "ContPotLarge.PNG");
-gameObjects["ContSaucepanLarge"] = new gameContainer("ContSaucepanLarge", "Large Saucepan", "ContSaucepanLarge.PNG");
-gameObjects["ContCuttingBoard"] = new gameContainer("ContCuttingBoard", "Cutting Board", "ContCuttingBoard.PNG");
-gameObjects["ContCuttingBoardFloured"] = new gameContainer("ContCuttingBoardFloured", "Floured Cutting Board", "ContCuttingBoard.PNG");
-gameObjects["ContBakingDish"] = new gameContainer("ContBakingDish", "Baking Dish", "ContBakingDish.PNG");
-gameObjects["ContBakingDishGreased"] = new gameContainer("ContBakingDishGreased", "Greased Baking Dish", "ContBakingDish.PNG");
-gameObjects["ContBakingDishFloured"] = new gameContainer("ContBakingDishFloured", "Floured Baking Dish", "ContBakingDish.PNG");
-gameObjects["ContBakingDishGreasedFloured"] = new gameContainer("ContBakingDishGreasedFloured", "Greased and Floured Baking Dish", "ContBakingDish.PNG");
-//gameObjects["ToolMasher"] = new gameObject("ToolMasher", "Masher", EnumGOType.Tool, "ToolMasher.PNG");
-//gameObjects["ToolPeeler"] = new gameObject("ToolPeeler", "Peeler", EnumGOType.Tool, "ToolPeeler.PNG");
-//gameObjects["ToolKnife"] = new gameObject("ToolKnife", "Knife", EnumGOType.Tool, "ToolKnife.PNG");
-//gameObjects["ToolHands"] = new gameObject("ToolHands", "Hands", EnumGOType.Tool, "ToolHands.PNG");
-//gameObjects["IngDish"] = new gameObject("IngDish", "Dish", "OverlaySelectionP1.PNG");
 
 
 var gameSprites = {};

@@ -123,34 +123,20 @@ function gameContainer(id, name, sprite)
 	this.Contains = [];
 	
 	this.ActOn = function(gobj, slot, origin) {
-		if (gobj.Type === EnumGOType.App) {			
+		if (gobj.Type === EnumGOType.App) {
+			var logMsg = this.Name + " acted on " + gobj.Name;			
 			console.log(this.Name + " acted on " + gobj.Name);
-			try {
-				gobj.AddTo(this);
-				//Report action to server here
-				//var logMsg = "Player 1 moved " + this.Name + " to the " + gobj.Name;
-				//matchConsole.Write(logMsg);
-
-				var action = inventoryGrid.GetMoveAction(this, gobj);
-
-				gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
-				inventoryGrid.ChangeSlotAnim(slot + "Box", this.Anim);
-			} catch(err) {
-				throw "Invalid action!";
-			}
-			//throw "test";
-		} else if (gobj.Type === EnumGOType.Cont) {
-			//this.TransferTo(gobj);
-			//Report action to server here
-			//var logMsg = "Player 1 transferred the contents of " + this.Name + " to the " + gobj.Name;
-			//matchConsole.Write(logMsg);
+			//gobj.AddTo(this);
 			var action = inventoryGrid.GetMoveAction(this, gobj);
 
 			gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
-			throw "Do not delete container!";
-		} else {
-			throw "Invalid action!";
-		}
+			//inventoryGrid.ChangeSlotAnim(slot + "Box", this.Anim);
+		} else if (gobj.Type === EnumGOType.Cont) {
+			var logMsg = this.Name + " acted on " + gobj.Name;			
+			var action = inventoryGrid.GetMoveAction(this, gobj);
+			gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
+			//throw "Do not delete container!";
+		} 
 	}
 	
 	//Transfer contents of container to new container
@@ -189,7 +175,10 @@ function gameIngredientContainer(id, name, sprite, ingredient) {
 		}
 	}
 	
-	this.Contains = [this.Ingredient];
+	this.Contains = [];
+	if (typeof ingredient != ingredient  && ingredient != "") {
+		this.Contains = [this.Ingredient];
+	}
 	
 	this.RemoveFrom = function(gobj) {
 		throw "Not yet implemented!";
@@ -197,16 +186,9 @@ function gameIngredientContainer(id, name, sprite, ingredient) {
 	
 	this.ActOn = function(gobj, slot, origin) {
 		if (gobj.Type === EnumGOType.Cont) {
-			//this.TransferTo(gobj);
-			//Report action to server here
-			var logMsg = "Player 1 poured the contents of " + this.Name + " to the " + gobj.Name;
-			matchConsole.Write(logMsg);
 			var action = inventoryGrid.GetMoveAction(this, gobj);
-
+			var logMsg = this.Name + " acted on " + gobj.Name;			
 			gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
-			throw "Do not delete container!";
-		} else {
-			throw "Invalid action!";
 		}
 	}
 }
@@ -214,15 +196,14 @@ function gameIngredientContainer(id, name, sprite, ingredient) {
 //////////////////
 //Game Appliance//
 //////////////////
-function gameAppliance(id, name, sprite)
+function gameAppliance(id, name, sprite, containers)
 {
 	this.Name = name;
 	this.ID = id;
 	this.Type = EnumGOType.App;
 	this.Sprite = sprite;
 	this.IsMovable = false;
-	
-	
+
 	if (!this.Sprite) {
 		this.Anim = null;
 	} else {
@@ -237,39 +218,30 @@ function gameAppliance(id, name, sprite)
 			return str;
 		}
 	}
-		
+
 	this.Contains = [];
 	
 	this.AddTo = function(gobj) {
-		if (this.Contains.length)
-			throw "Invalid action!  Cannot have more than one object on an appliance at a time!";
-		else
-			this.Contains.push(gobj);
+		this.Contains.push(gobj);
+	}
+
+	for (var i = 0; i < containers.length; i++) {
+		this.AddTo(containers[i]);
+	}	
+	
+
+	this.GetObject = function(slot) {
+		return this.Contains[slot];
 	}
 	
 	this.RemoveFrom = function(gobj) {
 		throw "Not yet implemented!";
 	}
 	
-	this.Container = function() {
-		//if (this.Contains.length === 0) return null;
-		//else 
-			return this.Contains[0];
+	this.IsEmpty = function(slot) {
+		return (this.Contains.length <= slot);
 	}
-	
-	this.IsEmpty = function() {
-		return (this.Contains.length === 0 || !this.Contains);
-	}
-	
-	//Transfer contents of container to new container
-	this.TransferTo = function(cont) {
-		if (!this.IsEmpty())
-		{ 	
-			cont.AddTo(this.Contains[0]);
-			this.Contains.length = 0;
-		}
-	}
-	
+
 	this.Activate = function() {
 		throw "Activation not yet implemented!";
 	}
