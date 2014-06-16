@@ -1,28 +1,30 @@
+"use strict";
+
 var gameConfig = {
-	//Title config
-	Title: "",
-	TitleColor: "red",
-	TitleFont: "Arial", //Not used yet
-	TitleSize: 60,
-	StartButton: "Start!",
-	//Main Menu configs
-	SPBtn: "Singleplayer",
-	MPBtn: "Multiplayer",
-	ExitBtn: "Exit",
-	//Match configs
-	//Stage config
-	StageHeight: 512,
-	StageWidth: 768,
-	StageBgColor: "black",
-	//Metagame control
-	GameLoopInterval: 100,
-	//General game positions
-	StageX: 0,
-	StageY: 0,
-	//Scenes
-	SceneSplashName : "splashScene",
-	SceneMainMenuName : "mainMenuScene",
-	SceneMatchName: "matchScene"
+    //Title config
+    Title: "",
+    TitleColor: "red",
+    TitleFont: "Arial", //Not used yet
+    TitleSize: 60,
+    StartButton: "Start!",
+    //Main Menu configs
+    SPBtn: "Singleplayer",
+    MPBtn: "Multiplayer",
+    ExitBtn: "Exit",
+    //Match configs
+    //Stage config
+    StageHeight: 512,
+    StageWidth: 768,
+    StageBgColor: "black",
+    //Metagame control
+    GameLoopInterval: 100,
+    //General game positions
+    StageX: 0,
+    StageY: 0,
+    //Scenes
+    SceneSplashName : "splashScene",
+    SceneMainMenuName : "mainMenuScene",
+    SceneMatchName: "matchScene"
 };
 
 var gamePos = new Object();
@@ -72,15 +74,15 @@ gameSprites["ActShape"] = "./Sprites/ActShape.PNG";
 gameSprites["ActPeel"] = "./Sprites/ActPeel.PNG";
 
 var gameAnimations = {
-	background1: new $.gameQuery.Animation({imageURL: gameSprites["MatchBackground"]}),
-	overSelectionP1: new $.gameQuery.Animation({imageURL: gameSprites["OverlaySelectionP1"]}),
-	victoryScreen: new $.gameQuery.Animation({imageURL: gameSprites["VictoryScreen"]}),
-	actUse: new $.gameQuery.Animation({imageURL: gameSprites["ActUse"]}),
-	actMix: new $.gameQuery.Animation({imageURL: gameSprites["ActMix"]}),
-	actSpread: new $.gameQuery.Animation({imageURL: gameSprites["ActSpread"]}),
-	actTurnOnOff: new $.gameQuery.Animation({imageURL: gameSprites["ActTurnOnOff"]}),
-	actLook: new $.gameQuery.Animation({imageURL: gameSprites["ActLook"]}),
-	actCut: new $.gameQuery.Animation({imageURL: gameSprites["ActCut"]}),
-	actShape: new $.gameQuery.Animation({imageURL: gameSprites["ActShape"]}),
-	actPeel: new $.gameQuery.Animation({imageURL: gameSprites["ActPeel"]})
+    background1: new $.gameQuery.Animation({imageURL: gameSprites["MatchBackground"]}),
+    overSelectionP1: new $.gameQuery.Animation({imageURL: gameSprites["OverlaySelectionP1"]}),
+    victoryScreen: new $.gameQuery.Animation({imageURL: gameSprites["VictoryScreen"]}),
+    actUse: new $.gameQuery.Animation({imageURL: gameSprites["ActUse"]}),
+    actMix: new $.gameQuery.Animation({imageURL: gameSprites["ActMix"]}),
+    actSpread: new $.gameQuery.Animation({imageURL: gameSprites["ActSpread"]}),
+    actTurnOnOff: new $.gameQuery.Animation({imageURL: gameSprites["ActTurnOnOff"]}),
+    actLook: new $.gameQuery.Animation({imageURL: gameSprites["ActLook"]}),
+    actCut: new $.gameQuery.Animation({imageURL: gameSprites["ActCut"]}),
+    actShape: new $.gameQuery.Animation({imageURL: gameSprites["ActShape"]}),
+    actPeel: new $.gameQuery.Animation({imageURL: gameSprites["ActPeel"]})
 };
