@@ -8,6 +8,9 @@
 //Note:
 /////////////////////////////////////////////////
 
+//The MD5 hash of the player name is returned to the player as a token at the end of the game.
+var PlayerNameMD5 = 0;
+
 var EnumGameMode = {
 	None: 0,
 	Singleplayer: 1,
@@ -37,6 +40,7 @@ var gameSceneSplash = {
 			"position":"relative",
 			"top":240,
 			"left":228}).val('Enter thy name Chef!')
+			//Clears the text input if it matches one of the strings below
 			.click(function() {
 				var name = $("#playerName").val();
 				if (name === 'Enter thy name Chef!') {
@@ -77,9 +81,12 @@ var gameSceneSplash = {
 				} else {
 					PlayerName = $("#playerName").val().replace(" ","");
 					console.log("PlayerName: " + PlayerName);
+					PlayerNameMD5 = CryptoJS.MD5(PlayerName);
+					console.log("Namehash: " + PlayerNameMD5);
 					RegisterCommand(gameConfig.SceneSplashName, EnumGameCommands.Start);
 				}
 			});
+			
 		//Game state change
 		CurrentGameState = EnumGameState.SplashIdle;
 		console.log("Splash Scene -> Setting game state to idle.");
@@ -153,6 +160,11 @@ var gameSceneMainMenu = {
 				RegisterCommand(gameConfig.SceneMainMenuName, EnumGameCommands.Exit);
 			});*/
 			
+		$.playground()
+				.addGroup("endgame", {width: gameConfig.StageWidth, height: gameConfig.StageHeight})
+				.addSprite("victory", {animation: gameAnimations.victoryScreen, width: gameConfig.StageWidth, height: gameConfig.StageHeight})
+				.end();
+
 		//Change state
 		CurrentGameState = EnumGameState.MainMenuIdle;
 	},
