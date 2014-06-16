@@ -90,7 +90,7 @@ function gameContainer(id, name, sprite)
     
     
     this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
-
+    var painter = new ContainerPainter(0, 0, this.Anim);
     this.Desc = function() {    
         if (!this.Contains.length) {
             return "This is an empty " + this.Name;
@@ -121,6 +121,10 @@ function gameContainer(id, name, sprite)
             gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
         } 
     };
+
+    this.getPainter = function() {
+        return painter;
+    };
     
     //Transfer contents of container to new container
     this.TransferTo = function(cont) {
@@ -143,7 +147,7 @@ function gameIngredientContainer(id, name, sprite, ingredient) {
     this.IsMovable = true;
 
     this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
-    
+    var painter = new ContainerPainter(0, 0, this.Anim);
     this.Desc = function() {    
         if (!this.Contains.length) {
             return "This is an empty " + this.Name;
@@ -169,6 +173,10 @@ function gameIngredientContainer(id, name, sprite, ingredient) {
             gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
         }
     };
+
+    this.getPainter = function() {
+        return painter;
+    };
 }
 
 //////////////////
@@ -183,7 +191,7 @@ function gameAppliance(id, name, sprite, containers)
     this.IsMovable = false;
 
     this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
-
+    var painter = new AppliancePainter(0, 0, this.Anim);
     this.Desc = function() {    
         if (!this.Contains.length) {
             return "This is an empty " + this.Name;
@@ -227,6 +235,10 @@ function gameAppliance(id, name, sprite, containers)
 
     this.Activate = function() {
         throw "Activation not yet implemented!";
+    };
+
+    this.getPainter = function() {
+        return painter;
     };
 }
 

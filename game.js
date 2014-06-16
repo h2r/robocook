@@ -34,11 +34,6 @@ var EnumGameState = {
     PostMatch: 80   //Post main play conditions, restart?
 };
 
-//Connect to server here
-gameConnect.wsurl = "ws://127.0.1.1:8787";
-//gameConnect.wsurl="ws://elzar.cs.brown.edu:8787";
-gameConnect.Init();
-
 //Set initial game state
 var CurrentGameState = EnumGameState.GameInit;
 var PlayerName = "";
@@ -230,17 +225,12 @@ function fnSceneMatch() {
     var actionHandler = new GeneralHandler();
     var inventoryGrid = new InventoryGrid();
     var gameSceneMatch = new GameSceneMatch(actionHandler, inventoryGrid);
-    gameConnect.AddCallback(gameSceneMatch);
+
     switch(CurrentGameState)
     {
         case EnumGameState.MatchInit:
             gameSceneMatch.Init();
-            var msg = {
-                msgtype: "init",
-                mode: "singleplayer"
-            };
-            gameConnect.Send(msg);
-
+            CurrentGameState = EnumGameState.MatchIntro;
             break;
             
         case EnumGameState.MatchIntro:

@@ -1,4 +1,4 @@
-"use strict";
+
 
 //////////////////////////////////////////////////////
 // gameconnect.js
@@ -11,103 +11,111 @@
 //  to connect.
 //////////////////////////////////////////////////////
 
-var gameConnect = {
-    wsurl: "ws://127.0.1.1:8787",
-    callbacks: new Array(),
-    callbackIds: new Array(),
-    ws: 0,
-    clientID: 0,
+var GameConnect = function(){
+    "use strict";
+
+    if (GameConnect.prototype._gameConnect) {
+        return GameSceneMatch.prototype._gameConnect;
+    }
+    GameConnect.prototype._gameSceneMatch = this;
     
-    Init: function(){
-        gameConnect.ws = new WebSocket(gameConnect.wsurl);
+    var wsurl = "ws://127.0.1.1:8787",
+        callbacks = [],
+        callbackIds = [],
+        ws = 0,
+        clientId = 0,
+        websocket = null,
+        isOpen = false;
+    
+    this.IsOpen = function() {
+        return isOpen;
+    };
+
+    this.Open = function() {
+        websocket = new WebSocket(wsurl);
         
-        gameConnect.ws.onopen = function() {
-            gameConnect.OnOpen();
+        websocket.onopen = function() {
+            OnOpen();
         };
-        gameConnect.ws.onmessage = function(evt) {
-            gameConnect.OnMessage(evt);
+        websocket.onmessage = function(evt) {
+            OnMessage(evt);
         };
-        gameConnect.ws.onclose = function(evt) {
-            gameConnect.OnClose(evt);
+        websocket.onclose = function(evt) {
+            OnClose(evt);
         };
-        gameConnect.ws.onerror = function(err) {
-            gameConnect.OnError(err);
+        websocket.onerror = function(err) {
+            OnError(err);
         };
-    },
+    };
 
-    AddCallback: function(callback) {
+    this.AddCallback = function(callback) {
         var id = 0;
-        if (this.callbackIds.length > 0) {
-            id = this.callbackIds[this.callbackIds.length - 1] + 1;
+        if (callbackIds.length > 0) {
+            id = callbackIds[callbackIds.length - 1] + 1;
         }
-        this.callbacks.push(callback);
-        this.callbackIds.push(id);
+        callbacks.push(callback);
+        callbackIds.push(id);
         return id;
-    },
+    };
 
-    RemoveCallback: function(id) {
-        for (var i = 0; i < this.callbackIds.length; i++) {
-            if (this.callbackIds[i] == id) {
-                this.callbackIds.splice(i, 1);
-                this.callbacks.splite(i, 1);
+    this.RemoveCallback = function(id) {
+        for (var i = 0; i < callbackIds.length; i++) {
+            if (callbackIds[i] == id) {
+                callbackIds.splice(i, 1);
+                callbacks.splice(i, 1);
             }
         }
-    },
+    };
 
-    OnOpen: function() {
+    var OnOpen = function() {
         console.log("Connection to websocket opened!");
 
-        for (var i = 0; i < this.callbacks.length; i++) {
-            this.callbacks[i].onOpen();
+        for (var i = 0; i < callbacks.length; i++) {
+            callbacks[i].onOpen();
         }
+        isOpen = true;
+    };
 
-        var msg = {
-            msgtype:"init",
-            source:"server",
-            clientid:"1030410200125"
-        };
-        this.ws.send(JSON.stringify(msg));
-    },
-
-    OnMessage: function(evt) {
+    var OnMessage = function(evt) {
         console.log("Websocket Message from server: " + evt.data);
         
 
         var msg = JSON.parse(evt.data);
         if (msg.hasOwnProperty('clientId')) {
-            this.clientId = msg.clientId;
+            clientId = msg.clientId;
         }
-        for (var i = 0; i < this.callbacks.length; i++) {
-            this.callbacks[i].onMessage(msg);
+        for (var i = 0; i < callbacks.length; i++) {
+            callbacks[i].onMessage(msg);
         }
 
-    },
+    };
     
-    OnClose: function(evt) {
+    var OnClose = function(evt) {
         console.log("Connection to websocket closed!");
-        for (var i = 0; i < this.callbacks.length; i++) {
-            this.callbacks[i].onClose(evt);
+        for (var i = 0; i < callbacks.length; i++) {
+            callbacks[i].onClose(evt);
         }
+        isOpen = false;
             
-    },
+    };
 
-    OnError: function(err) {
+    var OnError = function(err) {
         console.log("Websocket Error: " + err);
-        for (var i = 0; i < this.callbacks.length; i++) {
-            this.callbacks[i].onError(err);
+        for (var i = 0; i < callbacks.length; i++) {
+            callbacks[i].onError(err);
         }
-    },
+    };
 
-    Send: function(msg){
-        msg.clientId = gameConnect.clientId;
+    this.Send = function(msg){
+        msg.clientId = clientId;
         var msgString = JSON.stringify(msg);
         console.log("Sending: " + msgString);
-        this.ws.send(msgString);
-    },
+        websocket.send(msgString);
+    };
 
     //Reports actions taken by players to the server
     //Please note the functions which report success are contained in either gameobjects.js or gamerecipes.js.
-    ReportCmdSucc: function(obj, target, action, log) {
+    this.ReportCmdSucc = function(obj, target, action, log) {
         var token = {
                 msgtype: "action",
                 msg: {
@@ -117,23 +125,10 @@ var gameConnect = {
                 }
             };
         if (action !== "") {         
-            gameConnect.Send(token);
+            Send(token);
         }
         else {
             console.log("Failed to send message: " + JSON.stringify(token));
         }
-    },
-    
-    //Reports state transformations occurring due to met prereqs
-    //e.g. water boiling
-    ReportTransform: function(obj, loc, newobj, log) {
-        var token = {
-            msgtype: "transform",
-            msg: {
-            params: [obj, loc, newobj],
-            logmsg: log
-            }
-        };
-        gameConnect.Send(token);
-    }
-};
+    };
+}

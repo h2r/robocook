@@ -92,8 +92,6 @@ var GameSceneSplash = function(actionHandler) {
 		console.log("Splash Scene -> Processing splash start command...");
 		CurrentGameState = EnumGameState.SplashTrans;
 		console.log("Splash Scene -> Setting game state to transition.");
-
-		gameConnect.AddCallback(inventoryGrid);
 	};
 	
 	this.Trans = function() {

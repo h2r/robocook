@@ -80,10 +80,10 @@ GamePainter.prototype.init = function(mouseTracker) {
             .addSprite("holdingBox", {width: 64, height: 64, posx: 0, posy: 0})
             .end()
         .addGroup("selectionDiv", {width: 756, height: 512, posx: 0, posy: 0})
-            .mousemove(mouseTracker.RecordMousePos)
+            .mousemove(mouseTracker.onMouseMove)
             //.click(mouseTracker.RegisterClick)
-            .mousedown(mouseTracker.RegisterDown)
-            .mouseup(mouseTracker.RegisterUp)
+            .mousedown(mouseTracker.onMouseDown)
+            .mouseup(mouseTracker.onMouseUp)
             .end()
         .addGroup("recipeBackground", {width: 384, height: 192, posx: 384, posy: 0})
             .css({"background-image": "url('./Sprites/RecipeDivBG.PNG')", "overflow": "visible"})
@@ -164,6 +164,11 @@ var ActionBarPainter = function(usedActions, onClick) {
 
         $("actSelecter").x(64 * selector);
     };
+
+    this.getBounds = function() {
+        var div = $("#" + DisplayDiv);
+        return {"left":div.x(), "right":div.x() + div.width(), "bottom":div.y(), "top": div.y() + div.height()};
+    };
 }
 
 ActionBarPainter.prototype = (function() {
@@ -200,12 +205,12 @@ var getSprite = function(action) {
     };
 })();
 
-var AppliancePainter = function(posx, posy) {
+var AppliancePainter = function(posx, posy, currentSlot, anim) {
     "use strict";
 
-    var animation = null;
+    var animation = anim;
     var group = "appliances";
-    var slot = "";
+    var slot = currentSlot;
     var containers = [];
     var x = posx;
     var y = posy;
@@ -233,7 +238,7 @@ var AppliancePainter = function(posx, posy) {
                 {animation: animation, width: 128, height: 128, posx: x, posy: y});
         }
         else {
-            $("#" + slot.toString()).setAnimation(animation);
+            slotObject.setAnimation(animation);
         }
         for (var i = 0; i < containers.length; i++) {
             containers[i].draw();
@@ -241,10 +246,10 @@ var AppliancePainter = function(posx, posy) {
     };
 }
 
-var ContainerPainter = function(posx, posy) {
+var ContainerPainter = function(posx, posy, anim) {
 
     var group = "containers";
-    var animation = null;
+    var animation = anim;
     var slot = "";
     var x = posx;
     var y = posy;
@@ -283,7 +288,7 @@ var ContainerPainter = function(posx, posy) {
 var MatchConsolePainter = function() {
     "use strict";
     var DisplayDiv = "consoleDiv";
-    var text;
+    var text = [];
 
     $("consoleBackground")
         .addGroup(DisplayDiv, {width: 374, height: 186, posx: 10, posy: 6})
@@ -330,4 +335,52 @@ var HoldingBoxPainter = function() {
             holdingObjectPainter.draw();
         }
     };
+};
+
+var RecipePainter = function() {
+    "use strict";
+    var x, y;
+    var text;
+    var status;
+
+    this.SetX = function(newX) {
+        x = newX;
+    };
+
+    this.SetY = function(newY) {
+        y = newY;
+    };
+
+    this.setText = function(newText) {
+        text = newText;
+        if (typeof status === 'undefined') {
+            status = [];
+            for (var i = 0; i < text.length; i++) {
+                status[i] = false;
+            }
+        }
+    };
+
+    this.setStatus = function(newStatus) {
+        status = newStatus;
+        for (var i = status.length; i < text.length; i++) {
+            status[i] = false;
+        }
+    };
+
+    this.draw = function(){
+        if (typeof text === 'undefined') {
+            return;
+        }
+        $("#recipeDiv").html("");
+        $("#recipeDiv").append("<u>"+text[0]+"</u>");
+        $("#recipeDiv").append("<ol>");
+        var color;
+        for (var i=1; i<text.length; i++) {
+            color = (status[i]) ? "gray" : "black";
+                $("#recipeDiv").append("<li id='rlist"+(i-1)+"'>"+text[i]+"</li>").css({"color":color});
+        }
+        $("#recipeDiv").append("</ol>");
+    };
+
 };

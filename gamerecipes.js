@@ -46,3 +46,21 @@ var GeneralHandler = function(){
 
     }
 };
+
+var Recipe = function() {
+
+    var painter = new RecipePainter();
+
+    this.onMessage = function(msg) {
+        if ('recipe' in msg) {
+            painter.setText(msg.recipe);
+        }
+        if ('status' in msg) {
+            painter.setStatus(msg.status);
+        };
+    };
+
+    this.getPainter = function() {
+        return painter;
+    };
+};
