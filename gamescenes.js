@@ -14,8 +14,11 @@ var EnumGameMode = {
 	Multiplayer: 2
 };
 
-var gameSceneSplash = {
-	Init : function() {
+var GameSceneSplash = function(actionHandler) {
+	"use strict";
+
+	var actionHandler = actionHandler;
+	this.Init = function() {
 		console.log("Splash Scene -> Initializing.");
 		$("#stage").append("<div id='"+gameConfig.SceneSplashName+"'></div>");
 		
@@ -83,27 +86,27 @@ var gameSceneSplash = {
 		//Game state change
 		CurrentGameState = EnumGameState.SplashIdle;
 		console.log("Splash Scene -> Setting game state to idle.");
-	},
+	};
 	
-	Start : function() {
+	this.Start = function() {
 		console.log("Splash Scene -> Processing splash start command...");
 		CurrentGameState = EnumGameState.SplashTrans;
 		console.log("Splash Scene -> Setting game state to transition.");
-		actionHandler = generalHandler
+
 		gameConnect.AddCallback(inventoryGrid);
-	},
+	};
 	
-	Trans : function() {
+	this.Trans = function() {
 		console.log("Splash Scene -> Transitioning to Main Menu.");
 		//Destroy existing scene
 		$("#"+gameConfig.SceneSplashName).remove();
 		CurrentGameState = EnumGameState.MatchInit;
-	}
-};
+	};
+}
 
-var gameSceneMainMenu = {	
+var GameSceneMainMenu = function() {	
 	//Methods
-	Init: function() {
+	this.Init = function() {
 		console.log("Main Menu Scene -> Initializing.");
 		$("body").append("<div id='"+gameConfig.SceneMainMenuName+"'></div>");
 		
@@ -155,9 +158,9 @@ var gameSceneMainMenu = {
 			
 		//Change state
 		CurrentGameState = EnumGameState.MainMenuIdle;
-	},
+	};
 	
-	Singleplayer: function () {
+	this.Singleplayer = function () {
 
 		actionHandler = generalHandler;
 		//gameRecipe = recipeBrownies;
@@ -174,9 +177,9 @@ var gameSceneMainMenu = {
 
 		CurrentGameState = EnumGameState.MainMenuTrans;		
 		console.log("Main Menu Scene -> Setting game state to transition.");
-	},
+	};
 	
-	Multiplayer: function () {
+	this.Multiplayer = function () {
 		actionHandler = gnocchiHandler;
 		gameRecipe = recipeGnocchi;
 		gameIngList = ingListGnocchi;
@@ -195,12 +198,12 @@ var gameSceneMainMenu = {
 		console.log("Main Menu Scene -> Paging server...");
 		CurrentGameState = EnumGameState.MainMenuTrans;		
 		console.log("Main Menu Scene -> Setting game state to transition.");
-	},
+	};
 	
-	Exit: function () {
-	},
+	this.Exit = function () {
+	};
 	
-	Trans: function() {
+	this.Trans = function() {
 		console.log("Main Menu Scene -> Cleaning up...");
 		//Destroy existing scene
 		$("#"+gameConfig.SceneMainMenuName).remove();
@@ -215,28 +218,28 @@ var gameSceneMainMenu = {
 				CurrentGameState = EnumGameState.MatchInit;
 				break;
 		}
-	}
-};
+	};
+}
 
-var gameSceneMatchmaking = {
-	Init: function() {
+var GameSceneMatchmaking = function(){
+	this.Init = function() {
 		throw ("Not yet implemented!");
-	},
+	};
 	
-	Trans: function() {
+	this.Trans = function() {
 		throw ("Not yet implemented!");
-	}
-};
+	};
+}
 
 ////////////////////
 //Post Match Scene//
 ////////////////////
-var gameScenePostMatch = {
-	Init: function() {
+var GameScenePostMatch = function(){
+	this.Init = function() {
 		throw ("Not yet implemented!");
-	},
+	};
 	
-	Trans: function() {
+	this.Trans = function() {
 		throw ("Not yet implemented!");
-	}
-};
+	};
+}

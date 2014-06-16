@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////
 
 var gameConnect = {
-    wsurl: "ws://echo.websocket.org",
+    wsurl: "ws://127.0.1.1:8787",
     callbacks: new Array(),
     callbackIds: new Array(),
     ws: 0,
