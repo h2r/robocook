@@ -120,6 +120,11 @@ var GridPainter = function() {
         painters = newPainters;
     };
 
+
+    this.clear = function() {
+        painters = [];
+    };
+
     this.draw = function() {
         for (var i = 0; i < painters.length; i++) {
             painters[i].draw();
@@ -205,7 +210,7 @@ var getSprite = function(action) {
     };
 })();
 
-var AppliancePainter = function(posx, posy, currentSlot, anim) {
+var AppliancePainter = function(anim, posx, posy, currentSlot) {
     "use strict";
 
     var animation = anim;
@@ -219,6 +224,10 @@ var AppliancePainter = function(posx, posy, currentSlot, anim) {
         containers.push(newContainer);
     };
 
+    this.setPosition = function(newX, newY) {
+        x = newX;
+        y = newY;
+    }
     this.setGroup = function(newGroup) {
         group = newGroup;
     };
@@ -232,9 +241,9 @@ var AppliancePainter = function(posx, posy, currentSlot, anim) {
     };
 
     this.draw = function() {
-        var slotObject = $("#" + this.slot.toString());
-        if (typeof slotObject == 'undefined') {
-            $("#" + this.group).addSprite(slot.toString(), 
+        var slotObject = $("#" + slot.toString());
+        if (slotObject.length == 0) {
+            $("#" + group).addSprite(slot.toString(), 
                 {animation: animation, width: 128, height: 128, posx: x, posy: y});
         }
         else {
@@ -246,41 +255,67 @@ var AppliancePainter = function(posx, posy, currentSlot, anim) {
     };
 }
 
-var ContainerPainter = function(posx, posy, anim) {
-
-    var group = "containers";
+var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
+    "use strict";
+    var group = (typeof containerGroup !== 'undefined') ? containerGroup : "containers";
     var animation = anim;
-    var slot = "";
+    var slot = currentSlot;
     var x = posx;
     var y = posy;
 
-    this.setNewPosition = function(newX, newY) {
+    var getSlotObject = function() {
+        var slotObject =  $("#" + slot.toString());
+        if (slotObject.length == 0) {
+            setSprite();
+        }
+        return $("#" + slot.toString());
+    }
+
+    var setSprite = function() {
+        if (typeof group !== 'undefined') {
+            $("#" + group).addSprite(slot.toString(), 
+                {animation: animation, width: 64, height: 64, posx: x, posy: y});
+        }
+    }
+
+    this.setPosition = function(newX, newY) {
         x = newX;
         y = newY;
     };
 
     this.setGroup = function(newGroup) {
         group = newGroup;
+        $("#" + slot).html();
+        setSprite();
     };
 
     this.setAnimation = function(newAnimation) {
         animation = newAnimation;
+        var slotObject = getSlotObject();
+        if (slotObject.length != 0) {
+            slotObject.setAnimation(animation);
+        }
     };
 
     this.setSlot = function(newSlot) {
+        var oldSlotObject = getSlotObject();
+        if (oldSlotObject.length != 0) {
+            oldSlotObject.html();
+        }
+
         slot = newSlot;
+        var newSlotObject = getSlotObject();
+        newSlotObject.setAnimation(animation);
     };
 
     this.draw = function() {
-        var slotObject = $("#" + this.slot.toString());
-        if (typeof slotObject == 'undefined') {
-            $("#" + group).addSprite(slot.toString(), 
-                {animation: animation, width: 64, height: 64, posx: x, posy: y});
+        var slotObject = getSlotObject();
+        if (slotObject.length == 0) {
+            setSprite();
         }
         else {
             slotObject.x(x);
             slotObject.y(y);
-            slotObject.setAnimation(animation);
         }
     };
 }
@@ -311,26 +346,42 @@ var MatchConsolePainter = function() {
 var HoldingBoxPainter = function() {
     "use strict";
     var x, y;
+    var holdingGroup = "holding";
 
-    var holdingObjectPainter;
+    var holdingObjectPainter = null;
 
-    this.SetX = function(newX) {
+    var getGroupObject = function() {
+        return $("#" + holdingGroup);
+    };
+
+    this.setPosition = function(newX, newY) {
         x = newX;
-    };
-
-    this.SetY = function(newY) {
         y = newY;
+        this.draw();
     };
 
-    this.setHoldingObjectPainter = function(objPainter) {
+    this.setHoldingObjectPainter = function(objPainter, tileX, tileY) {
         holdingObjectPainter = objPainter;
+        holdingObjectPainter.setGroup(holdingGroup);
+        holdingObjectPainter.setPosition(-tileX,-tileY);
+        this.draw();
     };
 
     this.clearHoldingObjectPainter = function() {
+        if (holdingObjectPainter) {
+            holdingObjectPainter.setGroup();
+        }
         holdingObjectPainter = null;
+
+        var groupObject = getGroupObject();
+        groupObject.html();
     };
 
     this.draw = function() {
+        var groupObject = getGroupObject();
+        groupObject.x(x);
+        groupObject.y(y);
+
         if (holdingObjectPainter) {
             holdingObjectPainter.draw();
         }

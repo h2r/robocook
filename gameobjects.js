@@ -72,6 +72,18 @@ function gameIngredient(id, name, sprite, infinite, fnDesc)
             throw "Invalid action!";
         }
     };
+
+    this.getPainter = function() {
+        console.log("gameIngredient.getPainter(): This function is deprecated, stop calling it");
+    };
+
+    this.setSlot = function() {
+        console.log("gameIngredinet.setSlot(): This function is deprecated, stop calling it");
+    };
+
+    this.setPosition = function(x, y) {
+        painter.setPosition(x,y);
+    };
     
     this.Activate = function() {
         throw "Activation not yet implemented!";
@@ -90,40 +102,44 @@ function gameContainer(id, name, sprite)
     
     
     this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
-    var painter = new ContainerPainter(0, 0, this.Anim);
+    var painter = new ContainerPainter(this.Anim, 0, 0, 0, "containers");
     this.Desc = function() {    
-        if (!this.Contains.length) {
+        if (!Contains.length) {
             return "This is an empty " + this.Name;
         } else {
             var str = "This is a " + this.Name + " containing";
-            for (var i=0; i<this.Contains.length; i++) {
+            for (var i=0; i<Contains.length; i++) {
                 if (i >= 1) str += ",";
-                str += " " + this.Contains[i];
+                str += " " + Contains[i];
             }
             return str;
         }
     };
     
-    this.Contains = [];
+    var Contains = [];
     
     this.ActOn = function(gobj, slot, origin) {
-        var logMsg = this.Name + " acted on " + gobj.Name;  
-        console.log(logMsg);        
-
-        var action = inventoryGrid.GetMoveAction(this, gobj);
-            
-        if (gobj.Type === EnumGOType.App) 
+        var logMsg,
+            action;
+        if (gobj.Type === EnumGOType.App || gobj.Type === EnumGOType.Cont) 
         {
-            gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
+            logMsg = this.Name + " acted on " + gobj.Name;  
+            console.log(logMsg);        
+            action = ActionBar.getMoveAction(this, gobj);
         } 
-        else if (gobj.Type === EnumGOType.Cont) 
-        {
-            gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
-        } 
+        return {"ID": this.ID, "targetID": gobj.ID, "action": action, "message": logMsg};
     };
 
     this.getPainter = function() {
         return painter;
+    };
+
+    this.setSlot = function(slot) {
+        painter.setSlot(slot);
+    };
+
+    this.setPosition = function(x, y) {
+        painter.setPosition(x,y);
     };
     
     //Transfer contents of container to new container
@@ -147,9 +163,9 @@ function gameIngredientContainer(id, name, sprite, ingredient) {
     this.IsMovable = true;
 
     this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
-    var painter = new ContainerPainter(0, 0, this.Anim);
+    var painter = new ContainerPainter(this.Anim, 0, 0, 0, "ingredients");
     this.Desc = function() {    
-        if (!this.Contains.length) {
+        if (!Contains.length) {
             return "This is an empty " + this.Name;
         } else {
             var str = "This is a " + this.Name + " containing " + this.Ingredient;
@@ -157,9 +173,9 @@ function gameIngredientContainer(id, name, sprite, ingredient) {
         }
     };
     
-    this.Contains = [];
+    var Contains = [];
     if (typeof ingredient != ingredient  && ingredient !== "") {
-        this.Contains = [this.Ingredient];
+        Contains = [this.Ingredient];
     }
     
     this.RemoveFrom = function(gobj) {
@@ -167,16 +183,27 @@ function gameIngredientContainer(id, name, sprite, ingredient) {
     };
     
     this.ActOn = function(gobj, slot, origin) {
+        var action,
+            logMsg;
         if (gobj.Type === EnumGOType.Cont) {
-            var action = inventoryGrid.GetMoveAction(this, gobj);
-            var logMsg = this.Name + " acted on " + gobj.Name;          
-            gameConnect.ReportCmdSucc(this.ID, gobj.ID, action, logMsg);
+            action =  ActionBar.getMoveAction(this, gobj);
+            logMsg = this.Name + " acted on " + gobj.Name;          
         }
+
+        return {"ID": this.ID, "targetID": gobj.ID, "action": action, "message": logMsg};
     };
 
     this.getPainter = function() {
         return painter;
     };
+
+    this.setPosition = function(x, y) {
+        painter.setPosition(x,y);
+    };
+
+    this.setSlot = function(slot) {
+        painter.setSlot(slot);
+    }; 
 }
 
 //////////////////
@@ -191,12 +218,12 @@ function gameAppliance(id, name, sprite, containers)
     this.IsMovable = false;
 
     this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
-    var painter = new AppliancePainter(0, 0, this.Anim);
+    var painter = new AppliancePainter(this.Anim, 0, 0, 0);
     this.Desc = function() {    
-        if (!this.Contains.length) {
+        if (!Contains.length) {
             return "This is an empty " + this.Name;
         } else {
-            var str = "This is a " + this.Name + " containing: " + this.Contains[0].Desc();
+            var str = "This is a " + this.Name + " containing: " + Contains[0].Desc();
             return str;
         }
     };
@@ -230,7 +257,7 @@ function gameAppliance(id, name, sprite, containers)
     };
     
     this.IsEmpty = function(slot) {
-        return (this.Contains.length <= slot);
+        return (Contains.length <= slot);
     };
 
     this.Activate = function() {
@@ -239,6 +266,14 @@ function gameAppliance(id, name, sprite, containers)
 
     this.getPainter = function() {
         return painter;
+    };
+
+    this.setSlot = function(slot) {
+        painter.setSlot(slot);
+    };
+
+    this.setPosition = function(x, y) {
+        painter.setPosition(x,y);
     };
 }
 

@@ -2,6 +2,8 @@ var ObjectHolder = function() {
 	var holdingObject = null,
 		oldX,
 		oldY,
+		X,
+		Y,
 		painter = new HoldingBoxPainter();
 
 	this.IsHolding = function() {
@@ -9,22 +11,29 @@ var ObjectHolder = function() {
 	};
 
 	this.SetPosition = function(x, y) {
-		painter.SetX(x);
-		painter.SetY(y);
+		X = x;
+		Y = y;
+		painter.setPosition(x, y);
 	};
 
-	this.SetHoldingObject = function(obj, x, y) {
+	this.SetHoldingObject = function(obj, x, y, tileX, tileY) {
 		holdingObject = obj;
+
 		oldX = x;
 		oldY = y;
-		painter.setHoldingObjectPainter(obj.getPainter());
+
+		painter.setHoldingObjectPainter(obj.getPainter(), tileX, tileY);
 	};
 
 	this.Pop = function() {
 		var obj = holdingObject;
 		holdingObject = null;
 		painter.clearHoldingObjectPainter();
-		return {object:obj, x:oldX, y:oldY};
+		return {object:obj, x:X, y:Y, oldX:oldX, oldY:oldY};
+	};
+
+	this.getPainter = function() {
+		return painter;
 	};
 
 }

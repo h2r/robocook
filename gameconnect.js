@@ -125,7 +125,7 @@ var GameConnect = function(){
                 }
             };
         if (action !== "") {         
-            Send(token);
+            this.Send(token);
         }
         else {
             console.log("Failed to send message: " + JSON.stringify(token));
