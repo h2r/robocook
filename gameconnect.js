@@ -19,7 +19,7 @@ var GameConnect = function(){
     }
     GameConnect.prototype._gameSceneMatch = this;
     
-    var wsurl = "ws://127.0.1.1:8787",
+    var wsurl = "ws://127.0.0.1:8787",
         callbacks = [],
         callbackIds = [],
         ws = 0,

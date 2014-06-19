@@ -92,7 +92,9 @@ GamePainter.prototype.init = function(mouseTracker) {
                 .end().end()
         .addGroup("consoleBackground", {width: 384, height: 192, posx: 0, posy: 0})
             .css({"background-image": "url('./Sprites/TerminalDivBG.PNG')", "overflow": "visible"})
-            .end()
+            .addGroup("consoleDiv", {width: 374, height: 180, posx: 10, posy: 6})
+                .css({"font-size": "10pt", "color": "green", "overflow": "auto"})
+                .end().end()
         .addGroup(actionText.DisplayDiv, {width: 256, height: 64, posx: 448, posy: 448})
             .end();
 
@@ -285,7 +287,8 @@ var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
 
     this.setGroup = function(newGroup) {
         group = newGroup;
-        $("#" + slot).html();
+        var slotObject = getSlotObject();
+        slotObject.remove();
         setSprite();
     };
 
@@ -299,9 +302,7 @@ var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
 
     this.setSlot = function(newSlot) {
         var oldSlotObject = getSlotObject();
-        if (oldSlotObject.length != 0) {
-            oldSlotObject.html();
-        }
+        oldSlotObject.remove();
 
         slot = newSlot;
         var newSlotObject = getSlotObject();
@@ -320,28 +321,77 @@ var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
     };
 }
 
+var RecipePainter = function() {
+    "use strict";
+    var x, y;
+    var text;
+    var status;
+
+    this.SetX = function(newX) {
+        x = newX;
+    };
+
+    this.SetY = function(newY) {
+        y = newY;
+    };
+
+    this.setText = function(newText) {
+        text = newText;
+        if (typeof status === 'undefined') {
+            status = [];
+            for (var i = 0; i < text.length; i++) {
+                status[i] = false;
+            }
+        }
+    };
+
+    this.setStatus = function(newStatus) {
+        status = newStatus;
+        for (var i = status.length; i < text.length; i++) {
+            status[i] = false;
+        }
+    };
+
+    this.draw = function(){
+        if (typeof text === 'undefined') {
+            return;
+        }
+        $("#recipeDiv").html("");
+        $("#recipeDiv").append("<u>" + text[0] + "</u>");
+        $("#recipeDiv").append("<ol>");
+        var color;
+        for (var i = 1; i < text.length; i++) {
+            color = (status[i]) ? "gray" : "black";
+                $("#recipeDiv").append("<li id='rlist" + (i - 1) + "'>" + text[i] + "</li>").css({"color":color});
+        }
+        $("#recipeDiv").append("</ol>");
+    };
+
+}
+
 var MatchConsolePainter = function() {
     "use strict";
     var DisplayDiv = "consoleDiv";
     var text = [];
-
-    $("consoleBackground")
-        .addGroup(DisplayDiv, {width: 374, height: 186, posx: 10, posy: 6})
-            .css({"font-size": "10pt", "color": "green", "overflow": "auto"})
-        .end()
+    var height = $("#" + DisplayDiv).height() - 8;
 
     this.setText = function(lines) {
         text = lines;
     };
 
     this.draw = function() {
-        $("#" + DisplayDiv).html();
+        $("#" + DisplayDiv).html("");
         for (var i = 0; i < text.length; i++) {
-            $("#" + DisplayDiv).append(text[i] + "<br/>");
-            //.scrollTop($("#" + DisplayDiv)[0].scrollHeight);
+            $("#" + DisplayDiv).append(text[i] + "</br>");
         }
+        var scrollAmount = $("#" + DisplayDiv).height();
+        $("#" + DisplayDiv).scrollTop(scrollAmount);
+        //$("#" + DisplayDiv).append("<u>" + text[0] + "</u>");
+        //$("#" + DisplayDiv).append("<ol>");
+        
+        //$("#" + DisplayDiv).append("</ol>");
     };
-};
+}
 
 var HoldingBoxPainter = function() {
     "use strict";
@@ -386,52 +436,4 @@ var HoldingBoxPainter = function() {
             holdingObjectPainter.draw();
         }
     };
-};
-
-var RecipePainter = function() {
-    "use strict";
-    var x, y;
-    var text;
-    var status;
-
-    this.SetX = function(newX) {
-        x = newX;
-    };
-
-    this.SetY = function(newY) {
-        y = newY;
-    };
-
-    this.setText = function(newText) {
-        text = newText;
-        if (typeof status === 'undefined') {
-            status = [];
-            for (var i = 0; i < text.length; i++) {
-                status[i] = false;
-            }
-        }
-    };
-
-    this.setStatus = function(newStatus) {
-        status = newStatus;
-        for (var i = status.length; i < text.length; i++) {
-            status[i] = false;
-        }
-    };
-
-    this.draw = function(){
-        if (typeof text === 'undefined') {
-            return;
-        }
-        $("#recipeDiv").html("");
-        $("#recipeDiv").append("<u>"+text[0]+"</u>");
-        $("#recipeDiv").append("<ol>");
-        var color;
-        for (var i=1; i<text.length; i++) {
-            color = (status[i]) ? "gray" : "black";
-                $("#recipeDiv").append("<li id='rlist"+(i-1)+"'>"+text[i]+"</li>").css({"color":color});
-        }
-        $("#recipeDiv").append("</ol>");
-    };
-
-};
+}

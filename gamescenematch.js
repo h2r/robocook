@@ -49,8 +49,7 @@ var GameSceneMatch = function(actionHandler, grid){
 		mouseTracker.addOnMouseDrag(inventoryGrid);
 		mouseTracker.addOnMouseDown(actionBar);
 
-		matchConsole.Init();
-
+		
 		var newPainters = this.GetPainters();
 		gamePainter.addPainters(newPainters);
 
@@ -291,18 +290,6 @@ var InventoryGrid = function(matchCon) {
 
 		assignSlots(applianceObjects, containerObjects, ingredientContainerObjects);
 		updatePainter();
-
-
-
-
-
-
-
-
-
-
-
-
 	};
 
 	var getGroupOfObject = function(object) {
@@ -910,7 +897,7 @@ var InventoryGrid = function(matchCon) {
 
 	var SetObjectAtPosition = function(obj, x, y) {
 		var slot = getObjectSlotFromPosition(x, y);
-		var appliance = GetApplianceFromSlot(x, y);
+		var appliance = GetApplianceFromSlot(slot);
 		var toObj,
 			event;
 		if (typeof appliance !== 'undefined') {
@@ -1307,19 +1294,6 @@ var MatchConsole = function() {
 	"use strict";
 	var Lines = [];
 	var painter = new MatchConsolePainter();
-	this.Init = function() {
-		Lines = [
-			"Welcome to ROBOCOOK!", 
-			"-", 
-			"-", 
-			"-", 
-			"-",
-			"-",
-			"-",
-			"-",
-			"-",
-		];
-	};
 	
 	this.Peek = function() {
 		return Lines[this.Lines.length-1];
