@@ -45,9 +45,54 @@ var SplashPainter = function(startOnClick, textOnKeyDown) {
     };
 }
 
-var GamePainter = function() {
+var GamePainter = function(mouseTracker) {
     "use strict";
     var painters = [];
+    $.playground().pauseGame().clearScenegraph().startGame().addGroup(
+            "background", {width: gameConfig.StageWidth, height: gameConfig.StageHeight}).addSprite(
+            "background", {animation: gameAnimations.background1, width: gameConfig.StageWidth, height: gameConfig.StageHeight}).end()
+        .mousemove(mouseTracker.onMouseMove)
+        .mousedown(mouseTracker.onMouseDown)
+        .mouseup(mouseTracker.onMouseUp)    
+        .addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 192}).end()
+        .addGroup("containers", {width: 768, height: 64, posx: 0, posy: 320}).end()
+        .addGroup("ingredients", {width: 768, height: 64, posx: gamePos.MatchDivIngsX, posy: gamePos.MatchDivIngsY}).end()
+        .addGroup("holding", {width: 756, height: 512, posx: 0, posy: 0})
+            .addSprite("app1Box", {width: 64, height: 64, posx: 32, posy: 288-64})
+            .addSprite("app2Box", {width: 64, height: 64, posx: 160, posy: 288-64})
+            .addSprite("app3Box", {width: 64, height: 64, posx: 288, posy: 288-64})
+            .addSprite("holdingBox", {width: 64, height: 64, posx: 0, posy: 0})
+            .end()
+        .addGroup("selectionDiv", {width: 756, height: 512, posx: 0, posy: 0})
+            .end()
+        .addGroup("recipeBackground", {width: 384, height: 192, posx: 384, posy: 0})
+            .css({"background-image": "url('./Sprites/RecipeDivBG.PNG')", "overflow": "visible"})
+            .addGroup("recipeDiv", {width: 374, height: 186, posx: 10, posy: 6})
+                .css({"font-size": "10pt", "color": "black", "overflow": "auto"})
+                .end().end()
+        .addGroup("consoleBackground", {width: 384, height: 192, posx: 0, posy: 0})
+            .css({"background-image": "url('./Sprites/TerminalDivBG.PNG')", "overflow": "visible"})
+            .addGroup("consoleDiv", {width: 374, height: 180, posx: 10, posy: 6})
+                .css({"font-size": "10pt", "color": "green", "overflow": "auto"})
+                .end().end()
+        .addGroup("actionDiv",{width: 768, height: 64, posx: 0, posy: 448})
+            .css({"font-size": "8pt", "color": "yellow", "overflow": "auto"})
+            .addSprite("actSelector", {animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 0})
+            .append("<button id='matchResetBtn' type='button'>Reset</button>")
+            .end()
+        .addGroup(actionText.DisplayDiv, {width: 256, height: 64, posx: 448, posy: 448})
+            .end();
+
+    //Configure reset button
+    $("#matchResetBtn").css({
+        "position":"absolute",
+        "top":16,
+        "left":708}).click(function(event) {
+            event.preventDefault();
+            //console.log("Match Scene -> Reset button clicked!");
+            RegisterCommand(gameConfig.SceneMatchName, EnumGameCommands.MatchReset);
+        });     
+        
 
     this.draw = function () {
         var i = 0;  
@@ -65,51 +110,6 @@ var GamePainter = function() {
     };
 }
 
-GamePainter.prototype.init = function(mouseTracker) {
-    "use strict";
-    $.playground().pauseGame().clearScenegraph().startGame().addGroup(
-            "background", {width: gameConfig.StageWidth, height: gameConfig.StageHeight}).addSprite(
-            "background", {animation: gameAnimations.background1, width: gameConfig.StageWidth, height: gameConfig.StageHeight}).end()
-        .addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 192}).end()
-        .addGroup("containers", {width: 768, height: 128, posx: 0, posy: 320}).end()
-        .addGroup("ingredients", {width: 768, height: 128, posx: gamePos.MatchDivIngsX, posy: gamePos.MatchDivIngsY}).end()
-        .addGroup("holding", {width: 756, height: 512, posx: 0, posy: 0})
-            .addSprite("app1Box", {width: 64, height: 64, posx: 32, posy: 288-64})
-            .addSprite("app2Box", {width: 64, height: 64, posx: 160, posy: 288-64})
-            .addSprite("app3Box", {width: 64, height: 64, posx: 288, posy: 288-64})
-            .addSprite("holdingBox", {width: 64, height: 64, posx: 0, posy: 0})
-            .end()
-        .addGroup("selectionDiv", {width: 756, height: 512, posx: 0, posy: 0})
-            .mousemove(mouseTracker.onMouseMove)
-            //.click(mouseTracker.RegisterClick)
-            .mousedown(mouseTracker.onMouseDown)
-            .mouseup(mouseTracker.onMouseUp)
-            .end()
-        .addGroup("recipeBackground", {width: 384, height: 192, posx: 384, posy: 0})
-            .css({"background-image": "url('./Sprites/RecipeDivBG.PNG')", "overflow": "visible"})
-            .addGroup("recipeDiv", {width: 374, height: 186, posx: 10, posy: 6})
-                .css({"font-size": "10pt", "color": "black", "overflow": "auto"})
-                .end().end()
-        .addGroup("consoleBackground", {width: 384, height: 192, posx: 0, posy: 0})
-            .css({"background-image": "url('./Sprites/TerminalDivBG.PNG')", "overflow": "visible"})
-            .addGroup("consoleDiv", {width: 374, height: 180, posx: 10, posy: 6})
-                .css({"font-size": "10pt", "color": "green", "overflow": "auto"})
-                .end().end()
-        .addGroup(actionText.DisplayDiv, {width: 256, height: 64, posx: 448, posy: 448})
-            .end();
-
-    //Configure reset button
-    $("#matchResetBtn").css({
-        "position":"absolute",
-        "top":16,
-        "left":708}).click(function(event) {
-            event.preventDefault();
-            //console.log("Match Scene -> Reset button clicked!");
-            RegisterCommand(gameConfig.SceneMatchName, EnumGameCommands.MatchReset);
-        });     
-        
-};
-
 var GridPainter = function() {
     "use strict";
     var painters = [];
@@ -122,6 +122,17 @@ var GridPainter = function() {
         painters = newPainters;
     };
 
+    this.getBounds = function() {
+        var left,
+            right,
+            top,
+            bottom;
+        left = Math.min($("#appliances").x(), $("#containers").x(), $("#ingredients").x());
+        right = Math.max($("#appliances").x() + $("#appliances").width() , $("#containers").x() + $("#containers").width(), $("#ingredients").x() + $("#ingredients").width());
+        bottom = Math.min($("#appliances").y(), $("#containers").y(), $("#ingredients").y());
+        top = Math.max($("#appliances").y() + $("#appliances").height() , $("#containers").y() + $("#containers").height(), $("#ingredients").y() + $("#ingredients").height());
+        return {top:top, bottom:bottom, left:left, right:right};
+    };  
 
     this.clear = function() {
         painters = [];
@@ -140,16 +151,11 @@ var ActionBarPainter = function(usedActions, onClick) {
         selector = 0;
     var DisplayDiv = "actionDiv";
 
-    $.playground()
-        .addGroup(DisplayDiv,{width: 768, height: 64, posx: 0, posy: 448})
-            .css({"font-size": "8pt", "color": "yellow", "overflow": "auto"})
-            .addSprite("actSelector", {animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 0})
-            .append("<button id='matchResetBtn' type='button'>Reset</button>")
-        .end()
     this.setSelector = function(position) {
-        if (0 <= position && position <= this.actions.length) {
-            this.setSelector = position;
+        if (0 <= position && position < actions.length) {
+            selector = position;
         }
+        this.draw();
     };
 
     this.draw = function() {
@@ -158,28 +164,27 @@ var ActionBarPainter = function(usedActions, onClick) {
             action = 0,
             actionDiv = "",
             animation = null;
+        var actionGroup = $("#" + DisplayDiv);
 
-        for (i = 0; i < actionBar.Actions.length; i++) {
+        for (i = 0; i < actions.length; i++) {
             x = i * 64;
-            action = this.actions[i];
-            animation = this.getSprite(action);
+            action = actions[i];
+            animation = getSprite(action);
             actionDiv = "action_" + i.toString();
 
             actionGroup.addSprite(actionDiv, {animation: animation, width: 64, height: 64, posx: x});
             $("#" + actionDiv).click(onClick);
         }
 
-        $("actSelecter").x(64 * selector);
+        $("#actSelector").x(64 * selector);
     };
 
     this.getBounds = function() {
         var div = $("#" + DisplayDiv);
         return {"left":div.x(), "right":div.x() + div.width(), "bottom":div.y(), "top": div.y() + div.height()};
     };
-}
 
-ActionBarPainter.prototype = (function() {
-var getSprite = function(action) {
+    var getSprite = function(action) {
         switch(action) {
         case EnumActions.Look:
             return gameAnimations.actLook;
@@ -210,7 +215,7 @@ var getSprite = function(action) {
         }
         return -1;
     };
-})();
+}
 
 var AppliancePainter = function(anim, posx, posy, currentSlot) {
     "use strict";
@@ -222,7 +227,7 @@ var AppliancePainter = function(anim, posx, posy, currentSlot) {
     var x = posx;
     var y = posy;
 
-    this.addContainerPainter = function(newContainer) {
+    this.addPainter = function(newContainer) {
         containers.push(newContainer);
     };
 

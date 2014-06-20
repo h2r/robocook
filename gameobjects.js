@@ -232,6 +232,7 @@ function gameAppliance(id, name, sprite, containers)
     
     this.AddTo = function(gobj) {
         Contains.push(gobj);
+        painter.addPainter(gobj.getPainter());
     };
 
     for (var i = 0; i < containers.length; i++) {

@@ -2,7 +2,6 @@ var gameRecipe = null;
 var gameIngList = null;
 var gameTitle = null;
 var winFlag = false;
-var activeAction = 0;
 
 
 var GameSceneMatch = function(actionHandler, grid){
@@ -14,8 +13,8 @@ var GameSceneMatch = function(actionHandler, grid){
     
     var handler = actionHandler;
 	var inventoryGrid = grid;
-	var gamePainter = new GamePainter();
 	var mouseTracker = new MouseTracker();
+	var gamePainter = new GamePainter(mouseTracker);
 	var recipe = new Recipe();
 	var gameConnect = new GameConnect();
 	var matchConsole = new MatchConsole();
@@ -34,20 +33,20 @@ var GameSceneMatch = function(actionHandler, grid){
 		console.log("Match Scene -> Initializing.");
 		
 		//Load kitchen
-		inventoryGrid.Init();
+		inventoryGrid.Init(matchConsole, actionBar);
 		inventoryGrid.addOnActionCallback(this);
 		
 		//Initialize groups, add tiles as sprite
 		actionText.Init();
 		
-		gamePainter.init(mouseTracker);
+		//gamePainter.init(mouseTracker);
 
 		//Init mouse tracker
 		mouseTracker.addOnMouseClick(inventoryGrid);
 		mouseTracker.addOnMouseDown(inventoryGrid);
 		mouseTracker.addOnMouseUp(inventoryGrid);
 		mouseTracker.addOnMouseDrag(inventoryGrid);
-		mouseTracker.addOnMouseDown(actionBar);
+		mouseTracker.addOnMouseClick(actionBar);
 
 		
 		var newPainters = this.GetPainters();
@@ -122,6 +121,7 @@ var GameSceneMatch = function(actionHandler, grid){
 		var painters = inventoryGrid.GetPainters();
 		painters.push(recipe.getPainter());
 		painters.push(matchConsole.GetPainter());
+		painters.push(actionBar.getPainter());
 		return painters;
 	};
 }
@@ -136,51 +136,282 @@ var InventoryGrid = function(matchCon) {
     }
     InventoryGrid.prototype._inventoryGrid = this;
 
+    /////////////////////////////
+    // PRIVATE CLASS VARIABLES //
+    /////////////////////////////
 	var ObjectsToIgnore = [
 		"counter","shelf"
 	];
 
 	var InfiniteIngredients = [
 	];
+
+	var slotsPerRow = gameConfig.StageWidth / 64;
+	
 	
 	var GameObjects = {};
 	var objectSlotLookup = {};
-	this.GameActions = {};
-	this.GameObjectCount = 0;
+	//this.GameActions = {};
+	//this.GameObjectCount = 0;
 	var objectHolder = new ObjectHolder();
-	var slotsPerRow = gameConfig.StageWidth / 64;
 	var gridPainter = new GridPainter();
 	var matchConsole = matchCon;
-	var self = this;
+	//var self = this;
 	var onActionCallbacks = [];
+	var actionBar;
 
-	this.Init = function(state) {
-		$.each(gameObjects, function(key, value) {
-			if (value.Contains) {
-				value.Contains.length = 0;
-			}
-		});
+	////////////////////
+	// PUBLIC METHODS //
+	////////////////////
+	this.Init = function(mConsole, aBar) {
+		matchConsole = mConsole;
+		actionBar = aBar;
 	};
 
+	// public
 	this.addOnActionCallback =function(callback) {
 		onActionCallbacks.push(callback);
 	};
 
+	// public
+	this.onMessage = function(msg) {
+		loadStateFromMsg(msg.state);
+		winFlag = msg.success;
+	};
+
+	// public
+	this.onMouseDown = function(x, y) {
+		if (!isWithinBounds(x,y)) {
+			return;
+		}
+		var obj = removeObjectFromPosition(x, y);
+		var tileX = x % 64;
+		var tileY = y % 64;
+
+		if (typeof obj !== 'undefined') {
+			objectHolder.SetHoldingObject(obj, x, y, tileX, tileY);
+		}
+	};
+
+	// public
+	this.onMouseUp = function() {
+		if (objectHolder.IsHolding()) {
+			var obj = objectHolder.Pop();
+			if (!setObjectAtPosition(obj.object, obj.x, obj.y)) {
+				setObjectAtPosition(obj.object, obj.oldX, obj.oldY);
+			}
+		}
+	};
+
+	// public
+	this.onMouseDrag = function(x, y) {
+		objectHolder.SetPosition(x,y);
+	};
+
+	// public
+	this.onMouseClick = function(x, y) {
+		if (!isWithinBounds(x,y)) {
+			return;
+		}
+		var action = actionBar.getActiveAction();
+		var slot = getSlot(x, y);
+		if (action === EnumActions.ToString(EnumActions.Look)) {
+			var desc = getObjDesc(slot);
+			if (desc) matchConsole.Write(desc);
+		} else {
+			var obj = getObjectFromPosition(x, y);
+			var logMsg  = "Performing " + action + " on " + obj.ID;
+			performAction({"ID": obj.ID, "action": action, "message": logMsg});
+		}
+	};
+
+	// ugh really?
+	this.setActionBar = function(bar) {
+		actionBar = bar;
+	};
+
+	// public
+	this.GetPainters = function() {
+		var painters = [];
+		painters.push(gridPainter);
+		return painters;
+	};
+
+	/////////////////////
+	// PRIVATE METHODS //
+	/////////////////////
+	
+	var isWithinBounds = function(x, y) {
+		var bounds = gridPainter.getBounds();
+		return (bounds.left <= x && x <= bounds.right && bounds.bottom <= y && y <= bounds.top);
+	};
+
+	// getSlot, getObjectFromPosition, removeObjectFromPosition, setObjectAtPosition
+	var getSlotInAppliance = function(slot) {
+		var obj = GameObjects[slot];
+		if (obj instanceof gameAppliance) {
+			return 0;
+		}
+		obj = GameObjects[slot - 1];
+		if (obj instanceof gameAppliance) {
+			return 1;
+		}
+		var width = slotsPerRow;
+		obj = GameObjects[slot - width];	
+		if (obj instanceof gameAppliance) {
+			return 2;
+		}
+		obj = GameObjects[slot - width - 1];	
+		if (obj instanceof gameAppliance) {
+			return 3;
+		}
+		return -1;	
+	};
+
+	// getObjDesc, getObjType, getObjName
+	var getObjFromSlot = function(slot) {
+		var obj = GameObjects[slot];
+		if (typeof obj == 'undefined') {
+			obj = getApplianceFromSlot(slot);
+		}
+		return obj;
+	};
+
+	// getObjectFromPosition
+	var getObjectSlotFromPosition = function(x, y) {
+		var width = slotsPerRow;
+		var rows = Math.floor(y / 64);
+		var columns = Math.floor(x / 64);
+		return rows * width + columns;
+
+	};
+
+	// onMouseClick
+	var getObjectFromPosition = function(x, y) {
+		var slot = getObjectSlotFromPosition(x, y);
+		var appliance = getApplianceFromSlot(slot);
+		var obj;
+		if (typeof appliance != 'undefined') {
+			var applianceSlot = getSlotInAppliance(slot);
+			if (!appliance.IsEmpty(applianceSlot)) {
+				obj = appliance.GetObject(applianceSlot);
+			}
+			else {
+				obj = appliance;
+			}
+		}
+		else {
+			obj = GameObjects[slot];
+		}
+
+		return obj;
+	};
+
+	// onMouseDown
+	var removeObjectFromPosition = function(x, y) {
+		var slot = getObjectSlotFromPosition(x, y);
+		var appliance = getApplianceFromSlot(slot);
+		var obj;
+		if (typeof appliance != 'undefined') {
+			var applianceSlot = getSlotInAppliance(slot);
+			if (!appliance.IsEmpty(applianceSlot)) {
+				obj = appliance.Remove(applianceSlot);
+			}
+		}
+		else {
+			obj = GameObjects[slot];
+			delete GameObjects[slot];
+		}
+
+		return obj;
+	};
+
+	// onMouseUp
+	var setObjectAtPosition = function(obj, x, y) {
+		var slot = getObjectSlotFromPosition(x, y);
+		var appliance = getApplianceFromSlot(slot);
+		var toObj,
+			event;
+		if (typeof appliance !== 'undefined') {
+			toObj = appliance;
+			var applianceSlot = getSlotInAppliance(slot);
+			if (!appliance.IsEmpty(applianceSlot)) {
+				toObj = appliance.GetObject(applianceSlot);
+			}
+			event = obj.ActOn(toObj);
+		}
+		else {
+			toObj = GameObjects[slot];
+			if (typeof toObj !== 'undefined') {
+				event = obj.ActOn(toObj);
+			}
+			setObjectAtSlot(obj, slot);
+		}
+		if (typeof event !== 'undefined') {
+			performAction(event);
+		}
+	};
+
+	// setObjectAtPosition, getObjectDescription
+	var isSlotEmpty = function(slot) {
+		if (slot > 0) {
+			var obj = GameObjects[slot];
+			if (typeof obj == 'undefined' && !isSlotAppliance(slot)) {
+				return true;
+			}
+			return false;
+		}
+		return true;
+	};
+
+	// isSlotEmpty
+	var isSlotAppliance = function(slot) {
+		return (typeof getApplianceFromSlot(slot) != 'undefined');
+	};
+
+	// isSlotAppliance, getObjFromSlot
+	var getApplianceFromSlot = function(slot) {
+		var obj = GameObjects[slot];
+		if (typeof obj == 'undefined') {
+			obj = GameObjects[slot - 1];
+		}
+		var width = slotsPerRow;
+		if (typeof obj == 'undefined') {
+			obj = GameObjects[slot - width];	
+		}
+		if (typeof obj == 'undefined') {
+			obj = GameObjects[slot - (width + 1)];	
+		}
+		if (obj instanceof gameAppliance) {
+			return obj;
+		}
+		return undefined;
+	};
+
+	// setObjectAtPosition
+	var setObjectAtSlot = function(obj, slot) {
+		if (isSlotEmpty(slot)) {
+			GameObjects[slot] = obj;
+		}
+	};
+
+	// setObjectAtPosition
 	var performAction = function(event) {
 		for (var i = 0; i < onActionCallbacks.length; i++) {
 			onActionCallbacks[i].onAction(event);
 		}
 	};	
 	
+	// getApplianceSlots, getContainerSlots, getIngredientContainerSlots
 	var getSlot = function(gx, gy) {
 		var width = slotsPerRow;
 		var rows = Math.floor(gy / 64);
 		var columns = Math.floor(gx / 64);
 		var slot = rows * width + columns;
 
-		var appliance = GetApplianceFromSlot(slot);
+		var appliance = getApplianceFromSlot(slot);
 		if (typeof appliance != 'undefined') {
-			var applianceSlot = GetSlotInAppliance(slot);
+			var applianceSlot = getSlotInAppliance(slot);
 			if (appliance.IsEmpty(applianceSlot)) {
 				return slot;
 			}
@@ -192,6 +423,64 @@ var InventoryGrid = function(matchCon) {
 		return slot;
 	};
 
+	// setPositions
+	var getSlotPosition = function(slot) {
+		slot = parseInt(slot);
+		var row = Math.floor(slot / slotsPerRow),
+			column = slot % slotsPerRow;
+
+		var x = column * 64,
+			y = row * 64;
+
+		var group = getGroupOfObject()
+		if (typeof group !== 'undefined') {
+			var groupObj = $("#" + group.toString());
+			if (groupObj.length != 0) {
+				x -= groupObj.x();
+				y -= groupObj.y();
+			}
+		}
+
+		return {"x": x, "y": y};
+	};
+
+	// getObjectGroupPosition, getSlotPosition
+	var getGroupOfObject = function(object) {
+		var group;
+		if (object instanceof gameContainer) {
+			group = "containers";
+		}
+		else if (object instanceof gameIngredientContainer) {
+			group = "ingredients";
+		}
+		else if (object instanceof gameAppliance) {
+			group = "appliances";
+		}
+		return group;
+	}
+
+	// getApplianceSlots, getContainerSlots, getIngredientContainerSlots
+	var getGroupPosition = function(group) {
+		if (typeof group !== 'undefined') {
+			return {"x":$("#" + group.toString()).x(), "y": $("#" + group.toString()).y()};
+		}
+		return {"x": 0, "y":0};
+	};
+
+	// getApplianceSlots, getContainerSlots, getIngredientContainerSlots
+	var getObjectSlots = function(startSlot, width, numberRows) {
+		var slots = [];
+		var slot;
+		for (var i = 0; i < numberRows; i++) {
+			for (var j = 0; j < slotsPerRow; j+=width) {
+				slot = startSlot + i * slotsPerRow + j;
+				slots.push(slot);
+			}
+		}
+		return slots;
+	}
+
+	/*
 	this.GetApplianceSlot = function(applianceX, applianceY, x ,y) {
 		var width = 2;
 		x -= applianceX;
@@ -239,37 +528,11 @@ var InventoryGrid = function(matchCon) {
 			self.ClearSlotAnimation(slot);
 		}
 		GameObjects = {};
-	};
+	};*/
 
-	this.LoadStateFromMsg = function(stateMsg)
+	// onMessage
+	var loadStateFromMsg = function(stateMsg)
 	{
-		/*
-		self.ClearSlotAnimations();
-		var startSlot = self.GetSlot($("#appliances").x(), $("#appliances").y());
-		var appliances = self.GetObjectsOfClassFromMsg(objects, "space");
-		self.LoadAppliancesFromMsg(startSlot, appliances);
-
-		startSlot = this.GetSlot($("#containers").x(), $("#containers").y());
-		var containers = this.GetObjectsOfClassFromMsg(objects, "container");
-		var ingredients = this.GetObjectsOfClassFromMsg(objects, "simple_ingredient");
-		var workingContainers = [];
-		var ingredientContainers = [];
-
-		// load worknig containers
-		self.SeparateContainers(containers, ingredients, ingredientContainers, workingContainers);
-		self.LoadContainersFromMsg(startSlot, workingContainers);
-
-		// load ingredient containers
-		startSlot = this.GetSlot($("#ingredients").x(), $("#ingredients").y());
-		self.LoadIngredientContainersFromMsg(startSlot, ingredientContainers);
-		//this.LoadIngredientsFromMsg(startSlot, ingredientContainers);
-
-		self.UpdateAnimations();
-
-		*/
-
-
-
 		var objects= stateMsg.data;
 		var appliances = getObjectsOfClassFromMsg(objects, "space");
 		var containers = getObjectsOfClassFromMsg(objects, "container");
@@ -284,126 +547,176 @@ var InventoryGrid = function(matchCon) {
 			containerObjects = [],
 			ingredientContainerObjects = [];
 
-		loadAppliances(appliances, applianceObjects);
+		loadIngredientContainers(ingredientContainers, ingredients, ingredientContainerObjects);
 		loadContainers(workingContainers, containerObjects);
-		loadIngredientContainers(ingredientContainers, ingredientContainerObjects);
+
+		var containersInAppliances = [];
+		loadAppliances(appliances, applianceObjects, containerObjects, ingredientContainerObjects, containersInAppliances);
+
+		containerObjects = removeContainersFromList(containerObjects, containersInAppliances);
+		ingredientContainerObjects = removeContainersFromList(ingredientContainerObjects, containersInAppliances);
 
 		assignSlots(applianceObjects, containerObjects, ingredientContainerObjects);
 		updatePainter();
 	};
 
-	var getGroupOfObject = function(object) {
-		var group;
-		if (object instanceof gameContainer) {
-			group = "containers";
-		}
-		else if (object instanceof gameIngredientContainer) {
-			group = "ingredients";
-		}
-		else if (object instanceof gameAppliance) {
-			group = "appliances";
-		}
-		return group;
-	}
-
-	var getSlotPosition = function(slot) {
-		slot = parseInt(slot);
-		var row = Math.floor(slot / slotsPerRow),
-			column = slot % slotsPerRow;
-
-		var x = column * 64,
-			y = row * 64;
-
-		var group = getGroupOfObject()
-		if (typeof group !== 'undefined') {
-			var groupObj = $("#" + group.toString());
-			if (groupObj.length != 0) {
-				x -= groupObj.x();
-				y -= groupObj.y();
+	// loadStateFromMsg
+	var separateContainers = function(containers, ingredients, ingredientContainers, workingContainers) {
+		var ingredientNames = getIngredientNames(ingredients);
+		for (var i = 0; i < containers.length; i++) {
+			var containerName = containers[i].name;
+			var index = containerName.indexOf("_bowl");
+			if (index > -1) {
+				var strippedName = containerName.substring(0, index);
+				if (strippedName in ingredientNames) {
+					ingredientContainers.push(containers[i]);
+				}
+				else {
+					workingContainers.push(containers[i]);
+				}
+			}
+			else {
+				workingContainers.push(containers[i]);
 			}
 		}
-
-		return {"x": x, "y": y};
 	};
 
-	var getObjectSlots = function(startSlot, width, numberRows) {
-		var slots = [];
-		var slot;
-		for (var i = 0; i < numberRows; i++) {
-			for (var j = 0; j < slotsPerRow; j+=width) {
-				slot = startSlot + i * slotsPerRow + j;
-				slots.push(slot);
+	// loadStateFromMessage
+	var removeContainersFromList = function(containers, toRemove) {
+		var remainingContainers = [];
+		for (var i = containers.length - 1; i >= 0; i--) {
+			if ($.inArray(containers[i].Name, toRemove) == -1) {
+				remainingContainers.push(containers[i]);
 			}
 		}
-		return slots;
-	}
+		return remainingContainers;
+	};
 
-	var getGroupPosition = function(group) {
-		if (typeof group !== 'undefined') {
-			return {"x":$("#" + group.toString()).x(), "y": $("#" + group.toString()).y()};
+
+	var getIngredientNames = function(ingredients) {
+		var ingredientNames = {};
+		for (var i = 0; i < ingredients.length; i++) {
+			ingredientNames[ingredients[i].name] = ingredients[i].name;
 		}
-		return {"x": 0, "y":0};
+		return ingredientNames;
 	};
 
-	var getObjectGroupPosition = function(obj) {
-		var group;
-		if (typeof obj !== 'undefined') {
-			group = getGroupOfObject(obj);
+	// loadStateFromMsg
+	var getObjectsOfClassFromMsg = function(objects, classStr)
+	{
+		var classObjects = [];
+		for (var i = 0; i < objects.length; i++){
+			var object = objects[i];
+			if (object.class == classStr)
+			{
+				if ($.inArray(object.name, ObjectsToIgnore) == -1) {
+					classObjects.push(object);
+				}
+			}
 		}
-		return getGroupPosition(group);
+		return classObjects;
 	};
 
-	var getApplianceSlots = function() {
-		var startPosition = getGroupPosition("appliances");
-		var startSlot = getSlot(startPosition.x, startPosition.y);
-		return getObjectSlots(startSlot, 2, 1);
-	};
-	
-	var getWorkingContainerSlots = function() {
-		var startPosition = getGroupPosition("containers");
-		var startSlot = getSlot(startPosition.x, startPosition.y);
-		return getObjectSlots(startSlot, 1, 2);
-	};
-
-	var getIngredientContainerSlots = function() {
-		var startPosition = getGroupPosition("ingredients");
-		var startSlot = getSlot(startPosition.x, startPosition.y);
-		return getObjectSlots(startSlot, 1, 2);
-	};
-
-	var removeObjectFromList = function(obj, list) {
-		var position = $.inArray(obj, list);
-		if (position > -1) {
-			list.splice(position);
-			return true;
+	// loadStateFromMsg
+	var loadAppliances = function(appliances, appliancesList, containerObjects, ingredientContainerObjects, containersInAppliances) {
+		var containers = [],
+			applianceObj;
+		for (var i=0; i < appliances.length; i++) {
+			containers = getContainerObjects(appliances[i].contains, containerObjects, ingredientContainerObjects); 
+			containersInAppliances.push(containers);
+			applianceObj = getNewApplianceFromMsg(appliances[i], containers);
+			appliancesList.push(applianceObj);
 		}
-		return false;
 	};
 
-	var assignObjectSlots = function(objects, slots, lookup) {
-		var i,
-			slot,
-			obj;
-		for (i = 0; i < objects.length; i++) {
-			obj = objects[i];
-			slot = slots[i];
-			lookup[slot] = obj;
-			obj.setSlot(slot);
+	// loadAppliances
+	var getContainerObjects = function(names, workingContainers, ingredientContainers) {
+		var containerObjects = [];
+		for (var i = 0; i < workingContainers.length; i++) {
+			if ($.inArray(workingContainers[i].Name, names) != -1) {
+				containerObjects.push(workingContainers[i]);
+			}
 		}
-	}
-
-	var setPositions = function(objects) {
-		var obj;
-		var position;
-		var groupPosition;
-		for (var slot in objects) {
-			obj = objects[slot];
-			groupPosition = getObjectGroupPosition(obj);
-			position = getSlotPosition(slot);
-			obj.setPosition(position.x - groupPosition.x, position.y - groupPosition.y);
+		for (var i = 0; i < ingredientContainers.length; i++) {
+			if ($.inArray(ingredientContainers[i].Name, names) != -1) {
+				containerObjects.push(ingredientContainers[i]);
+			}
 		}
-	}
+		return containerObjects;
+	};
 
+	// loadAppliances
+	var getNewApplianceFromMsg = function(appliance, containers)
+	{
+		var name = appliance.name;
+		var id = appliance.name;
+		var sprite = name;
+		if (appliance.onoff) {
+			sprite += "_on";
+		}
+		sprite += ".PNG";
+		return new gameAppliance(id, name, sprite, containers);
+	};
+
+	// loadStateFromMsg
+	var loadContainers = function(containers, containersList) {
+		var container;
+		for (var i = 0; i < containers.length; i++) {
+			container = containers[i];
+			var containerObj = getNewContainerFromMsg(container);
+			containerObj.Contains = container.contains;
+			containersList.push(containerObj);
+		}
+	};
+
+	// loadContainers
+	var getNewContainerFromMsg = function(container)
+	{
+		var name = container.name;
+		var id = container.name;
+		var sprite = name + ".PNG";
+		return new gameContainer(id, name, sprite);
+	};
+
+	// loadStateFromMsg
+	var loadIngredientContainers = function(ingredientContainers, ingredients, ingredientContainersList) {
+		for (var i = 0; i < ingredientContainers.length; i++) {
+			var container = ingredientContainers[i];
+			var ingredient = "";
+			var ingredientObject;
+			if (container.contains.length > 0) {
+				ingredient = container.contains[0];
+				ingredientObject = getIngredientFromList(ingredient, ingredients);
+			}
+			var containerObj = getNewIngredientContainerFromMsg(container, ingredientObject);
+			ingredientContainersList.push(containerObj);
+		}
+	};
+
+	// loadIngredientContainers
+	var getIngredientFromList = function(name, ingredients) {
+		var ingredient;
+		for (var i =0; i < ingredients.length; i++) {
+			if (ingredients[i].name == name) {
+				ingredient = ingredients[i];
+			}
+		}
+		return ingredient;
+	};
+
+	// loadIngredientContainers
+	var getNewIngredientContainerFromMsg = function(container, ingredient) {
+		var name = container.name;
+		var id = container.name;
+		var sprite = name;
+		if (typeof ingredient !== 'undefined' && ingredient.peeled) {
+			sprite += "_peeled"
+		}
+		sprite += ".PNG";
+		return new gameIngredientContainer(name, id, sprite, ingredient.Name);
+	};
+
+	// loadStateFromMsg
 	var assignSlots = function(appliances, workingContainers, ingredientContainers) {
 		var tempSlots = {};
 		
@@ -437,35 +750,73 @@ var InventoryGrid = function(matchCon) {
 		GameObjects = tempSlots;
 	};
 
-	var loadAppliances = function(appliances, appliancesList) {
-		for (var i=0; i < appliances.length; i++) {
-			var applianceObj = getNewApplianceFromMsg(appliances[i]);
-			appliancesList.push(applianceObj);
-		}
+	// assignSlots
+	var getApplianceSlots = function() {
+		var startPosition = getGroupPosition("appliances");
+		var startSlot = getSlot(startPosition.x, startPosition.y);
+		return getObjectSlots(startSlot, 2, 1);
+	};
+	
+	// assignSlots
+	var getWorkingContainerSlots = function() {
+		var startPosition = getGroupPosition("containers");
+		var startSlot = getSlot(startPosition.x, startPosition.y);
+		return getObjectSlots(startSlot, 1, 2);
 	};
 
-	var loadContainers = function(containers, containersList) {
-		var container;
-		for (var i = 0; i < containers.length; i++) {
-			container = containers[i];
-			var containerObj = getNewContainerFromMsg(container);
-			containerObj.Contains = container.contains;
-			containersList.push(containerObj);
-		}
+	// assignSlots
+	var getIngredientContainerSlots = function() {
+		var startPosition = getGroupPosition("ingredients");
+		var startSlot = getSlot(startPosition.x, startPosition.y);
+		return getObjectSlots(startSlot, 1, 2);
 	};
 
-	var loadIngredientContainers = function(ingredientContainers, ingredientContainersList) {
-		for (var i = 0; i < ingredientContainers.length; i++) {
-			var container = ingredientContainers[i];
-			var ingredient = "";
-			if (container.contains.length > 0) {
-				ingredient = container.contains[0];
-			}
-			var containerObj = getNewIngredientContainerFromMsg(container, ingredient);
-			ingredientContainersList.push(containerObj);
+	//assignSlots
+	var removeObjectFromList = function(obj, list) {
+		var position = $.inArray(obj, list);
+		if (position > -1) {
+			list.splice(position);
+			return true;
 		}
+		return false;
 	};
 
+	// assignSlots
+	var assignObjectSlots = function(objects, slots, lookup) {
+		var i,
+			slot,
+			obj;
+		for (i = 0; i < objects.length; i++) {
+			obj = objects[i];
+			slot = slots[i];
+			lookup[slot] = obj;
+			obj.setSlot(slot);
+		}
+	}
+
+	// assignSlots
+	var setPositions = function(objects) {
+		var obj;
+		var position;
+		var groupPosition;
+		for (var slot in objects) {
+			obj = objects[slot];
+			groupPosition = getObjectGroupPosition(obj);
+			position = getSlotPosition(slot);
+			obj.setPosition(position.x - groupPosition.x, position.y - groupPosition.y);
+		}
+	}
+
+	// setPositions
+	var getObjectGroupPosition = function(obj) {
+		var group;
+		if (typeof obj !== 'undefined') {
+			group = getGroupOfObject(obj);
+		}
+		return getGroupPosition(group);
+	};
+
+	// loadStateFromMsg
 	var updatePainter = function() {
 		gridPainter.clear();
 		gridPainter.addPainter(objectHolder.getPainter());
@@ -476,6 +827,7 @@ var InventoryGrid = function(matchCon) {
 		}
 	};
 
+	/*
 	this.LoadIngredientsFromMsg = function(startSlot, ingredients)
 	{
 		for (var i = 0; i < ingredients.length; i++) {
@@ -484,75 +836,11 @@ var InventoryGrid = function(matchCon) {
 			self.InsertObject(startSlot + i, ingredientObj);
 		}
 	};
+	*/
+	
+	
 
-
-	var separateContainers = function(containers, ingredients, ingredientContainers, workingContainers) {
-		var ingredientNames = self.GetIngredientNames(ingredients);
-		for (var i = 0; i < containers.length; i++) {
-			var containerName = containers[i].name;
-			var index = containerName.indexOf("_bowl");
-			if (index > -1) {
-				var strippedName = containerName.substring(0, index);
-				if (strippedName in ingredientNames) {
-					ingredientContainers.push(containers[i]);
-				}
-				else {
-					workingContainers.push(containers[i]);
-				}
-			}
-			else {
-				workingContainers.push(containers[i]);
-			}
-		}
-
-	};
-
-	this.GetIngredientNames = function(ingredients) {
-		var ingredientNames = {};
-		for (var i = 0; i < ingredients.length; i++) {
-			ingredientNames[ingredients[i].name] = ingredients[i].name;
-		}
-		return ingredientNames;
-	};
-
-	var getObjectsOfClassFromMsg = function(objects, classStr)
-	{
-		var classObjects = [];
-		for (var i = 0; i < objects.length; i++){
-			var object = objects[i];
-			if (object.class == classStr)
-			{
-				if ($.inArray(object.name, ObjectsToIgnore) == -1) {
-					classObjects.push(object);
-				}
-			}
-		}
-		return classObjects;
-	};
-
-	var getNewApplianceFromMsg = function(appliance)
-	{
-		var name = appliance.name;
-		var id = appliance.name;
-		var sprite = name + ".PNG";
-		var containers = appliance.contains
-		return new gameAppliance(id, name, sprite, containers);
-	};
-
-	var getNewContainerFromMsg = function(container)
-	{
-		var name = container.name;
-		var id = container.name;
-		var sprite = name + ".PNG";
-		return new gameContainer(id, name, sprite);
-	};
-
-	var getNewIngredientContainerFromMsg = function(container, ingredient) {
-		var name = container.name;
-		var id = container.name;
-		var sprite = name + ".PNG";
-		return new gameIngredientContainer(name, id, sprite, ingredient);
-	};
+	/*
 
 	var getNewIngredientFromMsg = function(ingredient)
 	{
@@ -561,371 +849,13 @@ var InventoryGrid = function(matchCon) {
 		var sprite = name + ".PNG";
 		var isInfinite = ($.inArray(name, this.InfiniteIngredients) > -1);
 		return new gameIngredient(id, name, sprite, isInfinite);
-	};
-
-	this.UpdateAnimations = function()
-	{
-		/*
-		var applianceX = 0;
-		var applianceY = 0;
-		var containerX = 0;
-		var containerY = 0;
-		var ingredientX = 0;
-		var ingredientY = 0;
-
-		var ingredients = {};
-		var containers = {};
-		var appliances = {};
-		self.DivideObjects(GameObjects, ingredients, containers, appliances);
-		for (var slot in appliances)
-		{
-			var object = appliances[slot];
-			self.UpdateAnimation("appliances", object, slot, 128, 128, applianceX, applianceY);
-
-			var applianceGroup = self.GetApplianceGroup("appliances", object, applianceX, applianceY);
-			var x = 0;
-			var y = 0;
-			for (var key in object.Contains) {
-				var container = object.Contains[key];
-				var containerObject = undefined;
-				for (var cSlot in containers) {
-					if (containers[cSlot].Name == container) {
-						containerObject = containers[cSlot];
-						delete containers[cSlot];
-				
-					}
-				}
-				//var containerObject = containers[container];
-				self.UpdateApplianceContainerAnimation(applianceGroup, containerObject, key);
-				x += 64;
-				if (x >64) {
-					x = 0;
-					y += 64;
-				}
-			}
-			
-			applianceX += 128;
-		}
-		for (var slot in containers) {
-			var object = containers[slot];
-			self.UpdateAnimation("containers", object, slot, 64, 64, containerX, containerY);
-			containerX += 64;
-			if (containerX > 64*11 ) {
-				containerX = 0;
-				containerY += 64;
-			}
-		}
-		for (var slot in ingredients) {
-			var object = ingredients[slot];
-			if (object.Contains.length > 0) {
-				self.UpdateAnimation("ingredients", object, slot, 64, 64, ingredientX, ingredientY);
-			}
-			else {
-				self.ClearAnimation(key);
-			}
-			ingredientX += 64;
-			if (ingredientX > 64*11 ) {
-				ingredientX = 0;
-				ingredientY += 64;
-			}
-		}
-	*/
-		//$.gameQuery.resourceManager.refresh();
-	};
-	/*
-	this.DivideObjects = function(objects, ingredients, containers, appliances) {
-		for (var key in GameObjects) {
-			var object = GameObjects[key];
-			if (object instanceof gameAppliance) {
-				appliances[key] = object;
-			}
-			else if (object instanceof gameContainer) {
-				containers[key] = object;
-			}
-			else if (object instanceof gameIngredientContainer) {
-				ingredients[key] = object;
-			}
-		}
-	};
-
-	this.GetApplianceGroup = function(group, object, x, y) {
-		var objectName = object.Name;
-		var poundName = "#" + objectName;
-		if ($(poundName).length ==  0) {
-			$("#" + group).addGroup(objectName, {width: 128, height: 128,posx: x, posy: y}).end();
-		}
-		return objectName;
-	};
-
-	this.UpdateAnimation = function(group, object, slot, width, height, x, y)
-	{
-		var groupObj = $("#" + group);
-		var groupX = groupObj.x();
-		var groupY = groupObj.y();
-		//var slot = this.GetSlot(x + groupX, y + groupY);
-		var poundSlot = "#" + slot.toString();
-		var sprite = $(poundSlot);
-		var anim = object.Anim;
-		
-		this.UpdateAnimationSlot(group, anim, sprite, slot, groupX, groupY, x, y, width, height);
-	};
-
-	this.UpdateApplianceContainerAnimation = function(group, object, slot) {
-		var applianceGroupObj = $("#appliances");
-		var groupX = applianceGroupObj.x();
-		var groupY = applianceGroupObj.y();
-		var applianceObj = $("#" + group);
-		groupX += applianceObj.x();
-		groupY += applianceObj.y();
-		var x = 64 * (slot % 2);
-		var y = 64 * Math.floor(slot / 2);
-
-		//var slot = this.GetSlot(x, y);
-		var poundSlot = "#" + group + slot.toString();
-		var sprite = $(poundSlot);
-		var anim = object.Anim;
-
-		this.UpdateAnimationSlot(group, anim, sprite, slot, groupX, groupY, x, y, 64, 64 );
-	};
-
-	this.UpdateAnimationSlot = function(group, animation, sprite, slot, groupX, groupY, x, y, width, height) {
-		if (sprite.length == 0) {
-			$("#" + group).addSprite(slot.toString(), {animation: animation, width: width, height: height, posx: x, posy: y});
-			self.UpdateGrid(name, -1, -1, x+groupX, y+groupY, width, height);
-		}
-		else
-		{
-			var oldX = sprite.x();
-			var oldY = sprite.y();
-			sprite.x(x);
-			sprite.y(y);
-			self.ChangeSlotAnim(slot, animation);
-			self.UpdateGrid(slot.toString(), oldX + groupX, oldY+groupY, x+groupX, y+groupY, width, height);
-		}
-	};
-
-	this.UpdateApplianceAnimation = function(appliance) {
-
-
-		for (var i = 0; i < 4; i++) {
-			var obj = appliance.GetObject(i);
-			if (typeof obj != 'undefined') {
-				var oldX = sprite.x();
-				var oldY = sprite.y();
-				sprite.x(x);
-				sprite.y(y);
-				self.UpdateGrid(slot.toString(), oldX + groupX, oldY+groupY, x+groupX, y+groupY, width, height);
-			}
-		}
-	};
-
-	this.UpdateGrid = function(name, oldX, oldY, x, y, width, height) {
-		//Checking if this needs to clear it's old position
-		if (oldX > -1 && oldY > -1) {
-			//Iterate over grid with tiles 64x64
-			for (var i = oldX; i < oldX + width; i+= 64) {
-				if (i in this.Grid) {
-					for (var j = oldY; j < oldY + height; j += 64) {
-						//If the name in this spot is actually the object's name, clean it up
-						if (j in this.Grid[i] && this.Grid[i][j] == name) {
-							this.Grid[i][j] = "";
-						}
-					}
-				}
-			}
-		}
-		//Iterate over grid
-		for (var i = x; i < x + width; i+= 64) {
-			// Do we need to add a new row to the map?
-			if (!(i in this.Grid)) {
-				this.Grid[i] = {};
-			}
-			// Add the name to all the spots in this map
-			for (var j = y; j < y + height; j += 64) {
-				this.Grid[i][j] = name;
-			}
-		}
-
-	};
-
-	this.CleanName = function (name) {
-		return name.replace(/\s+/g, '_');
 	};*/
 
-	this.onMessage = function(msg) {
-		this.LoadStateFromMsg(msg.state);
-		winFlag = msg.success;
-	};
+	
 
-	this.onMouseDown = function(x, y) {
-		var obj = RemoveObjectFromPosition(x, y);
-		var tileX = x % 64;
-		var tileY = y % 64;
-
-		objectHolder.SetHoldingObject(obj, x, y, tileX, tileY);
-	};
-
-	this.onMouseUp = function() {
-		if (objectHolder.IsHolding()) {
-			var obj = objectHolder.Pop();
-			if (!SetObjectAtPosition(obj.object, obj.x, obj.y)) {
-				SetObjectAtPosition(obj.object, obj.oldX, obj.oldY);
-			}
-		}
-	};
-
-	this.onMouseDrag = function(x, y) {
-		objectHolder.SetPosition(x,y);
-	};
-
-	this.onMouseClick = function(x, y) {
-		var slot = inventoryGrid.GetSlot(gx, gy);
-		if (activeAction === EnumActions.Look) {
-			var desc = this.GetObjDesc(slot);
-			if (desc) matchConsole.Write(desc);
-		} else {
-			var obj = GetObjectFromPosition(x, y);
-			RegisterCommand(obj, activeAction, actionSlot);
-		}
-	};
 
 	
-	this.IsSlotEmpty = function(slot) {
-		if (slot > 0) {
-			var obj = GameObjects[slot];
-			if (typeof obj == 'undefined' && !this.IsSlotApp(slot)) {
-				return true;
-			}
-			return false;
-		}
-		return true;
-	};
-	
-	this.IsSlotApp = function(slot) {
-		return (typeof GetApplianceFromSlot(slot) != 'undefined');
-	};
-
-	var GetApplianceFromSlot = function(slot) {
-		var obj = GameObjects[slot];
-		if (typeof obj == 'undefined') {
-			obj = GameObjects[slot - 1];
-		}
-		var width = slotsPerRow;
-		if (typeof obj == 'undefined') {
-			obj = GameObjects[slot - width];	
-		}
-		if (typeof obj == 'undefined') {
-			obj = GameObjects[slot - (width + 1)];	
-		}
-		if (obj instanceof gameAppliance) {
-			return obj;
-		}
-		return undefined;
-	};
-
-	var GetSlotInAppliance = function(slot) {
-		var obj = GameObjects[slot];
-		if (obj instanceof gameAppliance) {
-			return 0;
-		}
-		obj = GameObjects[slot - 1];
-		if (obj instanceof gameAppliance) {
-			return 1;
-		}
-		var width = slotsPerRow;
-		obj = GameObjects[slot - width];	
-		if (obj instanceof gameAppliance) {
-			return 2;
-		}
-		obj = GameObjects[slot - width - 1];	
-		if (obj instanceof gameAppliance) {
-			return 3;
-		}
-		return -1;	
-	};
-
-	this.GetObjFromSlot = function(slot) {
-		var obj = GameObjects[slot];
-		if (typeof obj == 'undefined') {
-			obj = GetApplianceFromSlot(slot);
-		}
-		return obj;
-	};
-
-	var getObjectSlotFromPosition = function(x, y) {
-		var width = slotsPerRow;
-		var rows = Math.floor(y / 64);
-		var columns = Math.floor(x / 64);
-		return rows * width + columns;
-
-	};
-
-	var GetObjectFromPosition = function(x, y) {
-		var slot = getObjectSlotFromPosition(x, y);
-		var appliance = GetApplianceFromSlot(slot);
-		var obj = null;
-		if (typeof appliance != 'undefined') {
-			var applianceSlot = GetSlotInAppliance(slot);
-			if (!appliance.IsEmpty(applianceSlot)) {
-				obj = appliance.GetObject(applianceSlot);
-			}
-		}
-		else {
-			obj = GameObjects[slot];
-		}
-
-		return obj;
-	};
-
-	var RemoveObjectFromPosition = function(x, y) {
-		var slot = getObjectSlotFromPosition(x, y);
-		var appliance = GetApplianceFromSlot(slot);
-		var obj = null;
-		if (typeof appliance != 'undefined') {
-			var applianceSlot = GetSlotInAppliance(slot);
-			if (!appliance.IsEmpty(applianceSlot)) {
-				obj = appliance.Remove(applianceSlot);
-			}
-		}
-		else {
-			obj = GameObjects[slot];
-			delete GameObjects[slot];
-		}
-
-		return obj;
-	};
-
-	var SetObjectAtPosition = function(obj, x, y) {
-		var slot = getObjectSlotFromPosition(x, y);
-		var appliance = GetApplianceFromSlot(slot);
-		var toObj,
-			event;
-		if (typeof appliance !== 'undefined') {
-			toObj = appliance;
-			var applianceSlot = GetSlotInAppliance(slot);
-			if (!appliance.IsEmpty(applianceSlot)) {
-				toObj = appliance.GetObject(applianceSlot);
-			}
-			event = obj.ActOn(toObj);
-		}
-		else {
-			toObj = GameObjects[slot];
-			if (typeof toObj !== 'undefined') {
-				event = obj.ActOn(toObj);
-			}
-			SetObjectAtSlot(obj, slot);
-		}
-		if (typeof event !== 'undefined') {
-			performAction(event);
-		}
-	};
-
-	var SetObjectAtSlot = function(obj, slot) {
-		if (self.IsSlotEmpty(slot)) {
-			GameObjects[slot] = obj;
-		}
-	};
-	
+	/*
 	this.FetchObj = function(slot) {
 		if (this.IsSlotApp(slot)) {
 			var appliance = GetApplianceFromSlot(slot);
@@ -953,7 +883,7 @@ var InventoryGrid = function(matchCon) {
 	this.PlaceObj = function(obj, slot) {
 		if (slot < 0) throw "Attempted to place in non slot!";
 		//Place in non empty slot
-		if (!this.IsSlotEmpty(slot)) { 
+		if (!isSlotEmpty(slot)) { 
 			var gobj = this.FetchObj(slot);
 			var origin = this.GetSlot(mouseTracker.DownX, mouseTracker.DownY);
 			obj.ActOn(gobj, slot, origin);
@@ -969,28 +899,30 @@ var InventoryGrid = function(matchCon) {
 			gameConnect.ReportCmdSucc(obj.ID, slot, action, "");
 			//}
 		}
-	};
+	};*/
 
 	
 	//Gets the description of the gameObject in slot
-	this.GetObjDesc = function(slot) {
-		var obj = this.GetObjFromSlot(slot);
-		return (this.IsSlotEmpty(slot)) ? false : obj.Desc();
-	};
-	this.GetObjType = function(slot) {
-		var obj = this.GetObjFromSlot(slot);		
-		return (this.IsSlotEmpty(slot)) ? false : obj.Type;
-	};
-	this.GetObjName = function(slot) {
-		var obj = this.GetObjFromSlot(slot);
-		return (this.IsSlotEmpty(slot)) ? false : obj.Name;
+	// onMouseClick
+	var getObjDesc = function(slot) {
+		var obj = getObjFromSlot(slot);
+		return (isSlotEmpty(slot)) ? false : obj.Desc();
 	};
 
-	this.GetPainters = function() {
-		var painters = [];
-		painters.push(gridPainter);
-		return painters;
+	// public
+	/*
+	this.GetObjType = function(slot) {
+		var obj = getObjFromSlot(slot);		
+		return (isSlotEmpty(slot)) ? false : obj.Type;
 	};
+
+	// public
+	this.GetObjName = function(slot) {
+		var obj = getObjFromSlot(slot);
+		return (isSlotEmpty(slot)) ? false : obj.Name;
+	};*/
+
+	
 };
 
 /////////////////
@@ -1012,7 +944,7 @@ var MouseTracker = function() {
 
 	var onMouseClick = function() {
 		for (var i = 0; i < mouseClickCallbacks.length; i++) {
-			mouseClickCallbacks[i].onMouseDown(X, Y);
+			mouseClickCallbacks[i].onMouseClick(X, Y);
 		}
 	};
 
@@ -1392,48 +1324,49 @@ var ActionBar = function(actions, mouseTracker) {
     }
     ActionBar.prototype._actionBar = this;
     
-    var left,
-    	right,
-    	top,
-    	bottom;
 
-	this.Actions = actions;
-	this.activeAction = this.Actions[0];
+	var Actions = actions;
+	var activeAction = Actions[0];
 	var painter = new ActionBarPainter(actions, mouseTracker.RegisterClick);
+    var bounds = painter.getBounds();
 
-	this.GetPainter = function() {
+	this.getPainter = function() {
 		return painter;
 	}
 
-	var isWithinActionBar = function(x, y) {
-		return (left <= x && x <= right && bottom <= y && y <= top);
-	};
-
-	this.onMouseDown = function(x, y) {
+	this.onMouseClick = function(x, y) {
 		if (isWithinActionBar(x, y)){
-			this.SelectNewAction(x,y);
+			selectNewAction(x,y);
+			painter.draw();
 		}
 	};
 
-	this.SelectNewAction = function(x ,y) {
-		var actionGroup = $("#" + actionBar.DisplayDiv);
-		var actionBarY = actionGroup.y();
-		if (y > actionBarY) {
-			var index = actionBar.GetActionNumber(x, y);
-			activeAction = actionBar.Actions[index];
-			painter.setSelector(index);
-			return true;
-		}
-		return false;
+	this.getActiveAction = function() {
+		return EnumActions.ToString(activeAction);
 	};
 
-	this.GetSelectedAction = function(x, y) {
-		var index = actionBar.GetActionNumber(x, y);
-		return actionBar.Actions[index];
+	var isWithinActionBar = function(x, y) {
+		return (bounds.left <= x && x <= bounds.right && bounds.bottom <= y && y <= bounds.top);
 	};
 
-	this.GetActionNumber = function(x, y) {
+	
+	var selectNewAction = function(x ,y) {
+		var index = getActionNumber(x, y);
+		activeAction = Actions[index];
+		painter.setSelector(index);
+	};
+
+	var getSelectedAction = function(x, y) {
+		var index = getActionNumber(x, y);
+		return Actions[index];
+	};
+
+	var getActionNumber = function(x, y) {
 		return Math.floor(x / 64);
+	};
+
+	var getActions = function() {
+		return Actions;
 	};
 };
 
