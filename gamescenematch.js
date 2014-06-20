@@ -159,6 +159,8 @@ var InventoryGrid = function(matchCon) {
 	//var self = this;
 	var onActionCallbacks = [];
 	var actionBar;
+	var mouseDownX, mouseDownY;
+	var isMouseDown = false;
 
 	////////////////////
 	// PUBLIC METHODS //
@@ -184,13 +186,8 @@ var InventoryGrid = function(matchCon) {
 		if (!isWithinBounds(x,y)) {
 			return;
 		}
-		var obj = removeObjectFromPosition(x, y);
-		var tileX = x % 64;
-		var tileY = y % 64;
-
-		if (typeof obj !== 'undefined') {
-			objectHolder.SetHoldingObject(obj, x, y, tileX, tileY);
-		}
+		mouseDownX = x;
+		mouseDownY = y;
 	};
 
 	// public
@@ -205,6 +202,15 @@ var InventoryGrid = function(matchCon) {
 
 	// public
 	this.onMouseDrag = function(x, y) {
+		if (!objectHolder.IsHolding()) {
+			var obj = removeObjectFromPosition(mouseDownX, mouseDownY);
+			var tileX = mouseDownX % 64;
+			var tileY = mouseDownY % 64;
+
+			if (typeof obj !== 'undefined') {
+				objectHolder.SetHoldingObject(obj, x, y, tileX, tileY);
+			}
+		}
 		objectHolder.SetPosition(x,y);
 	};
 
@@ -730,15 +736,15 @@ var InventoryGrid = function(matchCon) {
 
 			if (removeObjectFromList(object, appliances)) {
 				tempSlots[slot] = object;
-				removeObjectFromList(slot, applianceSlots);
+				removeItemFromList(slot, applianceSlots);
 			}
 			else if (removeObjectFromList(object, workingContainers)) {
 				tempSlots[slot] = object;
-				removeObjectFromList(slot, workingContainerSlots);
+				removeItemFromList(slot, workingContainerSlots);
 			}
 			else if (removeObjectFromList(object, ingredientContainers)) {
-				tempSlot[slot] = object;
-				removeObjectFromList(slot, ingredientContainerSlots);
+				tempSlots[slot] = object;
+				removeItemFromList(slot, ingredientContainerSlots);
 			}
 		}
 
@@ -773,9 +779,20 @@ var InventoryGrid = function(matchCon) {
 
 	//assignSlots
 	var removeObjectFromList = function(obj, list) {
-		var position = $.inArray(obj, list);
+		for (var i = 0; i < list.length; i++) {
+			if (obj.Name == list[i].Name) {
+				list.splice(i, 1);
+				return true;
+			}
+		}
+		return false;
+	};
+
+	//assignSlots
+	var removeItemFromList = function(item, list) {
+		var position = $.inArray(item, list);
 		if (position > -1) {
-			list.splice(position);
+			list.splice(position,1);
 			return true;
 		}
 		return false;
