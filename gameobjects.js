@@ -11,6 +11,7 @@ var EnumGOType = {
 };
 
 //Game Object
+/*
 function gameObject(id, name, type, sprite, fnDesc)
 {
     this.Name = name;
@@ -30,12 +31,12 @@ function gameObject(id, name, type, sprite, fnDesc)
     
     //Slot management
     //this.SetSlot = function(slot) { this.Slot = slot; }
-}
+}*/
 
 ///////////////////
 //Game Ingredient//
 ///////////////////
-function gameIngredient(id, name, sprite, infinite, fnDesc)
+var Ingredient = function(id, name, sprite, infinite, fnDesc)
 {
     this.Name = name;
     this.ID = id;
@@ -84,15 +85,11 @@ function gameIngredient(id, name, sprite, infinite, fnDesc)
     this.setPosition = function(x, y) {
         painter.setPosition(x,y);
     };
-    
-    this.Activate = function() {
-        throw "Activation not yet implemented!";
-    };
-}
+};
 //////////////////
 //Game Container//
 //////////////////
-function gameContainer(id, name, sprite)
+var Container = function(id, name, sprite)
 {
     this.Name = name;
     this.ID = id;
@@ -152,9 +149,9 @@ function gameContainer(id, name, sprite)
     this.Activate = function() {
         throw "Activation not yet implemented!";
     };
-}
+};
 
-function gameIngredientContainer(id, name, sprite, ingredient) {
+var IngredientContainer = function(id, name, sprite, ingredient) {
     this.Name = name;
     this.ID = id;
     this.Type = EnumGOType.IngContainer;
@@ -204,23 +201,30 @@ function gameIngredientContainer(id, name, sprite, ingredient) {
     this.setSlot = function(slot) {
         painter.setSlot(slot);
     }; 
-}
+};
 
 //////////////////
 //Game Appliance//
 //////////////////
-function gameAppliance(id, name, sprite, containers)
+var Appliance = function(id, name, sprite, containers)
 {
     this.Name = name;
     this.ID = id;
     this.Type = EnumGOType.App;
-    this.Sprite = sprite;
     this.IsMovable = false;
+    var painter;
+    //this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
 
-    this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
-    var painter = new AppliancePainter(this.Anim, 0, 0, 0);
+    var initPainter = function() {
+        var containerPainters = [];
+        for (var i = 0; i < Contains.contents.length; i++) {
+            containerPainters.push(Contains.contents[i].getPainter());
+        }
+        painter = new AppliancePainter(sprite, 0, 0, 0, containerPainters);
+    }; 
+
     this.Desc = function() {    
-        if (!Contains.length) {
+        if (!Contains.contents.length) {
             return "This is an empty " + this.Name;
         } else {
             var str = "This is a " + this.Name + " containing: " + Contains[0].Desc();
@@ -228,20 +232,21 @@ function gameAppliance(id, name, sprite, containers)
         }
     };
 
-    var Contains = [];
-    
+    var Contains = {contents: $.extend(true, [], containers)};
+    initPainter();
     this.AddTo = function(gobj) {
-        Contains.push(gobj);
+        //initPainter();
+        Contains.contents.push(gobj);
         painter.addPainter(gobj.getPainter());
     };
 
-    for (var i = 0; i < containers.length; i++) {
-        this.AddTo(containers[i]);
-    }   
+    //for (var i = 0; i < containers.length; i++) {
+    //    this.AddTo(containers[i]);
+    // }   
     
 
     this.GetObject = function(slot) {
-        return Contains[slot];
+        return Contains.contents[slot];
     };
 
     this.Remove = function(slot) {
@@ -253,40 +258,36 @@ function gameAppliance(id, name, sprite, containers)
         return obj;
     };
     
-    this.RemoveFrom = function(gobj) {
-        throw "Not yet implemented!";
-    };
-    
     this.IsEmpty = function(slot) {
-        return (Contains.length <= slot);
-    };
-
-    this.Activate = function() {
-        throw "Activation not yet implemented!";
+        var length = Contains.contents.length;
+        return (length <= slot);
     };
 
     this.getPainter = function() {
+        //initPainter();
         return painter;
     };
 
     this.setSlot = function(slot) {
+        //initPainter();
         painter.setSlot(slot);
     };
 
     this.setPosition = function(x, y) {
+        //initPainter();
         painter.setPosition(x,y);
     };
-}
+};
 
 //////////
 //Action//
 //////////
-function gameAction(name, sprite, cmdstr)
+var gameAction = function(name, sprite, cmdstr)
 {
     this.Name = name;   //This is the display name of the command
     this.Sprite = sprite;  //The sprite to display
     this.Cmd = cmdstr;  //The string used for issuing commands
     this.IsMovable = false;
     
-}
+};
 

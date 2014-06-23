@@ -4,7 +4,7 @@ var gameTitle = null;
 var winFlag = false;
 
 
-var GameSceneMatch = function(actionHandler, grid){
+var GameSceneMatch = function(playground, actionHandler, grid){
 	"use strict";
 	if (GameSceneMatch.prototype._gameSceneMatch) {
         return GameSceneMatch.prototype._gameSceneMatch;
@@ -14,7 +14,7 @@ var GameSceneMatch = function(actionHandler, grid){
     var handler = actionHandler;
 	var inventoryGrid = grid;
 	var mouseTracker = new MouseTracker();
-	var gamePainter = new GamePainter(mouseTracker);
+	var gamePainter = new GamePainter(playground, mouseTracker);
 	var recipe = new Recipe();
 	var gameConnect = new GameConnect();
 	var matchConsole = new MatchConsole();
@@ -66,10 +66,9 @@ var GameSceneMatch = function(actionHandler, grid){
 		if (!winFlag) {
 			handler.UpdateAppliances();
 		} else {
-			$.playground()
-				.addGroup("endgame", {width: gameConfig.StageWidth, height: gameConfig.StageHeight})
-				.addSprite("victory", {animation: gameAnimations.victoryScreen, width: gameConfig.StageWidth, height: gameConfig.StageHeight})
-				.end();
+			$.playground().addGroup(
+				"endgame", {width: gameConfig.StageWidth, height: gameConfig.StageHeight}).addSprite(
+				"victory", {animation: gameAnimations.victoryScreen, width: gameConfig.StageWidth, height: gameConfig.StageHeight}).end();
 		}
 		
 	};
@@ -106,10 +105,6 @@ var GameSceneMatch = function(actionHandler, grid){
 	this.onAction = function(event) {
 		gameConnect.ReportCmdSucc(event.ID, event.targetID, event.action, event.message);
 	};
-	
-	this.Trans = function() {
-		throw ("Not yet implemented!");
-	};
 
 	var drawScreen = function() {
 		gamePainter.draw();
@@ -117,14 +112,13 @@ var GameSceneMatch = function(actionHandler, grid){
 	};
 
 	this.GetPainters = function() {
-		var painters = [];
 		var painters = inventoryGrid.GetPainters();
 		painters.push(recipe.getPainter());
 		painters.push(matchConsole.GetPainter());
 		painters.push(actionBar.getPainter());
 		return painters;
 	};
-}
+};
 
 //////////////////
 //Inventory Grid//
@@ -255,20 +249,20 @@ var InventoryGrid = function(matchCon) {
 	// getSlot, getObjectFromPosition, removeObjectFromPosition, setObjectAtPosition
 	var getSlotInAppliance = function(slot) {
 		var obj = GameObjects[slot];
-		if (obj instanceof gameAppliance) {
+		if (obj instanceof Appliance) {
 			return 0;
 		}
 		obj = GameObjects[slot - 1];
-		if (obj instanceof gameAppliance) {
+		if (obj instanceof Appliance) {
 			return 1;
 		}
 		var width = slotsPerRow;
 		obj = GameObjects[slot - width];	
-		if (obj instanceof gameAppliance) {
+		if (obj instanceof Appliance) {
 			return 2;
 		}
 		obj = GameObjects[slot - width - 1];	
-		if (obj instanceof gameAppliance) {
+		if (obj instanceof Appliance) {
 			return 3;
 		}
 		return -1;	
@@ -341,7 +335,8 @@ var InventoryGrid = function(matchCon) {
 		if (typeof appliance !== 'undefined') {
 			toObj = appliance;
 			var applianceSlot = getSlotInAppliance(slot);
-			if (!appliance.IsEmpty(applianceSlot)) {
+			var isEmpty = appliance.IsEmpty(applianceSlot);
+			if (!isEmpty) {
 				toObj = appliance.GetObject(applianceSlot);
 			}
 			event = obj.ActOn(toObj);
@@ -388,7 +383,7 @@ var InventoryGrid = function(matchCon) {
 		if (typeof obj == 'undefined') {
 			obj = GameObjects[slot - (width + 1)];	
 		}
-		if (obj instanceof gameAppliance) {
+		if (obj instanceof Appliance) {
 			return obj;
 		}
 		return undefined;
@@ -431,17 +426,17 @@ var InventoryGrid = function(matchCon) {
 
 	// setPositions
 	var getSlotPosition = function(slot) {
-		slot = parseInt(slot);
+		slot = parseInt(slot, 10);
 		var row = Math.floor(slot / slotsPerRow),
 			column = slot % slotsPerRow;
 
 		var x = column * 64,
 			y = row * 64;
 
-		var group = getGroupOfObject()
+		var group = getGroupOfObject();
 		if (typeof group !== 'undefined') {
 			var groupObj = $("#" + group.toString());
-			if (groupObj.length != 0) {
+			if (groupObj.length !== 0) {
 				x -= groupObj.x();
 				y -= groupObj.y();
 			}
@@ -453,17 +448,17 @@ var InventoryGrid = function(matchCon) {
 	// getObjectGroupPosition, getSlotPosition
 	var getGroupOfObject = function(object) {
 		var group;
-		if (object instanceof gameContainer) {
+		if (object instanceof Container) {
 			group = "containers";
 		}
-		else if (object instanceof gameIngredientContainer) {
+		else if (object instanceof IngredientContainer) {
 			group = "ingredients";
 		}
-		else if (object instanceof gameAppliance) {
+		else if (object instanceof Appliance) {
 			group = "appliances";
 		}
 		return group;
-	}
+	};
 
 	// getApplianceSlots, getContainerSlots, getIngredientContainerSlots
 	var getGroupPosition = function(group) {
@@ -484,7 +479,7 @@ var InventoryGrid = function(matchCon) {
 			}
 		}
 		return slots;
-	}
+	};
 
 	/*
 	this.GetApplianceSlot = function(applianceX, applianceY, x ,y) {
@@ -528,7 +523,7 @@ var InventoryGrid = function(matchCon) {
 		for (var slot in GameObjects) {
 
 			var object = GameObjects[slot];
-			//if (object instanceof gameAppliance) {
+			//if (object instanceof Appliance) {
 
 			//}
 			self.ClearSlotAnimation(slot);
@@ -625,12 +620,12 @@ var InventoryGrid = function(matchCon) {
 
 	// loadStateFromMsg
 	var loadAppliances = function(appliances, appliancesList, containerObjects, ingredientContainerObjects, containersInAppliances) {
-		var containers = [],
-			applianceObj;
+		var containers = [];
+		//	applianceObj;
 		for (var i=0; i < appliances.length; i++) {
 			containers = getContainerObjects(appliances[i].contains, containerObjects, ingredientContainerObjects); 
 			containersInAppliances.push(containers);
-			applianceObj = getNewApplianceFromMsg(appliances[i], containers);
+			var applianceObj = getNewApplianceFromMsg(appliances[i], containers);
 			appliancesList.push(applianceObj);
 		}
 	};
@@ -661,7 +656,7 @@ var InventoryGrid = function(matchCon) {
 			sprite += "_on";
 		}
 		sprite += ".PNG";
-		return new gameAppliance(id, name, sprite, containers);
+		return new Appliance(id, name, sprite, containers);
 	};
 
 	// loadStateFromMsg
@@ -681,7 +676,7 @@ var InventoryGrid = function(matchCon) {
 		var name = container.name;
 		var id = container.name;
 		var sprite = name + ".PNG";
-		return new gameContainer(id, name, sprite);
+		return new Container(id, name, sprite);
 	};
 
 	// loadStateFromMsg
@@ -719,7 +714,7 @@ var InventoryGrid = function(matchCon) {
 			sprite += "_peeled"
 		}
 		sprite += ".PNG";
-		return new gameIngredientContainer(name, id, sprite, ingredient.Name);
+		return new IngredientContainer(name, id, sprite, ingredient.Name);
 	};
 
 	// loadStateFromMsg
@@ -734,17 +729,24 @@ var InventoryGrid = function(matchCon) {
 		for (var slot in GameObjects) {
 			object = GameObjects[slot];
 
-			if (removeObjectFromList(object, appliances)) {
-				tempSlots[slot] = object;
+			var foundObject = removeObjectFromList(object, appliances);
+			if (typeof foundObject !== 'undefined') {
+				tempSlots[slot] = foundObject;
 				removeItemFromList(slot, applianceSlots);
 			}
-			else if (removeObjectFromList(object, workingContainers)) {
-				tempSlots[slot] = object;
-				removeItemFromList(slot, workingContainerSlots);
-			}
-			else if (removeObjectFromList(object, ingredientContainers)) {
-				tempSlots[slot] = object;
-				removeItemFromList(slot, ingredientContainerSlots);
+			else {
+				foundObject = removeObjectFromList(object, workingContainers);
+				if (typeof foundObject !== 'undefined') {
+					tempSlots[slot] = foundObject;
+					removeItemFromList(slot, workingContainerSlots);
+				}
+				else {
+					foundObject = removeObjectFromList(object, ingredientContainers);
+					if (typeof foundObject !== 'undefined') {
+						tempSlots[slot] = object;
+						removeItemFromList(slot, ingredientContainerSlots);
+					}
+				}
 			}
 		}
 
@@ -779,13 +781,14 @@ var InventoryGrid = function(matchCon) {
 
 	//assignSlots
 	var removeObjectFromList = function(obj, list) {
+		var removedObject;
 		for (var i = 0; i < list.length; i++) {
 			if (obj.Name == list[i].Name) {
+				removedObject = list[i];
 				list.splice(i, 1);
-				return true;
 			}
 		}
-		return false;
+		return removedObject;
 	};
 
 	//assignSlots
@@ -865,7 +868,7 @@ var InventoryGrid = function(matchCon) {
 		var id = ingredient.name;
 		var sprite = name + ".PNG";
 		var isInfinite = ($.inArray(name, this.InfiniteIngredients) > -1);
-		return new gameIngredient(id, name, sprite, isInfinite);
+		return new Ingredient(id, name, sprite, isInfinite);
 	};*/
 
 	
@@ -1388,28 +1391,28 @@ var ActionBar = function(actions, mouseTracker) {
 };
 
 ActionBar.getMoveAction = function(object, target) {
-		if (object instanceof gameIngredientContainer) {
-			if (target instanceof gameIngredient) {
+		if (object instanceof IngredientContainer) {
+			if (target instanceof Ingredient) {
 				return "";
 			}
-			else if (target instanceof gameContainer) {
+			else if (target instanceof Container) {
 				return "pour";
 			}
-			else if (target instanceof gameIngredientContainer) {
+			else if (target instanceof IngredientContainer) {
 				return "pour";
 			}
 			else {
 				return "";
 			}
 		}
-		else if (object instanceof gameContainer) {
-			if (target instanceof gameIngredient) {
+		else if (object instanceof Container) {
+			if (target instanceof Ingredient) {
 				return "";
 			}
-			else if (target instanceof gameContainer) {
+			else if (target instanceof Container) {
 				return "pour";
 			}
-			else if (target instanceof gameIngredientContainer) {
+			else if (target instanceof IngredientContainer) {
 				return "pour";
 			}
 			else {

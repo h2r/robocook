@@ -43,12 +43,12 @@ var SplashPainter = function(startOnClick, textOnKeyDown) {
     this.addPainter = function(painter) {
         painters.push(painter);
     };
-}
+};
 
-var GamePainter = function(mouseTracker) {
+var GamePainter = function(playground, mouseTracker) {
     "use strict";
     var painters = [];
-    $.playground().pauseGame().clearScenegraph().startGame().addGroup(
+    playground.pauseGame().clearScenegraph().startGame().addGroup(
             "background", {width: gameConfig.StageWidth, height: gameConfig.StageHeight}).addSprite(
             "background", {animation: gameAnimations.background1, width: gameConfig.StageWidth, height: gameConfig.StageHeight}).end()
         .mousemove(mouseTracker.onMouseMove)
@@ -108,7 +108,7 @@ var GamePainter = function(mouseTracker) {
     this.addPainters = function(newPainters) {
         painters = painters.concat(newPainters);
     };
-}
+};
 
 var GridPainter = function() {
     "use strict";
@@ -215,17 +215,21 @@ var ActionBarPainter = function(usedActions, onClick) {
         }
         return -1;
     };
-}
+};
 
-var AppliancePainter = function(anim, posx, posy, currentSlot) {
+var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainters) {
     "use strict";
 
-    var animation = anim;
+    var animation = new $.gameQuery.Animation({imageURL: "./Sprites/" + sprite});
     var group = "appliances";
     var slot = currentSlot;
-    var containers = [];
+    var containers = containerPainters;
     var x = posx;
     var y = posy;
+
+    //if (typeof containers === 'undefined') {
+    //    containers = [];
+    //}
 
     this.addPainter = function(newContainer) {
         containers.push(newContainer);
@@ -234,7 +238,7 @@ var AppliancePainter = function(anim, posx, posy, currentSlot) {
     this.setPosition = function(newX, newY) {
         x = newX;
         y = newY;
-    }
+    };
     this.setGroup = function(newGroup) {
         group = newGroup;
     };
@@ -248,8 +252,9 @@ var AppliancePainter = function(anim, posx, posy, currentSlot) {
     };
 
     this.draw = function() {
+        
         var slotObject = $("#" + slot.toString());
-        if (slotObject.length == 0) {
+        if (slotObject.length === 0) {
             $("#" + group).addSprite(slot.toString(), 
                 {animation: animation, width: 128, height: 128, posx: x, posy: y});
         }
@@ -260,7 +265,7 @@ var AppliancePainter = function(anim, posx, posy, currentSlot) {
             containers[i].draw();
         }
     };
-}
+};
 
 var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
     "use strict";
@@ -272,18 +277,18 @@ var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
 
     var getSlotObject = function() {
         var slotObject =  $("#" + slot.toString());
-        if (slotObject.length == 0) {
+        if (slotObject.length === 0) {
             setSprite();
         }
         return $("#" + slot.toString());
-    }
+    };
 
     var setSprite = function() {
         if (typeof group !== 'undefined') {
             $("#" + group).addSprite(slot.toString(), 
                 {animation: animation, width: 64, height: 64, posx: x, posy: y});
         }
-    }
+    };
 
     this.setPosition = function(newX, newY) {
         x = newX;
@@ -300,7 +305,7 @@ var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
     this.setAnimation = function(newAnimation) {
         animation = newAnimation;
         var slotObject = getSlotObject();
-        if (slotObject.length != 0) {
+        if (slotObject.length !== 0) {
             slotObject.setAnimation(animation);
         }
     };
@@ -316,7 +321,7 @@ var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
 
     this.draw = function() {
         var slotObject = getSlotObject();
-        if (slotObject.length == 0) {
+        if (slotObject.length === 0) {
             setSprite();
         }
         else {
@@ -324,7 +329,7 @@ var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
             slotObject.y(y);
         }
     };
-}
+};
 
 var RecipePainter = function() {
     "use strict";
@@ -372,7 +377,7 @@ var RecipePainter = function() {
         $("#recipeDiv").append("</ol>");
     };
 
-}
+};
 
 var MatchConsolePainter = function() {
     "use strict";
@@ -396,7 +401,7 @@ var MatchConsolePainter = function() {
         
         //$("#" + DisplayDiv).append("</ol>");
     };
-}
+};
 
 var HoldingBoxPainter = function() {
     "use strict";
@@ -441,4 +446,4 @@ var HoldingBoxPainter = function() {
             holdingObjectPainter.draw();
         }
     };
-}
+};

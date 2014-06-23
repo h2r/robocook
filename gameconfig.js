@@ -57,7 +57,7 @@ gamePos.MatchDivIngsY = 384;
 
 //All objects loaded by the game by default
 var gameObjects = {};
-gameObjects["Empty"] = new gameObject("Empty", "Nothing", EnumGOType.Empty, "");
+//gameObjects["Empty"] = new gameObject("Empty", "Nothing", EnumGOType.Empty, "");
 
 
 var gameSprites = {};
