@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
+  <Overview>
+	<Title>Kitchen Simulator Usability Test</Title>
+	<Text>This survey requires that you complete the game at the following link: 
+	http://elzar.cs.brown.edu 
+	IMPORTANT: When you have finished the game do now close the tab/window!!!
+	On completion you will receive a key from the game.  Please copy and paste this as the answer to question #1.
+	The remaining questions ask for feedback about your experience playing the game.  Good feedback will be rewarded with a bonus.</Text>
+  </Overview>
+  
+  <Question>
+   <QuestionIdentifier>CompletionKey</QuestionIdentifier>
+   <IsRequired>true</IsRequired>
+   <QuestionContent>
+     <Text>Please copy and paste the key you received from completing the game to answer this question.</Text>
+   </QuestionContent>
+   <AnswerSpecification>
+     <FreeTextAnswer/>
+   </AnswerSpecification>
+  </Question>
+  <Question>
+   <QuestionIdentifier>ControlsFeedback</QuestionIdentifier>
+   <IsRequired>true</IsRequired>
+   <QuestionContent>
+     <Text>Did you have any difficulty figuring out the game's controls?</Text>
+   </QuestionContent>
+   <AnswerSpecification>
+     <FreeTextAnswer/>
+   </AnswerSpecification>
+  </Question>
+  <Question>
+   <QuestionIdentifier>LengthFeedback</QuestionIdentifier>
+   <IsRequired>true</IsRequired>
+   <QuestionContent>
+     <Text>About how long did it take you to finish the game?</Text>
+   </QuestionContent>
+   <AnswerSpecification>
+     <FreeTextAnswer/>
+   </AnswerSpecification>
+  </Question>
+  <Question>
+   <QuestionIdentifier>ObjectivesFeedback</QuestionIdentifier>
+   <IsRequired>true</IsRequired>
+   <QuestionContent>
+     <Text>Were the objectives of the game easy to understand?</Text>
+   </QuestionContent>
+   <AnswerSpecification>
+     <FreeTextAnswer/>
+   </AnswerSpecification>
+  </Question>
+  <Question>
+   <QuestionIdentifier>ActionsFeedback</QuestionIdentifier>
+   <IsRequired>true</IsRequired>
+   <QuestionContent>
+     <Text>Were the actions and their results intuitive?</Text>
+   </QuestionContent>
+   <AnswerSpecification>
+     <FreeTextAnswer/>
+   </AnswerSpecification>
+  </Question>
+  <Question>
+   <QuestionIdentifier>FirstImpression</QuestionIdentifier>
+   <IsRequired>true</IsRequired>
+   <QuestionContent>
+     <Text>What was your first impression of the game?</Text>
+   </QuestionContent>
+   <AnswerSpecification>
+     <FreeTextAnswer/>
+   </AnswerSpecification>
+  </Question>
+  <Question>
+   <QuestionIdentifier>LastImpression</QuestionIdentifier>
+   <IsRequired>true</IsRequired>
+   <QuestionContent>
+     <Text>What was your final impression of the game?</Text>
+   </QuestionContent>
+   <AnswerSpecification>
+     <FreeTextAnswer/>
+   </AnswerSpecification>
+  </Question>
+  <Question>
+   <QuestionIdentifier>FunRating</QuestionIdentifier>
+   <IsRequired>true</IsRequired>
+   <QuestionContent>
+     <Text>Please rate the entertainment value of the game.</Text>
+   </QuestionContent>
+   <AnswerSpecification>
+     <SelectionAnswer>
+		<StyleSuggestion>radiobutton</StyleSuggestion>
+		<Selections>
+			<Selection><SelectionIdentifier>1</SelectionIdentifier><Text>Boring</Text></Selection>
+			<Selection><SelectionIdentifier>2</SelectionIdentifier><Text>Somewhat Boring</Text></Selection>
+			<Selection><SelectionIdentifier>3</SelectionIdentifier><Text>Has its moments</Text></Selection>
+			<Selection><SelectionIdentifier>4</SelectionIdentifier><Text>Entertaining</Text></Selection>
+			<Selection><SelectionIdentifier>5</SelectionIdentifier><Text>Very Entertaining</Text></Selection>
+		</Selections>
+	 </SelectionAnswer>
+   </AnswerSpecification>
+  </Question>
+</QuestionForm>

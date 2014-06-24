@@ -179,6 +179,12 @@ var gameSceneMatch = {
 				.addGroup("endgame", {width: gameConfig.StageWidth, height: gameConfig.StageHeight})
 				.addSprite("victory", {animation: gameAnimations.victoryScreen, width: gameConfig.StageWidth, height: gameConfig.StageHeight})
 				.end();
+			$("#victory").append("<div id='gamecode'>Your Completion Code is: " + PlayerNameMD5 + " </div>");
+			$("#gamecode").css({
+				"background-color":"yellow",
+				"font-size":"200%",
+				"font-weight":"bolder"	
+			});
 		}
 	},
 	

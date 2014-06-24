@@ -6,6 +6,13 @@ Appliances are mispositioned
 v/ Remove spread action
 Finish sprites
 Get AMT setup
+
+!!is there an easy way to create a generic tile that's not image based and just overlays text on it when no sprite is available?
+!!finish sprites
+
+---AMT---
+1) use more active voice with the suggestion that we will award bonuses to people who provide good feedback
+2) more questions, more specific questions
 ======================================
 
 
