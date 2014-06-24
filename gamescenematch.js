@@ -12,7 +12,6 @@ var GameSceneMatch = function(playground, actionHandler, grid){
     GameSceneMatch.prototype._gameSceneMatch = this;
     
     var handler = actionHandler;
-	var inventoryGrid = grid;
 	var mouseTracker = new MouseTracker();
 	var gamePainter = new GamePainter(playground, mouseTracker);
 	var recipe = new Recipe();
@@ -29,11 +28,12 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 			//EnumActions.Cut,
 			//EnumActions.Shape,
 		], mouseTracker);
+
+	var inventoryGrid = new InventoryGrid(matchConsole, actionBar);
 	this.Init = function() {
 		console.log("Match Scene -> Initializing.");
 		
 		//Load kitchen
-		inventoryGrid.Init(matchConsole, actionBar);
 		inventoryGrid.addOnActionCallback(this);
 		
 		//Initialize groups, add tiles as sprite
@@ -123,7 +123,7 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 //////////////////
 //Inventory Grid//
 //////////////////
-var InventoryGrid = function(matchCon) {
+var InventoryGrid = function(_matchConsole, _actionBar) {
 	"use strict";
 	if (InventoryGrid.prototype._inventoryGrid) {
         return InventoryGrid.prototype._inventoryGrid;
@@ -133,36 +133,22 @@ var InventoryGrid = function(matchCon) {
     /////////////////////////////
     // PRIVATE CLASS VARIABLES //
     /////////////////////////////
-	var ObjectsToIgnore = [
-		"counter","shelf"
-	];
-
-	var InfiniteIngredients = [
-	];
+	
 
 	var slotsPerRow = gameConfig.StageWidth / 64;
 	
-	
 	var GameObjects = {};
-	var objectSlotLookup = {};
-	//this.GameActions = {};
-	//this.GameObjectCount = 0;
 	var objectHolder = new ObjectHolder();
 	var gridPainter = new GridPainter();
-	var matchConsole = matchCon;
-	//var self = this;
+	var matchConsole = _matchConsole;
 	var onActionCallbacks = [];
-	var actionBar;
+	var actionBar = _actionBar;
 	var mouseDownX, mouseDownY;
 	var isMouseDown = false;
 
 	////////////////////
 	// PUBLIC METHODS //
 	////////////////////
-	this.Init = function(mConsole, aBar) {
-		matchConsole = mConsole;
-		actionBar = aBar;
-	};
 
 	// public
 	this.addOnActionCallback =function(callback) {
@@ -223,11 +209,6 @@ var InventoryGrid = function(matchCon) {
 			var logMsg  = "Performing " + action + " on " + obj.ID;
 			performAction({"ID": obj.ID, "action": action, "message": logMsg});
 		}
-	};
-
-	// ugh really?
-	this.setActionBar = function(bar) {
-		actionBar = bar;
 	};
 
 	// public
@@ -405,10 +386,7 @@ var InventoryGrid = function(matchCon) {
 	
 	// getApplianceSlots, getContainerSlots, getIngredientContainerSlots
 	var getSlot = function(gx, gy) {
-		var width = slotsPerRow;
-		var rows = Math.floor(gy / 64);
-		var columns = Math.floor(gx / 64);
-		var slot = rows * width + columns;
+		var slot = getObjectSlotFromPosition(gx, gy);
 
 		var appliance = getApplianceFromSlot(slot);
 		if (typeof appliance != 'undefined') {
@@ -475,246 +453,20 @@ var InventoryGrid = function(matchCon) {
 		for (var i = 0; i < numberRows; i++) {
 			for (var j = 0; j < slotsPerRow; j+=width) {
 				slot = startSlot + i * slotsPerRow + j;
-				slots.push(slot);
+				slots.push(slot.toString());
 			}
 		}
 		return slots;
 	};
 
-	/*
-	this.GetApplianceSlot = function(applianceX, applianceY, x ,y) {
-		var width = 2;
-		x -= applianceX;
-		y -= applianceY;
-		var rows = Math.floor(x / 64);
-		var columns = Math.floor(y / 64);
-		return rows * width + columns;
-	};
-
-	this.GetActionSlot = function(x, y) {
-		var columns = Math.floor(y / 64);
-		return "action_" + columns.toString();
-	};
-
-	this.FindObjectByName = function(name) {
-		for (var key in GameObjects) {
-			var object = GameObjects[key];
-			if (object.Name == name) {
-				return object;
-			}
-		}
-		return null;
-	};
-	
-	this.ChangeSlotAnim = function(slot, anim) {
-		$("#"+slot.toString()).setAnimation(anim);
-	};
-	
-	this.ClearAnimation = function(slot) {
-		var poundSlot = "#" + slot.toString();
-		$(poundSlot).setAnimation();
-	};
-
-	this.ClearSlotAnimation = function(slot) {
-		$("#"+slot.toString()).setAnimation();
-	};
-
-	this.ClearSlotAnimations = function() {
-		for (var slot in GameObjects) {
-
-			var object = GameObjects[slot];
-			//if (object instanceof Appliance) {
-
-			//}
-			self.ClearSlotAnimation(slot);
-		}
-		GameObjects = {};
-	};*/
-
 	// onMessage
 	var loadStateFromMsg = function(stateMsg)
 	{
-		var objects= stateMsg.data;
-		var appliances = getObjectsOfClassFromMsg(objects, "space");
-		var containers = getObjectsOfClassFromMsg(objects, "container");
-		var ingredients = getObjectsOfClassFromMsg(objects, "simple_ingredient");
-		var workingContainers = [];
-		var ingredientContainers = [];
+		var stateMessageReader = new StateMessageReader();
+		var state = stateMessageReader.getStateFromMessage(stateMsg);
 
-		// load worknig containers
-		separateContainers(containers, ingredients, ingredientContainers, workingContainers);
-
-		var applianceObjects = [],
-			containerObjects = [],
-			ingredientContainerObjects = [];
-
-		loadIngredientContainers(ingredientContainers, ingredients, ingredientContainerObjects);
-		loadContainers(workingContainers, containerObjects);
-
-		var containersInAppliances = [];
-		loadAppliances(appliances, applianceObjects, containerObjects, ingredientContainerObjects, containersInAppliances);
-
-		containerObjects = removeContainersFromList(containerObjects, containersInAppliances);
-		ingredientContainerObjects = removeContainersFromList(ingredientContainerObjects, containersInAppliances);
-
-		assignSlots(applianceObjects, containerObjects, ingredientContainerObjects);
+		assignSlots(state.appliances, state.containers, state.ingredients);
 		updatePainter();
-	};
-
-	// loadStateFromMsg
-	var separateContainers = function(containers, ingredients, ingredientContainers, workingContainers) {
-		var ingredientNames = getIngredientNames(ingredients);
-		for (var i = 0; i < containers.length; i++) {
-			var containerName = containers[i].name;
-			var index = containerName.indexOf("_bowl");
-			if (index > -1) {
-				var strippedName = containerName.substring(0, index);
-				if (strippedName in ingredientNames) {
-					ingredientContainers.push(containers[i]);
-				}
-				else {
-					workingContainers.push(containers[i]);
-				}
-			}
-			else {
-				workingContainers.push(containers[i]);
-			}
-		}
-	};
-
-	// loadStateFromMessage
-	var removeContainersFromList = function(containers, toRemove) {
-		var remainingContainers = [];
-		for (var i = containers.length - 1; i >= 0; i--) {
-			if ($.inArray(containers[i].Name, toRemove) == -1) {
-				remainingContainers.push(containers[i]);
-			}
-		}
-		return remainingContainers;
-	};
-
-
-	var getIngredientNames = function(ingredients) {
-		var ingredientNames = {};
-		for (var i = 0; i < ingredients.length; i++) {
-			ingredientNames[ingredients[i].name] = ingredients[i].name;
-		}
-		return ingredientNames;
-	};
-
-	// loadStateFromMsg
-	var getObjectsOfClassFromMsg = function(objects, classStr)
-	{
-		var classObjects = [];
-		for (var i = 0; i < objects.length; i++){
-			var object = objects[i];
-			if (object.class == classStr)
-			{
-				if ($.inArray(object.name, ObjectsToIgnore) == -1) {
-					classObjects.push(object);
-				}
-			}
-		}
-		return classObjects;
-	};
-
-	// loadStateFromMsg
-	var loadAppliances = function(appliances, appliancesList, containerObjects, ingredientContainerObjects, containersInAppliances) {
-		var containers = [];
-		//	applianceObj;
-		for (var i=0; i < appliances.length; i++) {
-			containers = getContainerObjects(appliances[i].contains, containerObjects, ingredientContainerObjects); 
-			containersInAppliances.push(containers);
-			var applianceObj = getNewApplianceFromMsg(appliances[i], containers);
-			appliancesList.push(applianceObj);
-		}
-	};
-
-	// loadAppliances
-	var getContainerObjects = function(names, workingContainers, ingredientContainers) {
-		var containerObjects = [];
-		for (var i = 0; i < workingContainers.length; i++) {
-			if ($.inArray(workingContainers[i].Name, names) != -1) {
-				containerObjects.push(workingContainers[i]);
-			}
-		}
-		for (var i = 0; i < ingredientContainers.length; i++) {
-			if ($.inArray(ingredientContainers[i].Name, names) != -1) {
-				containerObjects.push(ingredientContainers[i]);
-			}
-		}
-		return containerObjects;
-	};
-
-	// loadAppliances
-	var getNewApplianceFromMsg = function(appliance, containers)
-	{
-		var name = appliance.name;
-		var id = appliance.name;
-		var sprite = name;
-		if (appliance.onoff) {
-			sprite += "_on";
-		}
-		sprite += ".PNG";
-		return new Appliance(id, name, sprite, containers);
-	};
-
-	// loadStateFromMsg
-	var loadContainers = function(containers, containersList) {
-		var container;
-		for (var i = 0; i < containers.length; i++) {
-			container = containers[i];
-			var containerObj = getNewContainerFromMsg(container);
-			containerObj.Contains = container.contains;
-			containersList.push(containerObj);
-		}
-	};
-
-	// loadContainers
-	var getNewContainerFromMsg = function(container)
-	{
-		var name = container.name;
-		var id = container.name;
-		var sprite = name + ".PNG";
-		return new Container(id, name, sprite);
-	};
-
-	// loadStateFromMsg
-	var loadIngredientContainers = function(ingredientContainers, ingredients, ingredientContainersList) {
-		for (var i = 0; i < ingredientContainers.length; i++) {
-			var container = ingredientContainers[i];
-			var ingredient = "";
-			var ingredientObject;
-			if (container.contains.length > 0) {
-				ingredient = container.contains[0];
-				ingredientObject = getIngredientFromList(ingredient, ingredients);
-			}
-			var containerObj = getNewIngredientContainerFromMsg(container, ingredientObject);
-			ingredientContainersList.push(containerObj);
-		}
-	};
-
-	// loadIngredientContainers
-	var getIngredientFromList = function(name, ingredients) {
-		var ingredient;
-		for (var i =0; i < ingredients.length; i++) {
-			if (ingredients[i].name == name) {
-				ingredient = ingredients[i];
-			}
-		}
-		return ingredient;
-	};
-
-	// loadIngredientContainers
-	var getNewIngredientContainerFromMsg = function(container, ingredient) {
-		var name = container.name;
-		var id = container.name;
-		var sprite = name;
-		if (typeof ingredient !== 'undefined' && ingredient.peeled) {
-			sprite += "_peeled"
-		}
-		sprite += ".PNG";
-		return new IngredientContainer(name, id, sprite, ingredient.Name);
 	};
 
 	// loadStateFromMsg
@@ -761,7 +513,10 @@ var InventoryGrid = function(matchCon) {
 	// assignSlots
 	var getApplianceSlots = function() {
 		var startPosition = getGroupPosition("appliances");
-		var startSlot = getSlot(startPosition.x, startPosition.y);
+		var width = slotsPerRow;
+		var rows = Math.floor(startPosition.y / 64);
+		var columns = Math.floor(startPosition.x / 64);
+		var startSlot = rows * width + columns;
 		return getObjectSlots(startSlot, 2, 1);
 	};
 	
@@ -810,20 +565,23 @@ var InventoryGrid = function(matchCon) {
 			obj = objects[i];
 			slot = slots[i];
 			lookup[slot] = obj;
-			obj.setSlot(slot);
+			//obj.setSlot(slot);
 		}
 	}
 
 	// assignSlots
 	var setPositions = function(objects) {
-		var obj;
-		var position;
-		var groupPosition;
+		var obj,
+			position,
+			groupPosition,
+			group;
+
 		for (var slot in objects) {
 			obj = objects[slot];
 			groupPosition = getObjectGroupPosition(obj);
+			group = getGroupOfObject(obj);
 			position = getSlotPosition(slot);
-			obj.setPosition(position.x - groupPosition.x, position.y - groupPosition.y);
+			obj.setConfiguration(slot, position.x - groupPosition.x, position.y - groupPosition.y, group);
 		}
 	}
 
@@ -847,102 +605,10 @@ var InventoryGrid = function(matchCon) {
 		}
 	};
 
-	/*
-	this.LoadIngredientsFromMsg = function(startSlot, ingredients)
-	{
-		for (var i = 0; i < ingredients.length; i++) {
-			var ingredient = ingredients[i];
-			var ingredientObj = this.GetNewIngredientFromMsg(ingredient);
-			self.InsertObject(startSlot + i, ingredientObj);
-		}
-	};
-	*/
-	
-	
-
-	/*
-
-	var getNewIngredientFromMsg = function(ingredient)
-	{
-		var name = ingredient.name;
-		var id = ingredient.name;
-		var sprite = name + ".PNG";
-		var isInfinite = ($.inArray(name, this.InfiniteIngredients) > -1);
-		return new Ingredient(id, name, sprite, isInfinite);
-	};*/
-
-	
-
-
-	
-	/*
-	this.FetchObj = function(slot) {
-		if (this.IsSlotApp(slot)) {
-			var appliance = GetApplianceFromSlot(slot);
-			var applianceSlot = GetSlotInAppliance(slot);
-			if (!appliance.IsEmpty(applianceSlot)) {
-				appliance.GetObject(applianceSlot);
-				var obj = appliance.GetObject(applianceSlot);
-				//this.ClearSlotAnim(slot + "Box");
-				return obj;
-				//matchConsole.Write("Player 1 took the " + obj.Name + " off of the " + GameObjects[slot].Name);
-			}
-			else {
-				return appliance;
-			}
-		}
-		else {
-			var obj = GameObjects[slot];
-			//delete GameObjects[slot];
-			//$("#"+slot).setAnimation();
-			return obj;
-		}
-		return undefined;
-	};
-	
-	this.PlaceObj = function(obj, slot) {
-		if (slot < 0) throw "Attempted to place in non slot!";
-		//Place in non empty slot
-		if (!isSlotEmpty(slot)) { 
-			var gobj = this.FetchObj(slot);
-			var origin = this.GetSlot(mouseTracker.DownX, mouseTracker.DownY);
-			obj.ActOn(gobj, slot, origin);
-		} else {
-			console.log(slot);
-			//if ((slot.charAt(0) === "c" ) === (obj.Type === EnumGOType.Ing)) {
-			//	throw "Placing object in mismatched slot!";
-			//} else {
-			//GameObjects[slot] = obj;
-			//$("#"+slot).setAnimation(obj.Anim);
-
-			var action = this.GetMoveAction(obj, slot);
-			gameConnect.ReportCmdSucc(obj.ID, slot, action, "");
-			//}
-		}
-	};*/
-
-	
-	//Gets the description of the gameObject in slot
-	// onMouseClick
 	var getObjDesc = function(slot) {
 		var obj = getObjFromSlot(slot);
 		return (isSlotEmpty(slot)) ? false : obj.Desc();
-	};
-
-	// public
-	/*
-	this.GetObjType = function(slot) {
-		var obj = getObjFromSlot(slot);		
-		return (isSlotEmpty(slot)) ? false : obj.Type;
-	};
-
-	// public
-	this.GetObjName = function(slot) {
-		var obj = getObjFromSlot(slot);
-		return (isSlotEmpty(slot)) ? false : obj.Name;
-	};*/
-
-	
+	};	
 };
 
 /////////////////

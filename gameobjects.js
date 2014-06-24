@@ -138,6 +138,10 @@ var Container = function(id, name, sprite)
     this.setPosition = function(x, y) {
         painter.setPosition(x,y);
     };
+
+    this.setConfiguration = function(slot, x, y, group) {
+        painter.setConfiguration(slot, x, y, group);
+    };
     
     //Transfer contents of container to new container
     this.TransferTo = function(cont) {
@@ -198,6 +202,10 @@ var IngredientContainer = function(id, name, sprite, ingredient) {
         painter.setPosition(x,y);
     };
 
+    this.setConfiguration = function(slot, x, y, group) {
+        painter.setConfiguration(slot, x, y, group);
+    };
+
     this.setSlot = function(slot) {
         painter.setSlot(slot);
     }; 
@@ -217,8 +225,8 @@ var Appliance = function(id, name, sprite, containers)
 
     var initPainter = function() {
         var containerPainters = [];
-        for (var i = 0; i < Contains.contents.length; i++) {
-            containerPainters.push(Contains.contents[i].getPainter());
+        for (var i = 0; i < Contains.length; i++) {
+            containerPainters.push(Contains[i].getPainter());
         }
         painter = new AppliancePainter(sprite, 0, 0, 0, containerPainters);
     }; 
@@ -232,7 +240,7 @@ var Appliance = function(id, name, sprite, containers)
         }
     };
 
-    var Contains = {contents: $.extend(true, [], containers)};
+    var Contains = containers;
     initPainter();
     this.AddTo = function(gobj) {
         //initPainter();
@@ -246,7 +254,7 @@ var Appliance = function(id, name, sprite, containers)
     
 
     this.GetObject = function(slot) {
-        return Contains.contents[slot];
+        return Contains[slot];
     };
 
     this.Remove = function(slot) {
@@ -259,7 +267,7 @@ var Appliance = function(id, name, sprite, containers)
     };
     
     this.IsEmpty = function(slot) {
-        var length = Contains.contents.length;
+        var length = Contains.length;
         return (length <= slot);
     };
 
@@ -276,6 +284,10 @@ var Appliance = function(id, name, sprite, containers)
     this.setPosition = function(x, y) {
         //initPainter();
         painter.setPosition(x,y);
+    };
+
+    this.setConfiguration = function(slot, x, y, group) {
+        painter.setConfiguration(slot, x, y, group);
     };
 };
 

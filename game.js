@@ -52,7 +52,6 @@ var Game = function() {
     var actionHandler = new GeneralHandler(),
         gameSceneSplash = new GameSceneSplash(actionHandler),
         gameSceneMainMenu = new GameSceneMainMenu(actionHandler),
-        inventoryGrid = new InventoryGrid(),
         gameSceneMatch,
         playground;
         
@@ -233,7 +232,7 @@ var Game = function() {
         switch(CurrentGameState)
         {
             case EnumGameState.MatchInit:
-                gameSceneMatch = new GameSceneMatch(playground, actionHandler, inventoryGrid)
+                gameSceneMatch = new GameSceneMatch(playground, actionHandler)
                 gameSceneMatch.Init();
                 CurrentGameState = EnumGameState.MatchIntro;
                 break;
