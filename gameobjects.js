@@ -94,12 +94,11 @@ var Container = function(id, name, sprite)
     this.Name = name;
     this.ID = id;
     this.Type = EnumGOType.Cont;
-    this.Sprite = sprite;
     this.IsMovable = true;
+    this._sprite = sprite;
     
     
-    this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
-    var painter = new ContainerPainter(this.Anim, 0, 0, 0, "containers");
+    var painter = new ContainerPainter(sprite, 0, 0, 0, "containers");
     this.Desc = function() {    
         if (!Contains.length) {
             return "This is an empty " + this.Name;
@@ -159,12 +158,11 @@ var IngredientContainer = function(id, name, sprite, ingredient) {
     this.Name = name;
     this.ID = id;
     this.Type = EnumGOType.IngContainer;
-    this.Sprite = sprite;
     this.Ingredient = ingredient;
     this.IsMovable = true;
+    this._sprite = sprite;
 
-    this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
-    var painter = new ContainerPainter(this.Anim, 0, 0, 0, "ingredients");
+    var painter = new ContainerPainter(sprite, 0, 0, 0, "ingredients");
     this.Desc = function() {    
         if (!Contains.length) {
             return "This is an empty " + this.Name;

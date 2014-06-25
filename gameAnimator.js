@@ -344,10 +344,11 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
     };
 };
 
-var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
+var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup) {
     "use strict";
     var group = (typeof containerGroup !== 'undefined') ? containerGroup : "containers";
-    var animation = anim;
+    var animation = new $.gameQuery.Animation({imageURL: "./Sprites/" + sprite});
+    this._animation = $.extend(true, {}, animation);
     var slot = currentSlot;
     var x = posx;
     var y = posy;
@@ -384,6 +385,7 @@ var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
 
     this.setAnimation = function(newAnimation) {
         animation = newAnimation;
+        this._animation = animation;
     };
 
     this.clearAnimation = function() {
@@ -416,15 +418,6 @@ var ContainerPainter = function(anim, posx, posy, currentSlot, containerGroup) {
 
     this.draw = function() {
         setSprite();
-        /*
-        var slotObject = getSlotObject();
-        if (slotObject.length === 0) {
-            setSprite();
-        }
-        else {
-            slotObject.x(x);
-            slotObject.y(y);
-        }*/
     };
 };
 
@@ -493,10 +486,6 @@ var MatchConsolePainter = function() {
         }
         var scrollAmount = $("#" + DisplayDiv).height();
         $("#" + DisplayDiv).scrollTop(scrollAmount);
-        //$("#" + DisplayDiv).append("<u>" + text[0] + "</u>");
-        //$("#" + DisplayDiv).append("<ol>");
-        
-        //$("#" + DisplayDiv).append("</ol>");
     };
 };
 

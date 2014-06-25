@@ -103,7 +103,13 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 	};
 
 	this.onAction = function(event) {
-		gameConnect.ReportCmdSucc(event.ID, event.targetID, event.action, event.message);
+		if (event.action == "refresh") {
+			drawScreen();
+		}
+		else {
+			gameConnect.ReportCmdSucc(event.ID, event.targetID, event.action, event.message);
+
+		}
 	};
 
 	var drawScreen = function() {
@@ -177,6 +183,7 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 			if (!setObjectAtPosition(obj.object, obj.x, obj.y)) {
 				setObjectAtPosition(obj.object, obj.oldX, obj.oldY);
 			}
+			gridPainter.draw();
 		}
 	};
 
@@ -327,11 +334,19 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 			if (typeof toObj !== 'undefined') {
 				event = obj.ActOn(toObj);
 			}
-			setObjectAtSlot(obj, slot);
+			else 
+			{
+				if (setObjectAtSlot(obj, slot)) {
+					obj.setConfiguration(slot, x, y);
+					event = {action:"refresh"};
+				}
+			}
 		}
 		if (typeof event !== 'undefined') {
 			performAction(event);
+			return true;
 		}
+		return false;
 	};
 
 	// setObjectAtPosition, getObjectDescription
@@ -374,7 +389,9 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 	var setObjectAtSlot = function(obj, slot) {
 		if (isSlotEmpty(slot)) {
 			GameObjects[slot] = obj;
+			return true;
 		}
+		return false;
 	};
 
 	// setObjectAtPosition
@@ -411,8 +428,8 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		var x = column * 64,
 			y = row * 64;
 
-		var group = getGroupOfObject();
-		if (typeof group !== 'undefined') {
+		var group = getGroupOfSlot(slot);
+		if (typeof group !== "") {
 			var groupObj = $("#" + group.toString());
 			if (groupObj.length !== 0) {
 				x -= groupObj.x();
@@ -421,6 +438,21 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		}
 
 		return {"x": x, "y": y};
+	};
+
+	var getGroupOfSlot = function(slot) {
+		slot = parseInt(slot, 10);
+		var row = Math.floor(slot / slotsPerRow);
+		if (row <= 4) {
+			return "appliances";
+		}
+		if (row <= 5) {
+			return "containers";
+		}
+		if (row <= 6) {
+			return "ingredients";
+		}
+		return "";
 	};
 
 	// getObjectGroupPosition, getSlotPosition
@@ -495,7 +527,7 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 				else {
 					foundObject = removeObjectFromList(object, ingredientContainers);
 					if (typeof foundObject !== 'undefined') {
-						tempSlots[slot] = object;
+						tempSlots[slot] = foundObject;
 						removeItemFromList(slot, ingredientContainerSlots);
 					}
 				}
@@ -581,7 +613,7 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 			groupPosition = getObjectGroupPosition(obj);
 			group = getGroupOfObject(obj);
 			position = getSlotPosition(slot);
-			obj.setConfiguration(slot, position.x - groupPosition.x, position.y - groupPosition.y, group);
+			obj.setConfiguration(slot, position.x, position.y, group);
 		}
 	}
 
@@ -695,214 +727,6 @@ var MouseTracker = function() {
 	this.addOnMouseMove = function(callback) {
 		mouseMoveCallbacks.push(callback);
 	};
-
-	/*	
-	this.RegisterClick = function() {
-		/*console.log("Click at " + mouseTracker.X + " " + mouseTracker.Y);
-		if (mouseTracker.Clicked) {
-			mouseTracker.Clicked = false;
-			mouseTracker.DoubleClick(mouseTracker.GridX, mouseTracker.GridY);
-		} else {
-			mouseTracker.ClickTicks = 0;
-			mouseTracker.Clicked = true;
-		}
-		console.log("Grid coords: " + mouseTracker.GridX + "x" + mouseTracker.GridY);
-		Down = false;
-		onMouseClick()
-		mouseTracker.SingleClick(mouseTracker.GridX, mouseTracker.GridY);
-	};*/
-	/*
-	
-	this.RegisterDown = function() {
-		//console.log("Mouse down!");
-		Down = true;
-		if (!Dragging) {
-			DownX = GridX;
-			DownY = GridY;
-			DragTicks = 0;
-			onMouseDown(DownX, DownY);	
-		}	
-	};
-	
-	this.RegisterUp = function() {
-		console.log("Mouse up!");
-		Down = false;
-		onMouseUp();
-		if (!Dragging) {
-			if(mouseTracker.GridX === mouseTracker.DownX && mouseTracker.GridY === mouseTracker.DownY) {
-				onMouseClick(GridX, GridY);
-			}
-		}
-		//if(!mouseTracker.Dragging) {
-		//	if(mouseTracker.GridX === mouseTracker.DownX && mouseTracker.GridY === mouseTracker.DownY) {
-		//		mouseTracker.RegisterClick();
-		//	}
-		//} else {
-		//	mouseTracker.PutDownObj();
-		//}		
-	};
-	
-	this.RecordMousePos = function(event) {
-		//console.log(event.pageX+" "+event.pageY);
-		X = event.pageX - OffsetX;
-		Y = event.pageY - OffsetY;
-		GridX = X //>>> 6;
-		GridY = Y //>>> 6;
-		if (Down && DragTicks > 0) {
-			onMouseDrag(GridX, GridY);
-		}
-		else if (Down) {
-			DragTicks++;
-		}
-
-	};*/
-	
-	/*
-	Update: function() {	
-		//Mouse over tracking
-		actionText.Clear();
-		if (!mouseTracker.Down && !mouseTracker.Dragging) {
-			if (!inventoryGrid.IsSlotEmpty(inventoryGrid.GetSlot(mouseTracker.GridX, mouseTracker.GridY))) {
-					var text = EnumActions.ToString(activeAction);
-					text += " ";
-					var slot = inventoryGrid.GetSlot(mouseTracker.GridX, mouseTracker.GridY);
-					text += inventoryGrid.GetObjName(slot);
-					actionText.WriteTo(text);
-			}
-		}
-		
-		//Drag tracking
-		if (mouseTracker.Down && !mouseTracker.Dragging) { mouseTracker.DragTicks++;
-			if (mouseTracker.DragTicks >= 6) {
-				mouseTracker.DragTicks = 0;
-				mouseTracker.MouseDrag();
-			}
-		}
-		/*
-		//Click tracking
-		if (mouseTracker.Clicked) {mouseTracker.ClickTicks++;
-			console.log("" + mouseTracker.ClickTicks);
-			if (mouseTracker.ClickTicks >= 6) {
-				mouseTracker.ClickTicks = 0;
-				mouseTracker.Clicked = false;
-				mouseTracker.SingleClick(mouseTracker.GridX, mouseTracker.GridY);
-			}
-		}
-		
-		//Update holding box position
-		var mouseX = mouseTracker.X - 32;
-		var mouseY = mouseTracker.Y - 32;
-		$("#holdingBox").x(mouseX).y(mouseY);
-	},
-	
-	Init: function() {
-		$.playground().registerCallback(mouseTracker.Update, 1); 
-	},
-	
-	PickUpObj: function(slot) {
-		if (!inventoryGrid.IsSlotEmpty(slot)) {
-			mouseTracker.Holding = inventoryGrid.FetchObj(slot);
-			$("#holdingBox").setAnimation(mouseTracker.Holding.Anim);
-		}
-	},
-	
-	PutDownObj: function() {
-		var gx = mouseTracker.GridX;
-		var gy = mouseTracker.GridY;
-		var width = inventoryGrid.SlotsPerRow;
-		var rows = Math.floor(gy / 64);
-		var columns = Math.floor(gx / 64);
-		var slot = rows * width + columns;
-
-		var appliance = inventoryGrid.GetApplianceFromSlot(slot);
-		if (typeof appliance != 'undefined') {
-			var applianceSlot = inventoryGrid.GetSlotInAppliance(slot);
-			if (appliance.IsEmpty(applianceSlot)) {
-				mouseTracker.Holding.ActOn(appliance);
-			}
-			else {
-				inventoryGrid.PlaceObj(mouseTracker.Holding, slot);	
-			}
-		}
-		else {
-			inventoryGrid.PlaceObj(mouseTracker.Holding, slot);	
-		}
-		//return slot;
-		//var slot = inventoryGrid.GetSlot(mouseTracker.GridX, mouseTracker.GridY);
-		//var slot = inventoryGrid.GetSlot(mouseTracker.DownX, mouseTracker.DownY);
-		//inventoryGrid.PlaceObj(mouseTracker.Holding, slot);
-		
-		mouseTracker.Dragging = false;
-		mouseTracker.Holding = null;
-		$("#holdingBox").setAnimation();
-	},
-	
-	//Mouse actions
-	SingleClick: function(gx, gy) {
-		if (!actionBar.SelectNewAction(gx ,gy)) {
-			var slot = inventoryGrid.GetSlot(gx, gy);
-			if (activeAction === EnumActions.Look) {
-				var desc = inventoryGrid.GetObjDesc(slot);
-				if (desc) matchConsole.Write(desc);
-			} else {
-				var obj = inventoryGrid.GameObjects[slot];
-				RegisterCommand(obj, activeAction, actionSlot);
-			}
-		}
-	},
-	
-	/*
-	//Deprecated
-	DoubleClick: function(gx, gy) {
-		var slot = inventoryGrid.GetSlot(gx, gy);
-		var obj = inventoryGrid.GameObjects[slot];
-		actionHandler.HandleAction(obj, slot);
-	},*/
-	
-
-	// TODO need to adequately grab objects from appliances
-	/*MouseDrag: function() {
-		var gx = mouseTracker.DownX;
-		var gy = mouseTracker.DownY;
-		var width = inventoryGrid.SlotsPerRow;
-		var rows = Math.floor(gy / 64);
-		var columns = Math.floor(gx / 64);
-		var slot = rows * width + columns;
-
-		var appliance = inventoryGrid.GetApplianceFromSlot(slot);
-		if (typeof appliance != 'undefined') {
-			var applianceSlot = inventoryGrid.GetSlotInAppliance(slot);
-			if (!appliance.IsEmpty(applianceSlot)) {
-				mouseTracker.Dragging = true;
-
-				var objectName = appliance.GetObject(applianceSlot);
-				var object = inventoryGrid.FindObjectByName(objectName);
-
-				// TODO, this doesn't actually get the object, just the name
-				mouseTracker.Holding = object;
-				$("#holdingBox").setAnimation(mouseTracker.Holding.Anim);
-			}
-		}
-		else if (inventoryGrid.GameObjects[slot].IsMovable) {
-			mouseTracker.Dragging = true;
-			mouseTracker.PickUpObj(slot);
-		}
-
-
-
-			/*
-		var slot = inventoryGrid.GetSlot(mouseTracker.DownX, mouseTracker.DownY);
-		if (slot != "") {
-			var gotype = inventoryGrid.GetObjType(slot);
-			 else if (gotype === EnumGOType.App) {
-				if (inventoryGrid.GameObjects[slot].Contains.length > 0) {
-					mouseTracker.Dragging = true;
-
-					mouseTracker.PickUpObj(slot);
-				}
-			}
-		}*/
-	//}
 }
 
 ///////////
