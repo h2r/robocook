@@ -10,29 +10,6 @@ var EnumGOType = {
     Empty: 5
 };
 
-//Game Object
-/*
-function gameObject(id, name, type, sprite, fnDesc)
-{
-    this.Name = name;
-    this.ID = id;
-    this.Type = type;
-    this.Sprite = sprite;
-    this.Slot = "";
-    this.IsMovable = false;
-    
-    if (!this.Sprite) {
-        this.Anim = null;
-    } else {
-        this.Anim = new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite});
-    }
-
-    this.Desc = fnDesc || "This is a " + this.Name;
-    
-    //Slot management
-    //this.SetSlot = function(slot) { this.Slot = slot; }
-}*/
-
 ///////////////////
 //Game Ingredient//
 ///////////////////
@@ -230,7 +207,7 @@ var Appliance = function(id, name, sprite, containers)
     }; 
 
     this.Desc = function() {    
-        if (!Contains.contents.length) {
+        if (!Contains.length) {
             return "This is an empty " + this.Name;
         } else {
             var str = "This is a " + this.Name + " containing: " + Contains[0].Desc();

@@ -200,6 +200,6 @@ var StateMessageReader = function() {
 			sprite += "_peeled"
 		}
 		sprite += ".PNG";
-		return new IngredientContainer(name, id, sprite, ingredient.Name);
+		return new IngredientContainer(name, id, sprite, ingredient.name);
 	};	
 };

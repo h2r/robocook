@@ -68,27 +68,15 @@ var GamePainter = function(playground, mouseTracker) {
                 .end().end()
         .addGroup("consoleBackground", {width: 384, height: 192, posx: 0, posy: 0})
             .css({"background-image": "url('./Sprites/TerminalDivBG.PNG')", "overflow": "visible"})
-            .addGroup("consoleDiv", {width: 374, height: 180, posx: 10, posy: 6})
+            .addGroup("consoleDiv", {width: 364, height: 180, posx: 10, posy: 6})
                 .css({"font-size": "10pt", "color": "green", "overflow": "auto"})
                 .end().end()
         .addGroup("actionDiv",{width: 768, height: 64, posx: 0, posy: 448})
             .css({"font-size": "8pt", "color": "yellow", "overflow": "auto"})
             .addSprite("actSelector", {animation: gameAnimations.overSelectionP1, width: 64, height: 64, posx: 0})
-            .append("<button id='matchResetBtn' type='button'>Reset</button>")
             .end()
         .addGroup(actionText.DisplayDiv, {width: 256, height: 64, posx: 448, posy: 448})
-            .end();
-
-    //Configure reset button
-    $("#matchResetBtn").css({
-        "position":"absolute",
-        "top":16,
-        "left":708}).click(function(event) {
-            event.preventDefault();
-            //console.log("Match Scene -> Reset button clicked!");
-            RegisterCommand(gameConfig.SceneMatchName, EnumGameCommands.MatchReset);
-        });     
-        
+            .end();    
 
     this.draw = function () {
         var i = 0;  
@@ -141,12 +129,22 @@ var GridPainter = function() {
     };
 };
 
-var ActionBarPainter = function(usedActions, onClick) {
+var ActionBarPainter = function(usedActions, onClick, onReset) {
     "use strict";
     var actions = usedActions,
         selector = 0;
     var DisplayDiv = "actionDiv";
 
+    $("#" + DisplayDiv).append("<button id='matchResetBtn' type='button'>Reset</button>");
+            
+    //Configure reset button
+    
+    $("#matchResetBtn").css({
+        "position":"absolute",
+        "top":16,
+        "left":708});
+    $("#matchResetBtn").click(onReset);   
+    
     this.setSelector = function(position) {
         if (0 <= position && position < actions.length) {
             selector = position;
@@ -473,8 +471,7 @@ var MatchConsolePainter = function() {
     "use strict";
     var DisplayDiv = "consoleDiv";
     var text = [];
-    var height = $("#" + DisplayDiv).height() - 8;
-
+    
     this.setText = function(lines) {
         text = lines;
     };
@@ -484,7 +481,7 @@ var MatchConsolePainter = function() {
         for (var i = 0; i < text.length; i++) {
             $("#" + DisplayDiv).append(text[i] + "</br>");
         }
-        var scrollAmount = $("#" + DisplayDiv).height();
+        var scrollAmount = $("#" + DisplayDiv)[0].scrollHeight;
         $("#" + DisplayDiv).scrollTop(scrollAmount);
     };
 };
