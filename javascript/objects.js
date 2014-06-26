@@ -235,7 +235,8 @@ var Appliance = function(id, name, sprite, containers)
     this.Remove = function(slot) {
         var obj = null;
         if (!this.IsEmpty()) {
-            obj = Contains[slot];    
+            obj = Contains[slot];
+            painter.removePainter(obj.getPainter());    
             Contains = Contains.splice(slot,1);
         }
         return obj;

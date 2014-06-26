@@ -278,6 +278,8 @@ public class RobocookServer{
 	    	@Override
 	        public void configure(WebSocketServletFactory factory)
 	        {
+	    		// Set client timeout to 5 min
+	    		factory.getPolicy().setIdleTimeout(5*60*1000);
 	            factory.register(RobocookServer.class);
 	        }		    	
 	    };
