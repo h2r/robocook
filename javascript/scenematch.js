@@ -114,11 +114,14 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	this.onReset = function() {
 		inventoryGrid.reset();
 		gameConnect.requestReset();
 	};
 
+=======
+>>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
 =======
 >>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
 =======
@@ -868,6 +871,7 @@ var ActionBar = function(actions, mouseTracker) {
     
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	var performReset = function() {
 		activeAction = Actions[0];
 		painter.setSelector(0);
@@ -875,6 +879,8 @@ var ActionBar = function(actions, mouseTracker) {
     		resetCallbacks[i].onReset();
     	}
     };
+=======
+>>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
 =======
 >>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
 =======
