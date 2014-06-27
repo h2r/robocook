@@ -132,10 +132,4 @@ var GameConnect = function(){
             console.log("Failed to send message: " + JSON.stringify(token));
         }
     };
-
-    this.requestReset = function() {
-
-        var token = {msgtype: "reset"};
-        this.Send(token);
-    };
 }

@@ -37,6 +37,6 @@
 	<classpathentry kind="lib" path="lib/jetty/websocket-servlet-9.2.1.v20140609.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/baking"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/burlap_mlirl"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/BURLAP"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

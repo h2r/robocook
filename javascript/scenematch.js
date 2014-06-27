@@ -24,8 +24,10 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 			EnumActions.TurnOnOff,
 			EnumActions.Mix,
 			EnumActions.Peel
+			//EnumActions.Spread,
+			//EnumActions.Cut,
+			//EnumActions.Shape,
 		], mouseTracker);
-
 
 	var inventoryGrid = new InventoryGrid(matchConsole, actionBar);
 	this.Init = function() {
@@ -45,8 +47,6 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 		mouseTracker.addOnMouseUp(inventoryGrid);
 		mouseTracker.addOnMouseDrag(inventoryGrid);
 		mouseTracker.addOnMouseClick(actionBar);
-
-		actionBar.addResetCallback(this);
 
 		
 		var newPainters = this.GetPainters();
@@ -112,11 +112,14 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 		}
 	};
 
+<<<<<<< HEAD
 	this.onReset = function() {
 		inventoryGrid.reset();
 		gameConnect.requestReset();
 	};
 
+=======
+>>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
 	var drawScreen = function() {
 		gamePainter.draw();
 		$.gameQuery.resourceManager.refresh();
@@ -767,14 +770,10 @@ var MatchConsole = function() {
 		return Lines[this.Lines.length-1];
 	};
 	
-	// This implementation seems like it would get a bit resource intensive if Lines gets very long
 	this.Write = function(line) {
-		var lines = line.split("\n");
-		for (var i = 0; i < lines.length; i++) {
-			Lines.push(lines[i]);
-		}
+		//this.Lines.shift();
+		Lines.push(line);
 		painter.setText(Lines);
-		painter.draw();
 	};
 
 	this.GetPainter = function() {
@@ -864,6 +863,7 @@ var ActionBar = function(actions, mouseTracker) {
     }
     ActionBar.prototype._actionBar = this;
     
+<<<<<<< HEAD
 	var performReset = function() {
 		activeAction = Actions[0];
 		painter.setSelector(0);
@@ -871,20 +871,17 @@ var ActionBar = function(actions, mouseTracker) {
     		resetCallbacks[i].onReset();
     	}
     };
+=======
+>>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
 
 	var Actions = actions;
 	var activeAction = Actions[0];
-	var painter = new ActionBarPainter(actions, mouseTracker.RegisterClick, performReset);
+	var painter = new ActionBarPainter(actions, mouseTracker.RegisterClick);
     var bounds = painter.getBounds();
-    var resetCallbacks = [];
-
-    this.addResetCallback = function(callback) {
-    	resetCallbacks.push(callback);
-    };
 
 	this.getPainter = function() {
 		return painter;
-	};
+	}
 
 	this.onMouseClick = function(x, y) {
 		if (isWithinActionBar(x, y)){
@@ -900,6 +897,7 @@ var ActionBar = function(actions, mouseTracker) {
 	var isWithinActionBar = function(x, y) {
 		return (bounds.left <= x && x <= bounds.right && bounds.bottom <= y && y <= bounds.top);
 	};
+
 	
 	var selectNewAction = function(x ,y) {
 		var index = getActionNumber(x, y);
