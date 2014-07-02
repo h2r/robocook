@@ -112,20 +112,11 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 		}
 	};
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 	this.onReset = function() {
 		inventoryGrid.reset();
 		gameConnect.requestReset();
 	};
 
-=======
->>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
-=======
->>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
-=======
->>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
 	var drawScreen = function() {
 		gamePainter.draw();
 		$.gameQuery.resourceManager.refresh();
@@ -194,7 +185,9 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 	this.onMouseUp = function() {
 		if (objectHolder.IsHolding()) {
 			var obj = objectHolder.Pop();
-			if (!setObjectAtPosition(obj.object, obj.x, obj.y)) {
+			var gridX = obj.x - $("#grid").x();
+			var gridY = obj.y - $("#grid").y();
+			if (!setObjectAtPosition(obj.object, gridX, gridY)) {
 				setObjectAtPosition(obj.object, obj.oldX, obj.oldY);
 			}
 			gridPainter.draw();
@@ -209,10 +202,10 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 			var tileY = mouseDownY % 64;
 
 			if (typeof obj !== 'undefined') {
-				objectHolder.SetHoldingObject(obj, x - $("#grid").x(), y - $("#grid").y(), tileX, tileY);
+				objectHolder.SetHoldingObject(obj, x, y, tileX, tileY);
 			}
 		}
-		objectHolder.SetPosition(x - $("#grid").x(),y - $("#grid").y());
+		objectHolder.SetPosition(x,y);
 	};
 
 	// public
@@ -361,7 +354,7 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 					var position = getSlotPosition(slot);
 					var group = getGroupOfSlot(slot);
 					obj.setConfiguration(slot, position.x, position.y, group);
-					event = {action:"refresh"};
+					event = {"ID": obj.ID, "targetID": "counter", "action": "move"};
 				}
 			}
 		}
@@ -731,7 +724,6 @@ var MouseTracker = function() {
 		// X and Y are translated from absolute X and Y to grid coordinates
 		X = event.pageX;
 		Y = event.pageY;
-		
 		hasMoved = isDown;
 
 		for (var i = 0; i < mouseMoveCallbacks.length; i++) {
@@ -869,9 +861,6 @@ var ActionBar = function(actions, mouseTracker) {
     }
     ActionBar.prototype._actionBar = this;
     
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 	var performReset = function() {
 		activeAction = Actions[0];
 		painter.setSelector(0);
@@ -879,12 +868,6 @@ var ActionBar = function(actions, mouseTracker) {
     		resetCallbacks[i].onReset();
     	}
     };
-=======
->>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
-=======
->>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
-=======
->>>>>>> parent of 4572600... adding some more messages, drawing screen on look action, match console's right column, correcting reset button
 
 	var Actions = actions;
 	var activeAction = Actions[0];

@@ -77,10 +77,12 @@ var GameConnect = function(){
     };
 
     var OnMessage = function(evt) {
-        console.log("Websocket Message from server: " + event.data);
         
-
         var msg = JSON.parse(evt.data);
+        
+        console.log("Websocket Message from server %O", msg);
+
+
         if (msg.hasOwnProperty('clientId')) {
             clientId = msg.clientId;
         }

@@ -563,8 +563,8 @@ var HoldingBoxPainter = function() {
     };
 
     this.setHoldingObjectPainter = function(objPainter, tileX, tileY) {
-        objPainter.clearAnimation();
-        objPainter.setGroup();
+        //objPainter.clearAnimation();
+        //objPainter.setGroup();
 
         holdingObjectPainter = objPainter;
         holdingObjectPainter.setGroup(holdingGroup);
