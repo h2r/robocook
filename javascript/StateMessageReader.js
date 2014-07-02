@@ -173,9 +173,10 @@ var StateMessageReader = function() {
 			if (container.contains.length > 0) {
 				ingredient = container.contains[0];
 				ingredientObject = getIngredientFromList(ingredient, ingredients);
-			}
-			var containerObj = getNewIngredientContainerFromMsg(container, ingredientObject);
+				var containerObj = getNewIngredientContainerFromMsg(container, ingredientObject);
 			ingredientContainersList.push(containerObj);
+			}
+			
 		}
 	};
 

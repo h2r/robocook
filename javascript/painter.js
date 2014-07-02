@@ -53,10 +53,8 @@ var GamePainter = function(playground, mouseTracker) {
             "background", {animation: gameAnimations.background1, width: gameConfig.StageWidth, height: gameConfig.StageHeight}).end()
         .mousemove(mouseTracker.onMouseMove)
         .mousedown(mouseTracker.onMouseDown)
-        .mouseup(mouseTracker.onMouseUp)    
-        .addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 192}).end()
-        .addGroup("containers", {width: 768, height: 64, posx: 0, posy: 320}).end()
-        .addGroup("ingredients", {width: 768, height: 64, posx: gamePos.MatchDivIngsX, posy: gamePos.MatchDivIngsY}).end()
+        .mouseup(mouseTracker.onMouseUp)
+        .addGroup("grid", {width: 768, height: 256, posx: 0, posy: 192}).end()    
         .addGroup("holding", {width: 756, height: 512, posx: 0, posy: 0})
             .end()
         .addGroup("selectionDiv", {width: 756, height: 512, posx: 0, posy: 0})
@@ -109,9 +107,31 @@ var GamePainter = function(playground, mouseTracker) {
 var GridPainter = function() {
     "use strict";
     var painters = [];
+    
+    var initGroup = function() {
+        if ($("#appliances").length === 0) {
+            $("#grid").addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 0}).end()
+        }
+        if ($("#containers").length === 0) {
+            $("#grid").addGroup("containers", {width: 768, height: 64, posx: 0, posy: 128}).end()
+        }
+        if ($("#ingredients").length === 0) {
+            $("#grid").addGroup("ingredients", {width: 768, height: 64, posx: 0, posy: 192}).end()
+        }
+    };
+    initGroup();
 
     this.addPainter = function(painter) {
         painters.push(painter);
+    };
+
+    this.removePainter = function(painter) {
+        var position = $.inArray(painter, painters);
+        if (position != -1) 
+        {
+            painters[position].clear();
+            painters.splice(position, 1);
+        }
     };
 
     this.setPainters = function(newPainters) {
@@ -119,19 +139,28 @@ var GridPainter = function() {
     };
 
     this.getBounds = function() {
-        var left,
-            right,
-            top,
-            bottom;
-        left = Math.min($("#appliances").x(), $("#containers").x(), $("#ingredients").x());
-        right = Math.max($("#appliances").x() + $("#appliances").width() , $("#containers").x() + $("#containers").width(), $("#ingredients").x() + $("#ingredients").width());
-        bottom = Math.min($("#appliances").y(), $("#containers").y(), $("#ingredients").y());
-        top = Math.max($("#appliances").y() + $("#appliances").height() , $("#containers").y() + $("#containers").height(), $("#ingredients").y() + $("#ingredients").height());
+        var left = $("#grid").x();
+        var right = $("#grid").x() + $("#grid").width();
+        var bottom = $("#grid").y();
+        var top = $("#grid").y() + $("#grid").height();
         return {top:top, bottom:bottom, left:left, right:right};
     };  
 
     this.clear = function() {
+        for (var i = 0; i < painters.length; i++) {
+            painters[i].clear();
+        }
         painters = [];
+        clearGroup($("#appliances"));
+        clearGroup($("#containers"));
+        clearGroup($("#ingredients"));
+    };
+
+    var clearGroup = function(group) {
+        for (var i = 0; i < group.length; i++) {
+            group.remove();
+        }
+        initGroup();
     };
 
     this.draw = function() {
@@ -229,6 +258,10 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
     //    containers = [];
     //}
 
+    this.clear = function() {
+        removeAll();
+    };
+
     var groupObject = function() {
         return $("#" + applianceGroup.toString());
     };
@@ -296,6 +329,13 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
         containers.push(newContainer);
     };
 
+    this.removePainter = function(toRemove) {
+        var position = $.inArray(toRemove, containers);
+        if (position != -1) {
+            containers.splice(position, 1);
+        }
+    }
+
     this.setPosition = function(newX, newY) {
         removeAll();
         x = newX;
@@ -353,6 +393,10 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
     var x = posx;
     var y = posy;
 
+    this.clear = function() {
+        this.clearAnimation();
+    }
+
     var slotObject = function() {
         return $("#" + slot.toString());
     };
@@ -389,8 +433,14 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
     };
 
     this.clearAnimation = function() {
-        slotObject().setAnimation();
-        slotObject().remove();
+        if (slotObject().length === 0) {
+            var c = 1;
+        }
+        else {
+            slotObject().setAnimation();
+            slotObject().remove();
+
+        }
     };
 
     this.setSlot = function(newSlot) {
@@ -417,7 +467,9 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
     };
 
     this.draw = function() {
-        setSprite();
+        if (slot != "-1") {
+            setSprite();
+        }
     };
 };
 
@@ -499,6 +551,10 @@ var HoldingBoxPainter = function() {
 
     var holdingObjectPainter;
 
+    this.clear = function() {
+        this.clearHoldingObjectPainter();
+    };
+
     var groupObject = function() {
         return $("#" + holdingGroup);
     };
@@ -521,6 +577,9 @@ var HoldingBoxPainter = function() {
     };
 
     this.setHoldingObjectPainter = function(objPainter, tileX, tileY) {
+        //objPainter.clearAnimation();
+        //objPainter.setGroup();
+
         holdingObjectPainter = objPainter;
         holdingObjectPainter.setGroup(holdingGroup);
         holdingObjectPainter.setPosition(-tileX,-tileY);
@@ -531,9 +590,8 @@ var HoldingBoxPainter = function() {
         if (holdingObjectPainter) {
             holdingObjectPainter.clearAnimation();
             holdingObjectPainter.setGroup();
-            holdingObjectPainter.clearAnimation();
-
         }
+
         holdingObjectPainter = undefined;
 
         groupObject().remove();

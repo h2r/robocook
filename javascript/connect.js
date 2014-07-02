@@ -77,10 +77,12 @@ var GameConnect = function(){
     };
 
     var OnMessage = function(evt) {
-        console.log("Websocket Message from server: " + evt.data);
         
-
         var msg = JSON.parse(evt.data);
+        
+        console.log("Websocket Message from server %O", msg);
+
+
         if (msg.hasOwnProperty('clientId')) {
             clientId = msg.clientId;
         }
@@ -116,14 +118,15 @@ var GameConnect = function(){
     //Reports actions taken by players to the server
     //Please note the functions which report success are contained in either gameobjects.js or gamerecipes.js.
     this.ReportCmdSucc = function(obj, target, action, log) {
+
         var token = {
                 msgtype: "action",
                 msg: {
-                params: ["human", obj, target],
                 action: action,
                 logmsg: log
                 }
             };
+        token.msg.params = (target) ? ["human", obj, target] : ["human", obj];
         if (action !== "") {         
             this.Send(token);
         }

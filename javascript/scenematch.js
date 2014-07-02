@@ -112,6 +112,11 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 		}
 	};
 
+	this.onReset = function() {
+		inventoryGrid.reset();
+		gameConnect.requestReset();
+	};
+
 	var drawScreen = function() {
 		gamePainter.draw();
 		$.gameQuery.resourceManager.refresh();
@@ -172,18 +177,20 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		if (!isWithinBounds(x,y)) {
 			return;
 		}
-		mouseDownX = x;
-		mouseDownY = y;
+		mouseDownX = x - $("#grid").x();
+		mouseDownY = y - $("#grid").y();
 	};
 
 	// public
 	this.onMouseUp = function() {
 		if (objectHolder.IsHolding()) {
 			var obj = objectHolder.Pop();
-			if (!setObjectAtPosition(obj.object, obj.x, obj.y)) {
+			var gridX = obj.x - $("#grid").x();
+			var gridY = obj.y - $("#grid").y();
+			if (!setObjectAtPosition(obj.object, gridX, gridY)) {
 				setObjectAtPosition(obj.object, obj.oldX, obj.oldY);
 			}
-			gridPainter.draw();
+			//gridPainter.draw();
 		}
 	};
 
@@ -206,13 +213,16 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		if (!isWithinBounds(x,y)) {
 			return;
 		}
+		var gridX = x - $("#grid").x();
+		var gridY = y - $("#grid").y();
+
 		var action = actionBar.getActiveAction();
-		var slot = getSlot(x, y);
+		var slot = getSlot(gridX, gridY);
 		if (action === EnumActions.ToString(EnumActions.Look)) {
 			var desc = getObjDesc(slot);
 			if (desc) matchConsole.Write(desc);
 		} else {
-			var obj = getObjectFromPosition(x, y);
+			var obj = getObjectFromPosition(gridX, gridY);
 			var logMsg  = "Performing " + action + " on " + obj.ID;
 			performAction({"ID": obj.ID, "action": action, "message": logMsg});
 		}
@@ -223,6 +233,12 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		var painters = [];
 		painters.push(gridPainter);
 		return painters;
+	};
+
+	this.reset = function() {
+		GameObjects = {};
+		objectHolder.Pop();
+		gridPainter.clear();
 	};
 
 	/////////////////////
@@ -308,6 +324,7 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		}
 		else {
 			obj = GameObjects[slot];
+			gridPainter.removePainter(obj.getPainter());
 			delete GameObjects[slot];
 		}
 
@@ -337,8 +354,10 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 			else 
 			{
 				if (setObjectAtSlot(obj, slot)) {
-					obj.setConfiguration(slot, x, y);
-					event = {action:"refresh"};
+					var position = getSlotPosition(slot);
+					var group = getGroupOfSlot(slot);
+					obj.setConfiguration(slot, position.x, position.y, group);
+					event = {"ID": obj.ID, "targetID": "counter", "action": "move"};
 				}
 			}
 		}
@@ -389,6 +408,7 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 	var setObjectAtSlot = function(obj, slot) {
 		if (isSlotEmpty(slot)) {
 			GameObjects[slot] = obj;
+			gridPainter.addPainter(obj.getPainter());
 			return true;
 		}
 		return false;
@@ -428,6 +448,17 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		var x = column * 64,
 			y = row * 64;
 
+		return {"x": x, "y": y};
+	};
+
+	var getTransformedSlotPosition = function(slot) {
+		slot = parseInt(slot, 10);
+		var row = Math.floor(slot / slotsPerRow),
+			column = slot % slotsPerRow;
+
+		var x = column * 64,
+			y = row * 64;
+
 		var group = getGroupOfSlot(slot);
 		if (typeof group !== "") {
 			var groupObj = $("#" + group.toString());
@@ -443,13 +474,13 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 	var getGroupOfSlot = function(slot) {
 		slot = parseInt(slot, 10);
 		var row = Math.floor(slot / slotsPerRow);
-		if (row <= 4) {
+		if (row <= 2) {
 			return "appliances";
 		}
-		if (row <= 5) {
+		if (row <= 3) {
 			return "containers";
 		}
-		if (row <= 6) {
+		if (row <= 4) {
 			return "ingredients";
 		}
 		return "";
@@ -610,10 +641,10 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 
 		for (var slot in objects) {
 			obj = objects[slot];
-			groupPosition = getObjectGroupPosition(obj);
 			group = getGroupOfObject(obj);
+			groupPosition = getGroupPosition(group);
 			position = getSlotPosition(slot);
-			obj.setConfiguration(slot, position.x, position.y, group);
+			obj.setConfiguration(slot, position.x - groupPosition.x, position.y - groupPosition.y, group);
 		}
 	}
 
@@ -696,7 +727,6 @@ var MouseTracker = function() {
 		// X and Y are translated from absolute X and Y to grid coordinates
 		X = event.pageX;
 		Y = event.pageY;
-		
 		hasMoved = isDown;
 
 		for (var i = 0; i < mouseMoveCallbacks.length; i++) {
@@ -834,6 +864,13 @@ var ActionBar = function(actions, mouseTracker) {
     }
     ActionBar.prototype._actionBar = this;
     
+	var performReset = function() {
+		activeAction = Actions[0];
+		painter.setSelector(0);
+    	for (var i = 0; i < resetCallbacks.length; i++) {
+    		resetCallbacks[i].onReset();
+    	}
+    };
 
 	var Actions = actions;
 	var activeAction = Actions[0];
