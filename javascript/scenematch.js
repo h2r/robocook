@@ -190,7 +190,7 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 			if (!setObjectAtPosition(obj.object, gridX, gridY)) {
 				setObjectAtPosition(obj.object, obj.oldX, obj.oldY);
 			}
-			gridPainter.draw();
+			//gridPainter.draw();
 		}
 	};
 

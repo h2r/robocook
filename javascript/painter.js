@@ -109,9 +109,15 @@ var GridPainter = function() {
     var painters = [];
     
     var initGroup = function() {
-        $("#grid").addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 0}).end()
-        $("#grid").addGroup("containers", {width: 768, height: 64, posx: 0, posy: 128}).end()
-        $("#grid").addGroup("ingredients", {width: 768, height: 64, posx: 0, posy: 192}).end()
+        if ($("#appliances").length === 0) {
+            $("#grid").addGroup("appliances", {width: 384, height: 128, posx: 0, posy: 0}).end()
+        }
+        if ($("#containers").length === 0) {
+            $("#grid").addGroup("containers", {width: 768, height: 64, posx: 0, posy: 128}).end()
+        }
+        if ($("#ingredients").length === 0) {
+            $("#grid").addGroup("ingredients", {width: 768, height: 64, posx: 0, posy: 192}).end()
+        }
     };
     initGroup();
 
@@ -427,8 +433,14 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
     };
 
     this.clearAnimation = function() {
-        slotObject().setAnimation();
-        slotObject().remove();
+        if (slotObject().length === 0) {
+            var c = 1;
+        }
+        else {
+            slotObject().setAnimation();
+            slotObject().remove();
+
+        }
     };
 
     this.setSlot = function(newSlot) {
@@ -455,7 +467,9 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
     };
 
     this.draw = function() {
-        setSprite();
+        if (slot != "-1") {
+            setSprite();
+        }
     };
 };
 
