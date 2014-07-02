@@ -213,13 +213,16 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		if (!isWithinBounds(x,y)) {
 			return;
 		}
+		var gridX = x - $("#grid").x();
+		var gridY = y - $("#grid").y();
+
 		var action = actionBar.getActiveAction();
-		var slot = getSlot(x, y);
+		var slot = getSlot(gridX, gridY);
 		if (action === EnumActions.ToString(EnumActions.Look)) {
 			var desc = getObjDesc(slot);
 			if (desc) matchConsole.Write(desc);
 		} else {
-			var obj = getObjectFromPosition(x, y);
+			var obj = getObjectFromPosition(gridX, gridY);
 			var logMsg  = "Performing " + action + " on " + obj.ID;
 			performAction({"ID": obj.ID, "action": action, "message": logMsg});
 		}
