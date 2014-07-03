@@ -24,40 +24,21 @@
         <javac srcdir="${src.dir}" destdir="${classes.dir}">
             <classpath>
                 <pathelement path="${lib.dir}/h2r-baking.jar" />
-                <pathelement path="${lib.dir}/mongo-java-driver-2.12.0-rc3-javadoc.jar"/>
                 <pathelement path="${lib.dir}/mongo-java-driver-2.12.0-rc3.jar"/>
-                <pathelement path="${lib.dir}/jetty/apache-jstl-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/javax-websocket-server-impl-9.2.1.v20140609.jar"/>
+
+
                 <pathelement path="${lib.dir}/jetty/javax.websocket-api-1.0.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-alpn-client-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-alpn-server-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-annotations-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-client-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-continuation-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-deploy-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-http-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-io-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-jaas-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-jaspi-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-jmx-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-jndi-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-plus-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-proxy-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-quickstart-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-rewrite-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-schemas-3.1.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-security-9.2.1.v20140609.jar"/>
+
                 <pathelement path="${lib.dir}/jetty/jetty-server-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-servlet-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-servlets-9.2.1.v20140609.jar"/>
+                
                 <pathelement path="${lib.dir}/jetty/jetty-util-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-webapp-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/jetty-xml-9.2.1.v20140609.jar"/>
-                <pathelement path="${lib.dir}/jetty/servlet-api-3.1.jar"/>
+                
+
                 <pathelement path="${lib.dir}/jetty/websocket-api-9.2.1.v20140609.jar"/>
                 <pathelement path="${lib.dir}/jetty/websocket-common-9.2.1.v20140609.jar"/>
                 <pathelement path="${lib.dir}/jetty/websocket-server-9.2.1.v20140609.jar"/>
                 <pathelement path="${lib.dir}/jetty/websocket-servlet-9.2.1.v20140609.jar"/>
+                <pathelement path="${lib.dir}/jetty/servlet-api-3.1.jar" />
             </classpath>
         </javac>
     </target>
@@ -73,6 +54,7 @@
             <zipfileset src="${classes.dir}/external-libs.jar">
                 <exclude name="META-INF/**/*"/>
             </zipfileset>
+            <zipfileset src="${lib.dir}/jetty/servlet-api-3.1.jar"/>
             <manifest>
                 <attribute name="Main-Class" value="edu.brown.cs.h2r.Robocook.RobocookServer"/>
             </manifest>
