@@ -15,11 +15,9 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import org.eclipse.jetty.websocket.common.WebSocketSession;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -268,6 +266,8 @@ public class RobocookServer{
 	    	@Override
 	        public void configure(WebSocketServletFactory factory)
 	        {
+	    		// Set client timeout to 5 min
+	    		factory.getPolicy().setIdleTimeout(5*60*1000);
 	            factory.register(RobocookServer.class);
 	        }		    	
 	    };

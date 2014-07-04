@@ -3,17 +3,40 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/mongo-java-driver-2.12.0-rc3-javadoc.jar"/>
 	<classpathentry kind="lib" path="lib/mongo-java-driver-2.12.0-rc3.jar"/>
-	<classpathentry kind="lib" path="lib/websocket/websocket-api-9.1.4.v20140401.jar"/>
-	<classpathentry kind="lib" path="lib/websocket/websocket-common-9.1.4.v20140401.jar"/>
-	<classpathentry kind="lib" path="lib/websocket/websocket-server-9.1.4.v20140401.jar"/>
-	<classpathentry kind="lib" path="lib/websocket/websocket-servlet-9.1.4.v20140401.jar"/>
-	<classpathentry kind="lib" path="lib/jetty-server-9.1.4.v20140401.jar"/>
-	<classpathentry kind="lib" path="lib/jetty-util-9.1.4.v20140401.jar"/>
-	<classpathentry kind="lib" path="lib/servlet-api-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/jetty-http-9.1.4.v20140401.jar"/>
-	<classpathentry kind="lib" path="lib/jetty-io-9.1.4.v20140401.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/apache-jstl-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/javax-websocket-server-impl-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/javax.websocket-api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-alpn-client-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-alpn-server-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-annotations-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-client-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-continuation-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-deploy-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-http-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-io-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-jaas-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-jaspi-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-jmx-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-jndi-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-plus-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-proxy-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-quickstart-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-rewrite-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-schemas-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-security-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-server-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-servlet-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-servlets-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-util-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-webapp-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/jetty-xml-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/servlet-api-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/websocket-api-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/websocket-common-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/websocket-server-9.2.1.v20140609.jar"/>
+	<classpathentry kind="lib" path="lib/jetty/websocket-servlet-9.2.1.v20140609.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/baking"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/BURLAP"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/burlap_mlirl"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
