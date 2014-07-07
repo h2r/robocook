@@ -33,6 +33,17 @@ import edu.brown.cs.h2r.baking.Recipes.Recipe;
 @WebSocket
 public class RobocookServer{
 	private static final String MSGTYPE_STRING = "msgtype";
+	private static final String WELCOME_MESSAGE =
+			"Welcome to our cooking game!\n\n" +
+			"Your task is to complete recipe at the right by interacting with the tiles below.\n\n" +
+			"You can drag and drop tiles to move or pour them. You can also select different actions " +
+			"and click tiles to perform that action on them.\n\n" + 
+			"This is window will provide helpful status updates for you.\n\n" +
+			"Enjoy!";
+	
+	private static final String RESET_MESSAGE = 
+			"The state of the world has been reset.";
+	
 	private MongoClient mongo;
 	private DB db;
 	private Map<String, BasicKitchen> gameLookup;
@@ -161,19 +172,17 @@ public class RobocookServer{
 		{
 			// Get desired new game type from token
 			String gameType = "single";
-			/*try 
-			{
-				//RobocookServerToken msg = token.getToken("msg");
-				gameType = "single";
-			} 
-			catch (TokenCastException e) 
-			{
-				response.setBoolean("Error", true);
-				return response;
-			}*/
-			
 			this.initializeGame(gameType, response);
-			
+		}
+		else if (msgtype.equals("reset"))
+		{
+			String id;
+			try {
+				id = token.getString("clientId");
+			} catch (TokenCastException e) {
+				throw new RuntimeException("Client Id not in reset message");
+			}
+			this.resetState(id, response);
 		}
 		else if (msgtype.equals("action"))
 		{
@@ -225,7 +234,16 @@ public class RobocookServer{
 		RobocookServerToken newStateToken = RobocookServerToken.tokenFromJSONString(newState);
 		token.setStringList("recipe", recipe.getRecipeProcedures());
 		token.setToken("state", newStateToken);
-		token.setString("update", "Welcome to our new cooking game!");
+		token.setString("update", RobocookServer.WELCOME_MESSAGE);
+		token.setString("clientId", id);
+	}
+	
+	public void resetState(String id, RobocookServerToken token) {
+		BasicKitchen kitchen = this.gameLookup.get(id);
+		String newState = kitchen.resetCurrentState();
+		RobocookServerToken newStateToken = RobocookServerToken.tokenFromJSONString(newState);
+		token.setToken("state", newStateToken);
+		token.setString("update", RobocookServer.RESET_MESSAGE);
 		token.setString("clientId", id);
 	}
 	

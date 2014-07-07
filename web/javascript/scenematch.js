@@ -47,6 +47,7 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 		mouseTracker.addOnMouseUp(inventoryGrid);
 		mouseTracker.addOnMouseDrag(inventoryGrid);
 		mouseTracker.addOnMouseClick(actionBar);
+		actionBar.addResetCallback(this);
 
 		
 		var newPainters = this.GetPainters();
@@ -190,7 +191,6 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 			if (!setObjectAtPosition(obj.object, gridX, gridY)) {
 				setObjectAtPosition(obj.object, obj.oldX, obj.oldY);
 			}
-			//gridPainter.draw();
 		}
 	};
 
@@ -872,6 +872,7 @@ var ActionBar = function(actions, mouseTracker) {
     }
     ActionBar.prototype._actionBar = this;
     
+    var resetCallbacks = [];
 	var performReset = function() {
 		activeAction = Actions[0];
 		painter.setSelector(0);
@@ -882,7 +883,7 @@ var ActionBar = function(actions, mouseTracker) {
 
 	var Actions = actions;
 	var activeAction = Actions[0];
-	var painter = new ActionBarPainter(actions, mouseTracker.RegisterClick);
+	var painter = new ActionBarPainter(actions, mouseTracker.RegisterClick, performReset);
     var bounds = painter.getBounds();
 
 	this.getPainter = function() {
@@ -900,9 +901,15 @@ var ActionBar = function(actions, mouseTracker) {
 		return EnumActions.ToString(activeAction);
 	};
 
+	this.addResetCallback = function(newCallback) {
+		resetCallbacks.push(newCallback);
+	}
+
 	var isWithinActionBar = function(x, y) {
 		return (bounds.left <= x && x <= bounds.right && bounds.bottom <= y && y <= bounds.top);
 	};
+
+
 
 	
 	var selectNewAction = function(x ,y) {

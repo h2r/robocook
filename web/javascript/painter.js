@@ -77,17 +77,6 @@ var GamePainter = function(playground, mouseTracker) {
         .addGroup(actionText.DisplayDiv, {width: 256, height: 64, posx: 448, posy: 448})
             .end();
 
-    //Configure reset button
-    $("#matchResetBtn").css({
-        "position":"absolute",
-        "top":16,
-        "left":708}).click(function(event) {
-            event.preventDefault();
-            //console.log("Match Scene -> Reset button clicked!");
-            RegisterCommand(gameConfig.SceneMatchName, EnumGameCommands.MatchReset);
-        });     
-        
-
     this.draw = function () {
         var i = 0;  
         for (i = 0; i < painters.length; i++) {
@@ -170,11 +159,21 @@ var GridPainter = function() {
     };
 };
 
-var ActionBarPainter = function(usedActions, onClick) {
+var ActionBarPainter = function(usedActions, onClick, onReset) {
     "use strict";
     var actions = usedActions,
         selector = 0;
     var DisplayDiv = "actionDiv";
+
+
+
+    //Configure reset button
+    $("#matchResetBtn").css({
+        "position":"absolute",
+        "top":16,
+        "left":708}).click(onReset);     
+        
+
 
     this.setSelector = function(position) {
         if (0 <= position && position < actions.length) {
