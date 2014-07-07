@@ -221,6 +221,7 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		if (action === EnumActions.ToString(EnumActions.Look)) {
 			var desc = getObjDesc(slot);
 			if (desc) matchConsole.Write(desc);
+			performAction({"action": "refresh"});
 		} else {
 			var obj = getObjectFromPosition(gridX, gridY);
 			var logMsg  = "Performing " + action + " on " + obj.ID;

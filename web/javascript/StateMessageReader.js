@@ -150,7 +150,7 @@ var StateMessageReader = function() {
 		for (var i = 0; i < containers.length; i++) {
 			container = containers[i];
 			var containerObj = getNewContainerFromMsg(container);
-			containerObj.Contains = container.contains;
+			containerObj.addContents(container.contains);
 			containersList.push(containerObj);
 		}
 	};
@@ -200,6 +200,6 @@ var StateMessageReader = function() {
 			sprite += "_peeled"
 		}
 		sprite += ".PNG";
-		return new IngredientContainer(name, id, sprite, ingredient.Name);
+		return new IngredientContainer(name, id, sprite, ingredient.name);
 	};	
 };

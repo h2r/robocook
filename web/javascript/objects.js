@@ -100,7 +100,7 @@ var Container = function(id, name, sprite)
     
     var painter = new ContainerPainter(sprite, 0, 0, -1, "containers");
     this.Desc = function() {    
-        if (!Contains.length) {
+        if (Contains.length === 0) {
             return "This is an empty " + this.Name;
         } else {
             var str = "This is a " + this.Name + " containing";
@@ -113,6 +113,11 @@ var Container = function(id, name, sprite)
     };
     
     var Contains = [];
+    this.addContents = function(contents) {
+        for (var i = 0; i < contents.length; i++) {
+            Contains.push(contents[i]);
+        }
+    };
     
     this.ActOn = function(gobj, slot, origin) {
         var logMsg,
@@ -164,10 +169,14 @@ var IngredientContainer = function(id, name, sprite, ingredient) {
 
     var painter = new ContainerPainter(sprite, 0, 0, -1, "ingredients");
     this.Desc = function() {    
-        if (!Contains.length) {
+        if (Contains.length === 0) {
             return "This is an empty " + this.Name;
         } else {
-            var str = "This is a " + this.Name + " containing " + this.Ingredient;
+            var str = "This is a " + this.Name + " containing";
+            for (var i=0; i<Contains.length; i++) {
+                if (i >= 1) str += ",";
+                str += " " + Contains[i];
+            }
             return str;
         }
     };
