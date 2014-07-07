@@ -239,10 +239,16 @@ var Appliance = function(id, name, sprite, containers)
     }; 
 
     this.Desc = function() {    
-        if (!Contains.contents.length) {
+        if (Contains.length === 0) {
             return "This is an empty " + this.Name;
-        } else {
-            var str = "This is a " + this.Name + " containing: " + Contains[0].Desc();
+        } 
+        else 
+        {
+            var str = "This is a " + this.Name + " containing";
+            for (var i=0; i<Contains.length; i++) {
+                if (i >= 1) str += ",";
+                str += " " + Contains[i].Name;
+            }
             return str;
         }
     };
