@@ -66,7 +66,7 @@ var GamePainter = function(playground, mouseTracker) {
                 .end().end()
         .addGroup("consoleBackground", {width: 384, height: 192, posx: 0, posy: 0})
             .css({"background-image": "url('./Sprites/TerminalDivBG.PNG')", "overflow": "visible"})
-            .addGroup("consoleDiv", {width: 374, height: 180, posx: 10, posy: 6})
+            .addGroup("consoleDiv", {width: 364, height: 180, posx: 10, posy: 6})
                 .css({"font-size": "10pt", "color": "green", "overflow": "auto"})
                 .end().end()
         .addGroup("actionDiv",{width: 768, height: 64, posx: 0, posy: 448})

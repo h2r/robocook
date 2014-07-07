@@ -261,11 +261,6 @@ var Appliance = function(id, name, sprite, containers)
         painter.addPainter(gobj.getPainter());
     };
 
-    //for (var i = 0; i < containers.length; i++) {
-    //    this.AddTo(containers[i]);
-    // }   
-    
-
     this.GetObject = function(slot) {
         return Contains[slot];
     };

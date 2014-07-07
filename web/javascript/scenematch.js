@@ -222,10 +222,14 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 			var desc = getObjDesc(slot);
 			if (desc) matchConsole.Write(desc);
 			performAction({"action": "refresh"});
-		} else {
+		} 
+		else 
+		{
 			var obj = getObjectFromPosition(gridX, gridY);
-			var logMsg  = "Performing " + action + " on " + obj.ID;
-			performAction({"ID": obj.ID, "action": action, "message": logMsg});
+			if (typeof obj !== 'undefined') {
+				var logMsg  = "Performing " + action + " on " + obj.ID;
+				performAction({"ID": obj.ID, "action": action, "message": logMsg});
+			}
 		}
 	};
 
@@ -774,7 +778,10 @@ var MatchConsole = function() {
 	
 	this.Write = function(line) {
 		//this.Lines.shift();
-		Lines.push(line);
+		var lines = line.split(/\r\n|\r|\n/g);
+		for (var i = 0; i < lines.length; i++){
+			Lines.push(lines[i]);
+		}
 		painter.setText(Lines);
 	};
 
