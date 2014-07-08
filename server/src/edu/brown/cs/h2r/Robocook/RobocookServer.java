@@ -29,6 +29,7 @@ import edu.brown.cs.h2r.baking.Experiments.BasicKitchen;
 import edu.brown.cs.h2r.baking.Recipes.Brownies;
 import edu.brown.cs.h2r.baking.Recipes.MashedPotatoes;
 import edu.brown.cs.h2r.baking.Recipes.Recipe;
+import edu.brown.cs.h2r.baking.actions.BakingActionResult;
 
 @WebSocket
 public class RobocookServer{
@@ -252,7 +253,7 @@ public class RobocookServer{
 		BasicKitchen kitchen = this.gameLookup.get(id);
 		String[] paramsArray = params.toArray(new String[params.size()]);
 	
-		boolean didUpdate = kitchen.takeAction(action, paramsArray);
+		BakingActionResult updateResult = kitchen.takeAction(action, paramsArray);
 		String newState = kitchen.getCurrentStateString();
 		
 		
@@ -260,12 +261,12 @@ public class RobocookServer{
 		responseToken.setBoolean("success", kitchen.getIsSuccess());
 		
 		String updatedStatus;
-		if (didUpdate) {
+		if (updateResult.getIsSuccess()) {
 			updatedStatus = "Successfully performed action " + action;
 		}
 		else
 		{
-			updatedStatus = "Action " + action + " did nothing";
+			updatedStatus = updateResult.getWhyFailed();
 		}
 		responseToken.setString("update", updatedStatus);
 		responseToken.setString("clientId", id);
