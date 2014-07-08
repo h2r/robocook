@@ -10,29 +10,6 @@ var EnumGOType = {
     Empty: 5
 };
 
-//Game Object
-/*
-function gameObject(id, name, type, sprite, fnDesc)
-{
-    this.Name = name;
-    this.ID = id;
-    this.Type = type;
-    this.Sprite = sprite;
-    this.Slot = "";
-    this.IsMovable = false;
-    
-    if (!this.Sprite) {
-        this.Anim = null;
-    } else {
-        this.Anim = new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite});
-    }
-
-    this.Desc = fnDesc || "This is a " + this.Name;
-    
-    //Slot management
-    //this.SetSlot = function(slot) { this.Slot = slot; }
-}*/
-
 ///////////////////
 //Game Ingredient//
 ///////////////////
@@ -75,11 +52,11 @@ var Ingredient = function(id, name, sprite, infinite, fnDesc)
     };
 
     this.getPainter = function() {
-        console.log("gameIngredient.getPainter(): This function is deprecated, stop calling it");
+        console.err("gameIngredient.getPainter(): This function is deprecated, stop calling it");
     };
 
     this.setSlot = function() {
-        console.log("gameIngredinet.setSlot(): This function is deprecated, stop calling it");
+        console.err("gameIngredient.setSlot(): This function is deprecated, stop calling it");
     };
 
     this.setPosition = function(x, y) {
@@ -145,17 +122,6 @@ var Container = function(id, name, sprite)
 
     this.setConfiguration = function(slot, x, y, group) {
         painter.setConfiguration(slot, x, y, group);
-    };
-    
-    //Transfer contents of container to new container
-    this.TransferTo = function(cont) {
-        var arr = cont.Contains.concat(this.Contains);
-        cont.Contains = arr;
-        this.Contains.length = 0;
-    };
-    
-    this.Activate = function() {
-        throw "Activation not yet implemented!";
     };
 };
 

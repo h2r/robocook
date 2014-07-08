@@ -244,18 +244,29 @@ var ActionBarPainter = function(usedActions, onClick, onReset) {
 var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainters) {
     "use strict";
 
-    var animation = new $.gameQuery.Animation({imageURL: "./Sprites/" + sprite});
+    var x = posx;
+    var y = posy;
     var group = "appliances";
     var slot = currentSlot;
     var containers = containerPainters;
     var applianceGroup = "appliances" + "_" + slot.toString();
+    var animation;
+    var spritePainter;
+    var imageUrl = "./Sprites/" + sprite;
+    var self = this;
 
-    var x = posx;
-    var y = posy;
+    var imageExists = function() {
+        animation = new $.gameQuery.Animation({imageURL: imageUrl });
+    };
 
-    //if (typeof containers === 'undefined') {
-    //    containers = [];
-    //}
+    var imageNotExists = function() {
+        animation = new $.gameQuery.Animation({imageURL: "./Sprites/Appliance.PNG"})
+        spritePainter = new SpritePainter(sprite, "sprite_" + sprite, applianceGroup);
+        self.draw();
+    };
+
+    $.get(imageUrl)
+        .done(imageExists).fail(imageNotExists);
 
     this.clear = function() {
         removeAll();
@@ -300,7 +311,7 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
     var setSprite = function() {
         slotObject().remove();
         $("#" + applianceGroup).addSprite(slot.toString(), 
-            {animation:animation, width: 128, height: 128});
+                {animation:animation, width: 128, height: 128});
     };
 
     var setContainers = function() {
@@ -377,6 +388,9 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
 
     this.draw = function() {
         setAll();
+        if (typeof spritePainter !== 'undefined') {
+            spritePainter.draw();
+        }
         for (var i = 0; i < containers.length; i++) {
             containers[i].draw();
         }
