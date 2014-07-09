@@ -400,11 +400,27 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
 var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup) {
     "use strict";
     var group = (typeof containerGroup !== 'undefined') ? containerGroup : "containers";
-    var animation = new $.gameQuery.Animation({imageURL: "./Sprites/" + sprite});
-    this._animation = $.extend(true, {}, animation);
+    var containerGroup = group + "_" + currentSlot.toString();
+    var imageUrl = "./Sprites/" + sprite;
+    var animation,
+        spritePainter;
     var slot = currentSlot;
     var x = posx;
     var y = posy;
+    var self = this;
+
+    var imageExists = function() {
+        animation = new $.gameQuery.Animation({imageURL: imageUrl });
+    };
+
+    var imageNotExists = function() {
+        animation = new $.gameQuery.Animation({imageURL: "./Sprites/Container.PNG"})
+        spritePainter = new SpritePainter(sprite, "sprite_" + sprite, containerGroup);
+        self.draw();
+    };
+
+    $.get(imageUrl)
+        .done(imageExists).fail(imageNotExists);
 
     this.clear = function() {
         this.clearAnimation();
@@ -414,18 +430,12 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
         return $("#" + slot.toString());
     };
 
-    var getSlotObject = function() {
-        var slotObject =  $("#" + slot.toString());
-        if (slotObject.length === 0) {
-            setSprite();
-        }
-        return $("#" + slot.toString());
-    };
-
     var setSprite = function() {
         if (typeof group !== 'undefined') {
-            $("#" + group).addSprite(slot.toString(), 
-                {animation: animation, width: 64, height: 64, posx: x, posy: y});
+            $("#" + group).addGroup(containerGroup.toString(), 
+                {width: 64, height: 64, posx: x, posy: y})
+            $("#" + containerGroup).addSprite(slot.toString(), 
+                {animation: animation, width: 64, height: 64});
         }
     };
 
@@ -438,27 +448,32 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
     this.setGroup = function(newGroup) {
         slotObject().remove();
         group = newGroup;
+        containerGroup = group + "_" + slot.toString();
+        if (typeof spritePainter !== 'undefined') 
+        {
+            spritePainter.setGroup(containerGroup);
+        }
     };
 
     this.setAnimation = function(newAnimation) {
         animation = newAnimation;
-        this._animation = animation;
     };
 
     this.clearAnimation = function() {
-        if (slotObject().length === 0) {
-            var c = 1;
-        }
-        else {
+        if (slotObject().length !== 0) {
             slotObject().setAnimation();
             slotObject().remove();
-
         }
     };
 
     this.setSlot = function(newSlot) {
         slotObject().remove();
         slot = newSlot;
+        containerGroup = group + "_" + slot.toString();
+        if (typeof spritePainter !== 'undefined') 
+        {
+            spritePainter.setGroup(containerGroup);
+        }
     };
 
     this.setConfiguration = function(newSlot, newX, newY, newGroup) {
@@ -476,12 +491,19 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
         if (typeof newGroup !== 'undefined') {
             group = newGroup;
         }
-        
+        containerGroup = group + "_" + slot.toString();
+        if (typeof spritePainter !== 'undefined') 
+        {
+            spritePainter.setGroup(containerGroup);
+        }        
     };
 
     this.draw = function() {
         if (slot != "-1") {
             setSprite();
+            if (typeof spritePainter !== 'undefined') {
+            spritePainter.draw();   
+            }
         }
     };
 };

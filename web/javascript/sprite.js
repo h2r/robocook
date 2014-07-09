@@ -71,6 +71,11 @@ var SpritePainter = function(newText, newDiv, newGroup)
 		divObject.height(height);
 	};
 
+	this.setGroup = function(newGroup) {
+		divObject().remove();
+		group = newGroup;
+	};
+
 	this.draw = function() {
 		setDiv();
 		divObject().html("");
@@ -86,6 +91,6 @@ var SpritePainter = function(newText, newDiv, newGroup)
 		}
 
 		var actualHeight = divObject().innerHeight();
-		divObject().y(actualHeight);
+		divObject().y(height - actualHeight);
 	};
 };
