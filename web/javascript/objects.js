@@ -75,7 +75,7 @@ var Container = function(id, name, sprite)
     this._sprite = sprite;
     
     
-    var painter = new ContainerPainter(sprite, 0, 0, -1, "containers");
+    var painter = new ContainerPainter(name, sprite, 0, 0, -1, "containers");
     this.Desc = function() {    
         if (Contains.length === 0) {
             return "This is an empty " + this.Name;
@@ -133,7 +133,9 @@ var IngredientContainer = function(id, name, sprite, ingredient) {
     this.IsMovable = true;
     this._sprite = sprite;
 
-    var painter = new ContainerPainter(sprite, 0, 0, -1, "ingredients");
+    var name_wo_bowl = name.replace(" bowl", "");
+    name_wo_bowl = name_wo_bowl.replace("_bowl", "");
+    var painter = new ContainerPainter(name_wo_bowl, sprite, 0, 0, -1, "ingredients");
     this.Desc = function() {    
         if (Contains.length === 0) {
             return "This is an empty " + this.Name;

@@ -262,6 +262,7 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
     var imageNotExists = function() {
         animation = new $.gameQuery.Animation({imageURL: "./Sprites/Appliance.PNG"})
         spritePainter = new SpritePainter(sprite, "sprite_" + sprite, applianceGroup);
+        spritePainter.setSize(128,128);
         self.draw();
     };
 
@@ -397,7 +398,7 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
     };
 };
 
-var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup) {
+var ContainerPainter = function(text, sprite, posx, posy, currentSlot, containerGroup) {
     "use strict";
     var group = (typeof containerGroup !== 'undefined') ? containerGroup : "containers";
     var containerGroup = group + "_" + currentSlot.toString();
@@ -408,27 +409,35 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
     var x = posx;
     var y = posy;
     var self = this;
+    var initialized = false;
 
     var imageExists = function() {
         animation = new $.gameQuery.Animation({imageURL: imageUrl });
+        initialized = true;
     };
 
     var imageNotExists = function() {
         animation = new $.gameQuery.Animation({imageURL: "./Sprites/Container.PNG"})
-        spritePainter = new SpritePainter(sprite, "sprite_" + sprite, containerGroup);
+        spritePainter = new SpritePainter(text, "sprite_" + sprite, containerGroup);
+        initialized = true;
         self.draw();
+        //setSprite();
+        //slotObject().wrap('<span class="tile-wrapper"></span>')
     };
 
     $.get(imageUrl)
         .done(imageExists).fail(imageNotExists);
 
+    var slotObject = function() {
+        return $("#" + slot.toString());
+    };
+
+
     this.clear = function() {
         this.clearAnimation();
     }
 
-    var slotObject = function() {
-        return $("#" + slot.toString());
-    };
+    
 
     var setSprite = function() {
         if (typeof group !== 'undefined') {
@@ -499,10 +508,14 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
     };
 
     this.draw = function() {
-        if (slot != "-1") {
+        if (slot != "-1" && initialized) {
             setSprite();
             if (typeof spritePainter !== 'undefined') {
-            spritePainter.draw();   
+                spritePainter.draw();   
+            }
+            else
+            {
+                var c = 1;
             }
         }
     };
