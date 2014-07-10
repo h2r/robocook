@@ -244,18 +244,30 @@ var ActionBarPainter = function(usedActions, onClick, onReset) {
 var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainters) {
     "use strict";
 
-    var animation = new $.gameQuery.Animation({imageURL: "./Sprites/" + sprite});
+    var x = posx;
+    var y = posy;
     var group = "appliances";
     var slot = currentSlot;
     var containers = containerPainters;
     var applianceGroup = "appliances" + "_" + slot.toString();
+    var animation;
+    var spritePainter;
+    var imageUrl = "./Sprites/" + sprite;
+    var self = this;
 
-    var x = posx;
-    var y = posy;
+    var imageExists = function() {
+        animation = new $.gameQuery.Animation({imageURL: imageUrl });
+    };
 
-    //if (typeof containers === 'undefined') {
-    //    containers = [];
-    //}
+    var imageNotExists = function() {
+        animation = new $.gameQuery.Animation({imageURL: "./Sprites/Appliance.PNG"})
+        spritePainter = new SpritePainter(sprite, "sprite_" + sprite, applianceGroup);
+        spritePainter.setSize(128,128);
+        self.draw();
+    };
+
+    $.get(imageUrl)
+        .done(imageExists).fail(imageNotExists);
 
     this.clear = function() {
         removeAll();
@@ -300,7 +312,7 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
     var setSprite = function() {
         slotObject().remove();
         $("#" + applianceGroup).addSprite(slot.toString(), 
-            {animation:animation, width: 128, height: 128});
+                {animation:animation, width: 128, height: 128});
     };
 
     var setContainers = function() {
@@ -326,6 +338,10 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
 
     this.addPainter = function(newContainer) {
         containers.push(newContainer);
+    };
+
+    this.setPainters = function(newContainers) {
+        containers = newContainers;
     };
 
     this.removePainter = function(toRemove) {
@@ -377,41 +393,75 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
 
     this.draw = function() {
         setAll();
+        if (typeof spritePainter !== 'undefined') {
+            spritePainter.draw();
+        }
         for (var i = 0; i < containers.length; i++) {
             containers[i].draw();
         }
     };
 };
 
-var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup) {
+var ContainerPainter = function(text, sprite, posx, posy, currentSlot, containerGroup) {
     "use strict";
     var group = (typeof containerGroup !== 'undefined') ? containerGroup : "containers";
-    var animation = new $.gameQuery.Animation({imageURL: "./Sprites/" + sprite});
-    this._animation = $.extend(true, {}, animation);
+    var containerGroup = group + "_" + currentSlot.toString();
+    var imageUrl = "./Sprites/" + sprite;
+    var animation,
+        spritePainter;
     var slot = currentSlot;
     var x = posx;
     var y = posy;
+    var self = this;
+    var initialized = false;
 
-    this.clear = function() {
-        this.clearAnimation();
-    }
+    var imageExists = function() {
+        animation = new $.gameQuery.Animation({imageURL: imageUrl });
+        initialized = true;
+    };
+
+    var imageNotExists = function() {
+        animation = new $.gameQuery.Animation({imageURL: "./Sprites/Container.PNG"})
+        spritePainter = new SpritePainter(text, "sprite_" + sprite, containerGroup);
+        initialized = true;
+        self.draw();
+        //setSprite();
+        //slotObject().wrap('<span class="tile-wrapper"></span>')
+    };
+
+    $.get(imageUrl)
+        .done(imageExists).fail(imageNotExists);
 
     var slotObject = function() {
         return $("#" + slot.toString());
     };
 
-    var getSlotObject = function() {
-        var slotObject =  $("#" + slot.toString());
-        if (slotObject.length === 0) {
-            setSprite();
-        }
-        return $("#" + slot.toString());
+    var containerObject = function() {
+        return $("#" + containerGroup);
     };
 
-    var setSprite = function() {
+    var groupObject = function() {
+        return $("#" + group);
+    };
+
+    this.clear = function() {
+        this.clearAnimation();
+    }
+
+    
+
+    var drawSprite = function() {
         if (typeof group !== 'undefined') {
-            $("#" + group).addSprite(slot.toString(), 
-                {animation: animation, width: 64, height: 64, posx: x, posy: y});
+            if (containerObject().length === 0)
+            {
+                groupObject().addGroup(containerGroup.toString(), 
+                    {width: 64, height: 64, posx: x, posy: y})
+            }
+            if (slotObject().length === 0)
+            {
+                containerObject().addSprite(slot.toString(), 
+                    {animation: animation, width: 64, height: 64});
+            }
         }
     };
 
@@ -424,27 +474,32 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
     this.setGroup = function(newGroup) {
         slotObject().remove();
         group = newGroup;
+        containerGroup = group + "_" + slot.toString();
+        if (typeof spritePainter !== 'undefined') 
+        {
+            spritePainter.setGroup(containerGroup);
+        }
     };
 
     this.setAnimation = function(newAnimation) {
         animation = newAnimation;
-        this._animation = animation;
     };
 
     this.clearAnimation = function() {
-        if (slotObject().length === 0) {
-            var c = 1;
-        }
-        else {
+        if (slotObject().length !== 0) {
             slotObject().setAnimation();
             slotObject().remove();
-
         }
     };
 
     this.setSlot = function(newSlot) {
         slotObject().remove();
         slot = newSlot;
+        containerGroup = group + "_" + slot.toString();
+        if (typeof spritePainter !== 'undefined') 
+        {
+            spritePainter.setGroup(containerGroup);
+        }
     };
 
     this.setConfiguration = function(newSlot, newX, newY, newGroup) {
@@ -462,12 +517,19 @@ var ContainerPainter = function(sprite, posx, posy, currentSlot, containerGroup)
         if (typeof newGroup !== 'undefined') {
             group = newGroup;
         }
-        
+        containerGroup = group + "_" + slot.toString();
+        if (typeof spritePainter !== 'undefined') 
+        {
+            spritePainter.setGroup(containerGroup);
+        }        
     };
 
     this.draw = function() {
-        if (slot != "-1") {
-            setSprite();
+        if (slot != "-1" && initialized) {
+            drawSprite();
+            if (typeof spritePainter !== 'undefined') {
+                spritePainter.draw();   
+            }
         }
     };
 };
@@ -559,7 +621,7 @@ var HoldingBoxPainter = function() {
     };
 
     var getGroupObject = function() {
-        if (groupObject.length === 0) {
+        if (groupObject().length === 0) {
             setGroupObject();
         }
         return groupObject();
