@@ -526,10 +526,6 @@ var ContainerPainter = function(text, sprite, posx, posy, currentSlot, container
             if (typeof spritePainter !== 'undefined') {
                 spritePainter.draw();   
             }
-            else
-            {
-                var c = 1;
-            }
         }
     };
 };

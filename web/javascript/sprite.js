@@ -1,41 +1,3 @@
-var Sprite = function(text)
-{
-	var name = text;
-
-	var painter = new SpritePainter(name, name + "_sprite");
-
-	this.getPainter = function() {
-		return painter;
-	};
-
-};
-
-$.fn.textWidth = function()
-{
-	var self = $(this),
-        children = self.children(),
-        calculator = $('<span style="display: inline-block;" />'),
-        width;
-
-    children.wrap(calculator);
-    width = children.parent().width(); // parent = the calculator wrapper
-    children.unwrap();
-    return width;
-};
-
-$.fn.textHeight = function()
-{
-	var self = $(this),
-        children = self.children(),
-        calculator = $('<span style="display: inline-block;" />'),
-        height;
-
-    children.wrap(calculator);
-    height = children.parent().height(); // parent = the calculator wrapper
-    children.unwrap();
-    return height;
-};
-
 $.fn.textfill = function(longestWord, text, minFontSize, maxFontSize) {
     maxFontSize = parseInt(maxFontSize, 10);
     minFontSize = parseInt(minFontSize, 10);
@@ -59,17 +21,6 @@ $.fn.textfill = function(longestWord, text, minFontSize, maxFontSize) {
         ourText.html("<span>" + text + "</span>");
     });
 };
-
-$.fn.setTextPosition = function(x, y) {
-	return this.each(function(){
-        var ourText = $("span", this),
-        	parent = ourText.parent();
-        parent.x(x);
-        parent.y(y);
-    });
-}
-
-
 
 var SpritePainter = function(newText, newDiv, newGroup) 
 {
@@ -105,12 +56,6 @@ var SpritePainter = function(newText, newDiv, newGroup)
 		return words.length;
 	};	
 
-	var isSizedCorrectly = function() 
-	{
-		//console.log(text + " width: " + divObject().textWidth().toString());
-		return divObject().textWidth() < maxTextWidth;
-	};
-
 	this.setSize = function(newWidth, newHeight) {
 		width = newWidth;
 		maxTextWidth = width - 8;
@@ -141,22 +86,8 @@ var SpritePainter = function(newText, newDiv, newGroup)
 		setDiv();
 		divObject().html("");
 		var longestWord = getLongestWord();
-		divObject().html("<span>" + longestWord + "</span>");
-		divObject().textfill(longestWord, text, 8, 24);
-		var tHeight = divObject().textHeight();
-		//divObject().setTextPosition( 0, -tHeight);
-		
-		/*var fontSize = defaultTextSize;
-		var fontSizeStr = fontSize.toString() + "px";
-		divObject().css("font-size", fontSizeStr);
-		while(!isSizedCorrectly() && fontSize > 8)
-		{	
-			fontSize--;
-			fontSizeStr = fontSize.toString() + "px";
-			divObject().css("font-size", fontSizeStr);
-		}
 
-		var actualHeight = getNumberLines() * fontSize;
-		*/
+		divObject().html("<span>" + longestWord + "</span>");
+		divObject().textfill(longestWord, text, 8, 16);
 	};
 };

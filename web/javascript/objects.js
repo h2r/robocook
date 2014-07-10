@@ -71,11 +71,14 @@ var Container = function(id, name, sprite)
     this.Name = name;
     this.ID = id;
     this.Type = EnumGOType.Cont;
-    this.IsMovable = true;
-    this._sprite = sprite;
-    
-    
-    var painter = new ContainerPainter(name, sprite, 0, 0, -1, "containers");
+
+    var painterExists = (sprite in Container.prototype.painterLookup);
+
+    var painter = (painterExists) ? Container.prototype.painterLookup[sprite] :
+                new ContainerPainter(name, sprite, 0, 0, -1, "containers");
+
+    Container.prototype.painterLookup[sprite] = painter;
+
     this.Desc = function() {    
         if (Contains.length === 0) {
             return "This is an empty " + this.Name;
@@ -125,17 +128,25 @@ var Container = function(id, name, sprite)
     };
 };
 
+Container.prototype.painterLookup = {};
+
 var IngredientContainer = function(id, name, sprite, ingredient) {
     this.Name = name;
     this.ID = id;
     this.Type = EnumGOType.IngContainer;
     this.Ingredient = ingredient;
     this.IsMovable = true;
-    this._sprite = sprite;
 
     var name_wo_bowl = name.replace(" bowl", "");
     name_wo_bowl = name_wo_bowl.replace("_bowl", "");
-    var painter = new ContainerPainter(name_wo_bowl, sprite, 0, 0, -1, "ingredients");
+
+    var painterExists = (sprite in IngredientContainer.prototype.painterLookup);
+
+    var painter = (painterExists) ? IngredientContainer.prototype.painterLookup[sprite] :
+                new ContainerPainter(name_wo_bowl, sprite, 0, 0, -1, "ingredients");
+
+    IngredientContainer.prototype.painterLookup[sprite] = painter;
+
     this.Desc = function() {    
         if (Contains.length === 0) {
             return "This is an empty " + this.Name;
@@ -185,6 +196,8 @@ var IngredientContainer = function(id, name, sprite, ingredient) {
         painter.setSlot(slot);
     }; 
 };
+
+IngredientContainer.prototype.painterLookup = {};
 
 //////////////////
 //Game Appliance//
