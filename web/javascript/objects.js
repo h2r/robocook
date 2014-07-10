@@ -212,11 +212,17 @@ var Appliance = function(id, name, sprite, containers)
     //this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
 
     var initPainter = function() {
+        var painterExists = (sprite in Appliance.prototype.painterLookup);
+
         var containerPainters = [];
         for (var i = 0; i < Contains.length; i++) {
             containerPainters.push(Contains[i].getPainter());
         }
-        painter = new AppliancePainter(sprite, 0, 0, 0, containerPainters);
+        painter = (painterExists) ? Appliance.prototype.painterLookup[sprite] :
+            new AppliancePainter(sprite, 0, 0, 0, containerPainters);
+
+        painter.setPainters(containerPainters);
+        Appliance.prototype.painterLookup[sprite] = painter;
     }; 
 
     this.Desc = function() {    
@@ -280,6 +286,9 @@ var Appliance = function(id, name, sprite, containers)
         painter.setConfiguration(slot, x, y, group);
     };
 };
+
+Appliance.prototype.painterLookup = {};
+
 
 //////////
 //Action//

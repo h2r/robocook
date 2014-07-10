@@ -340,6 +340,10 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
         containers.push(newContainer);
     };
 
+    this.setPainters = function(newContainers) {
+        containers = newContainers;
+    };
+
     this.removePainter = function(toRemove) {
         var position = $.inArray(toRemove, containers);
         if (position != -1) {
