@@ -51,14 +51,6 @@ var Ingredient = function(id, name, sprite, infinite, fnDesc)
         }
     };
 
-    this.getPainter = function() {
-        console.err("gameIngredient.getPainter(): This function is deprecated, stop calling it");
-    };
-
-    this.setSlot = function() {
-        console.err("gameIngredient.setSlot(): This function is deprecated, stop calling it");
-    };
-
     this.setPosition = function(x, y) {
         painter.setPosition(x,y);
     };
