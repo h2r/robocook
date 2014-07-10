@@ -432,6 +432,13 @@ var ContainerPainter = function(text, sprite, posx, posy, currentSlot, container
         return $("#" + slot.toString());
     };
 
+    var containerObject = function() {
+        return $("#" + containerGroup);
+    };
+
+    var groupObject = function() {
+        return $("#" + group);
+    };
 
     this.clear = function() {
         this.clearAnimation();
@@ -439,12 +446,18 @@ var ContainerPainter = function(text, sprite, posx, posy, currentSlot, container
 
     
 
-    var setSprite = function() {
+    var drawSprite = function() {
         if (typeof group !== 'undefined') {
-            $("#" + group).addGroup(containerGroup.toString(), 
-                {width: 64, height: 64, posx: x, posy: y})
-            $("#" + containerGroup).addSprite(slot.toString(), 
-                {animation: animation, width: 64, height: 64});
+            if (containerObject().length === 0)
+            {
+                groupObject().addGroup(containerGroup.toString(), 
+                    {width: 64, height: 64, posx: x, posy: y})
+            }
+            if (slotObject().length === 0)
+            {
+                containerObject().addSprite(slot.toString(), 
+                    {animation: animation, width: 64, height: 64});
+            }
         }
     };
 
@@ -509,7 +522,7 @@ var ContainerPainter = function(text, sprite, posx, posy, currentSlot, container
 
     this.draw = function() {
         if (slot != "-1" && initialized) {
-            setSprite();
+            drawSprite();
             if (typeof spritePainter !== 'undefined') {
                 spritePainter.draw();   
             }
@@ -608,7 +621,7 @@ var HoldingBoxPainter = function() {
     };
 
     var getGroupObject = function() {
-        if (groupObject.length === 0) {
+        if (groupObject().length === 0) {
             setGroupObject();
         }
         return groupObject();
