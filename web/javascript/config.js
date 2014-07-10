@@ -24,7 +24,9 @@ var gameConfig = {
     //Scenes
     SceneSplashName : "splashScene",
     SceneMainMenuName : "mainMenuScene",
-    SceneMatchName: "matchScene"
+    SceneMatchName: "matchScene",
+	//Paths
+	SpritePath: "./../Sprites/"
 };
 
 var gamePos = new Object();
@@ -61,17 +63,17 @@ var gameObjects = {};
 
 
 var gameSprites = {};
-gameSprites["MatchBackground"] = "./Sprites/MatchBackground_PH.JPG";
-gameSprites["OverlaySelectionP1"] = "./Sprites/OverlaySelectionP1.PNG";
-gameSprites["VictoryScreen"] = "./Sprites/Win.PNG";
-gameSprites["ActUse"] = "./Sprites/ActUse.PNG";
-gameSprites["ActMix"] = "./Sprites/ActMix.PNG";
-gameSprites["ActSpread"] = "./Sprites/ActSpread.PNG";
-gameSprites["ActTurnOnOff"] = "./Sprites/ActTurnOnOff.PNG";
-gameSprites["ActLook"] = "./Sprites/ActLook.PNG";
-gameSprites["ActCut"] = "./Sprites/ActCut.PNG";
-gameSprites["ActShape"] = "./Sprites/ActShape.PNG";
-gameSprites["ActPeel"] = "./Sprites/ActPeel.PNG";
+gameSprites["MatchBackground"] = gameConfig.SpritePath + "MatchBackground_PH.JPG";
+gameSprites["OverlaySelectionP1"] = gameConfig.SpritePath + "OverlaySelectionP1.PNG";
+gameSprites["VictoryScreen"] = gameConfig.SpritePath + "Win.PNG";
+gameSprites["ActUse"] = gameConfig.SpritePath + "ActUse.PNG";
+gameSprites["ActMix"] = gameConfig.SpritePath + "ActMix.PNG";
+gameSprites["ActSpread"] = gameConfig.SpritePath + "ActSpread.PNG";
+gameSprites["ActTurnOnOff"] = gameConfig.SpritePath + "ActTurnOnOff.PNG";
+gameSprites["ActLook"] = gameConfig.SpritePath + "ActLook.PNG";
+gameSprites["ActCut"] = gameConfig.SpritePath + "ActCut.PNG";
+gameSprites["ActShape"] = gameConfig.SpritePath + "ActShape.PNG";
+gameSprites["ActPeel"] = gameConfig.SpritePath + "ActPeel.PNG";
 
 var gameAnimations = {
     background1: new $.gameQuery.Animation({imageURL: gameSprites["MatchBackground"]}),

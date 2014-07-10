@@ -60,7 +60,7 @@ var Game = function() {
     this.go = function() {
         $("#stage").height(gameConfig.StageHeight).width(gameConfig.StageWidth).css({
             "background-color" : gameConfig.StageBgColor,
-            "background-image" : "url('./Sprites/MatchBackground_PH.JPG')",
+            "background-image" : "url(" + gameSprites.MatchBackground + ")",
             "position" : "absolute",
             "top" : "10px",
             "left" : "10px"
