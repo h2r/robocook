@@ -582,23 +582,42 @@ var RecipePainter = function() {
 
 };
 
+$.fn.textHeight = function()
+ {
+   var self = $(this),
+         children = self.children(),
+         calculator = $('<span style="display: inline-block;" />'),
+         height;
+ 
+    var selfHeight = self.height();
+     
+     children.wrap(calculator);
+     height = children.parent().height(); // parent = the calculator wrapper
+     children.unwrap();
+     return height * children.length;
+ };
+
 var MatchConsolePainter = function() {
     "use strict";
     var DisplayDiv = "consoleDiv";
     var text = [];
     var height = $("#" + DisplayDiv).height() - 8;
 
+    var divObject = function() {
+        return $("#" + DisplayDiv);
+    }
+
     this.setText = function(lines) {
         text = lines;
     };
 
     this.draw = function() {
-        $("#" + DisplayDiv).html("");
+        divObject().html("");
         for (var i = 0; i < text.length; i++) {
-            $("#" + DisplayDiv).append(text[i] + "</br>");
+            divObject().append(text[i] + "</br>");
         }
-        var scrollAmount = $("#" + DisplayDiv).height();
-        $("#" + DisplayDiv).scrollTop(scrollAmount);
+        var scrollAmount = divObject().textHeight();
+       divObject().scrollTop(scrollAmount);
     };
 };
 
