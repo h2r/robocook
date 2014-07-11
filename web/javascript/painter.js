@@ -257,6 +257,7 @@ var AppliancePainter = function(sprite, posx, posy, currentSlot, containerPainte
 
     var imageExists = function() {
         animation = new $.gameQuery.Animation({imageURL: imageUrl });
+        self.draw();
     };
 
     var imageNotExists = function() {
