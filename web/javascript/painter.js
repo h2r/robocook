@@ -418,6 +418,7 @@ var ContainerPainter = function(text, sprite, posx, posy, currentSlot, container
     var imageExists = function() {
         animation = new $.gameQuery.Animation({imageURL: imageUrl });
         initialized = true;
+        self.draw();
     };
 
     var imageNotExists = function() {
@@ -425,8 +426,6 @@ var ContainerPainter = function(text, sprite, posx, posy, currentSlot, container
         spritePainter = new SpritePainter(text, "sprite_" + sprite, containerGroup);
         initialized = true;
         self.draw();
-        //setSprite();
-        //slotObject().wrap('<span class="tile-wrapper"></span>')
     };
 
     $.get(imageUrl)
