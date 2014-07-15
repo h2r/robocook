@@ -259,6 +259,7 @@ public class RobocookServer{
 		
 		responseToken.setBoolean("failed", kitchen.getIsBotched());
 		responseToken.setBoolean("success", kitchen.getIsSuccess());
+		kitchen.getCompletedSubgoals();
 		
 		String updatedStatus;
 		if (updateResult.getIsSuccess()) {
