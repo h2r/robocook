@@ -217,19 +217,19 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		var gridY = y - $("#grid").y();
 
 		var action = actionBar.getActiveAction();
-		var slot = getSlot(gridX, gridY);
+		var obj = getObjectFromPosition(gridX, gridY);
+		if (typeof obj === 'undefined') {
+			return;
+		}
+
 		if (action === EnumActions.ToString(EnumActions.Look)) {
-			var desc = getObjDesc(slot);
-			if (desc) matchConsole.Write(desc);
+			matchConsole.Write(obj.Desc());
 			performAction({"action": "refresh"});
 		} 
 		else 
 		{
-			var obj = getObjectFromPosition(gridX, gridY);
-			if (typeof obj !== 'undefined') {
-				var logMsg  = "Performing " + action + " on " + obj.ID;
-				performAction({"ID": obj.ID, "action": action, "message": logMsg});
-			}
+			var logMsg  = "Performing " + action + " on " + obj.ID;
+			performAction({"ID": obj.ID, "action": action, "message": logMsg});
 		}
 	};
 
