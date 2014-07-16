@@ -265,7 +265,14 @@ public class RobocookServer{
 
 		String updatedStatus;
 		if (updateResult.getIsSuccess()) {
-			updatedStatus = "Successfully performed action " + action;
+			updatedStatus = "Performed action " + action;
+			for (int i = 1; i < params.size(); i++)
+			{
+				updatedStatus += (i == 1) ? " with " : "";
+				updatedStatus += params.get(i);
+				updatedStatus += (i < params.size() - 2) ? ", " : "";
+				updatedStatus += (i == params.size() - 2) ? " and " : "";
+			}
 		}
 		else
 		{

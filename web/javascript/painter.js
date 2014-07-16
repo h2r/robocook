@@ -608,21 +608,27 @@ var MatchConsolePainter = function() {
     "use strict";
     var DisplayDiv = "consoleDiv";
     var text = [];
+    var error = [];
     var height = $("#" + DisplayDiv).height() - 8;
 
     var divObject = function() {
         return $("#" + DisplayDiv);
     }
 
-    this.setText = function(lines) {
+    this.setText = function(lines, status) {
         text = lines;
+        error = status;
     };
 
     this.draw = function() {
         divObject().html("");
+        var color;
         for (var i = 0; i < text.length; i++) {
-            divObject().append(text[i] + "</br>");
+            color = (error[i] == 0) ? "console_green" : "console_red";
+            divObject().append("<span class='" + color + "'>" + text[i] + "</span></br>");
         }
+        $(".console_green").css({"color":"green"});
+        $(".console_red").css({"color":"red"});
         var scrollAmount = divObject().textHeight();
        divObject().scrollTop(scrollAmount);
     };
