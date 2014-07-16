@@ -10,29 +10,6 @@ var EnumGOType = {
     Empty: 5
 };
 
-//Game Object
-/*
-function gameObject(id, name, type, sprite, fnDesc)
-{
-    this.Name = name;
-    this.ID = id;
-    this.Type = type;
-    this.Sprite = sprite;
-    this.Slot = "";
-    this.IsMovable = false;
-    
-    if (!this.Sprite) {
-        this.Anim = null;
-    } else {
-        this.Anim = new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite});
-    }
-
-    this.Desc = fnDesc || "This is a " + this.Name;
-    
-    //Slot management
-    //this.SetSlot = function(slot) { this.Slot = slot; }
-}*/
-
 ///////////////////
 //Game Ingredient//
 ///////////////////
@@ -74,14 +51,6 @@ var Ingredient = function(id, name, sprite, infinite, fnDesc)
         }
     };
 
-    this.getPainter = function() {
-        console.log("gameIngredient.getPainter(): This function is deprecated, stop calling it");
-    };
-
-    this.setSlot = function() {
-        console.log("gameIngredinet.setSlot(): This function is deprecated, stop calling it");
-    };
-
     this.setPosition = function(x, y) {
         painter.setPosition(x,y);
     };
@@ -94,11 +63,14 @@ var Container = function(id, name, sprite)
     this.Name = name;
     this.ID = id;
     this.Type = EnumGOType.Cont;
-    this.IsMovable = true;
-    this._sprite = sprite;
-    
-    
-    var painter = new ContainerPainter(sprite, 0, 0, -1, "containers");
+
+    var painterExists = (sprite in Container.prototype.painterLookup);
+
+    var painter = (painterExists) ? Container.prototype.painterLookup[sprite] :
+                new ContainerPainter(name, sprite, 0, 0, -1, "containers");
+
+    Container.prototype.painterLookup[sprite] = painter;
+
     this.Desc = function() {    
         if (Contains.length === 0) {
             return "This is an empty " + this.Name;
@@ -146,18 +118,9 @@ var Container = function(id, name, sprite)
     this.setConfiguration = function(slot, x, y, group) {
         painter.setConfiguration(slot, x, y, group);
     };
-    
-    //Transfer contents of container to new container
-    this.TransferTo = function(cont) {
-        var arr = cont.Contains.concat(this.Contains);
-        cont.Contains = arr;
-        this.Contains.length = 0;
-    };
-    
-    this.Activate = function() {
-        throw "Activation not yet implemented!";
-    };
 };
+
+Container.prototype.painterLookup = {};
 
 var IngredientContainer = function(id, name, sprite, ingredient) {
     this.Name = name;
@@ -165,9 +128,17 @@ var IngredientContainer = function(id, name, sprite, ingredient) {
     this.Type = EnumGOType.IngContainer;
     this.Ingredient = ingredient;
     this.IsMovable = true;
-    this._sprite = sprite;
 
-    var painter = new ContainerPainter(sprite, 0, 0, -1, "ingredients");
+    var name_wo_bowl = name.replace(" bowl", "");
+    name_wo_bowl = name_wo_bowl.replace("_bowl", "");
+
+    var painterExists = (sprite in IngredientContainer.prototype.painterLookup);
+
+    var painter = (painterExists) ? IngredientContainer.prototype.painterLookup[sprite] :
+                new ContainerPainter(name_wo_bowl, sprite, 0, 0, -1, "ingredients");
+
+    IngredientContainer.prototype.painterLookup[sprite] = painter;
+
     this.Desc = function() {    
         if (Contains.length === 0) {
             return "This is an empty " + this.Name;
@@ -218,6 +189,8 @@ var IngredientContainer = function(id, name, sprite, ingredient) {
     }; 
 };
 
+IngredientContainer.prototype.painterLookup = {};
+
 //////////////////
 //Game Appliance//
 //////////////////
@@ -231,11 +204,17 @@ var Appliance = function(id, name, sprite, containers)
     //this.Anim = (this.Sprite) ? new $.gameQuery.Animation({imageURL: "./Sprites/" + this.Sprite}) : null;
 
     var initPainter = function() {
+        var painterExists = (sprite in Appliance.prototype.painterLookup);
+
         var containerPainters = [];
         for (var i = 0; i < Contains.length; i++) {
             containerPainters.push(Contains[i].getPainter());
         }
-        painter = new AppliancePainter(sprite, 0, 0, 0, containerPainters);
+        painter = (painterExists) ? Appliance.prototype.painterLookup[sprite] :
+            new AppliancePainter(sprite, 0, 0, 0, containerPainters);
+
+        painter.setPainters(containerPainters);
+        Appliance.prototype.painterLookup[sprite] = painter;
     }; 
 
     this.Desc = function() {    
@@ -299,6 +278,9 @@ var Appliance = function(id, name, sprite, containers)
         painter.setConfiguration(slot, x, y, group);
     };
 };
+
+Appliance.prototype.painterLookup = {};
+
 
 //////////
 //Action//
