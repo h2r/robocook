@@ -86,7 +86,7 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 		if ('state' in msg) {
 			inventoryGrid.onMessage(msg);
 		}
-		if ('recipe' in msg) {
+		if ('recipe' in msg || 'status' in msg) {
 			recipe.onMessage(msg);
 		}
 		if ('update' in msg) {
