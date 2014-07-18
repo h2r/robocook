@@ -63,6 +63,7 @@ var Container = function(id, name, sprite)
     this.Name = name;
     this.ID = id;
     this.Type = EnumGOType.Cont;
+    var ingredientDescriptions = {};
 
     var painterExists = (sprite in Container.prototype.painterLookup);
 
@@ -78,17 +79,34 @@ var Container = function(id, name, sprite)
             var str = "This is a " + this.Name + " containing";
             for (var i=0; i<Contains.length; i++) {
                 if (i >= 1) str += ",";
-                str += " " + Contains[i];
+                str += " " + ingredientDescriptions[Contains[i]];
             }
             return str;
         }
     };
     
     var Contains = [];
-    this.addContents = function(contents) {
-        for (var i = 0; i < contents.length; i++) {
-            Contains.push(contents[i]);
+    this.addContents = function(ingredient, unnamedIngredients) {
+        if (ingredient.class == "complex_ingredient" && !ingredient.swapped)
+        {
+            ingredientDescriptions[ingredient.name] = "an unknown combination";
+            /*
+            for (var j = 0; j < ingredient.contents.length; j++)
+            {
+                var subIngredient = ingredient.contents[j];
+                var subIngredientName = (subIngredient in unnamedIngredients) ? "a strange combination" : subIngredient;
+                ingredientDescriptions[ingredient.name] += subIngredientName;
+
+                ingredientDescriptions[ingredient.name] += (j < ingredient.contents.length - 2) ? ", " : "";
+                ingredientDescriptions[ingredient.name] += (j == ingredient.contents.length - 2) ? " and " : "";
+            }*/
         }
+        else
+        {
+            ingredientDescriptions[ingredient.name] = ingredient.name;
+        }
+        Contains.push(ingredient.name);
+        
     };
     
     this.ActOn = function(gobj, slot, origin) {

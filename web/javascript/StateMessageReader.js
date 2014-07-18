@@ -3,11 +3,15 @@ var StateMessageReader = function() {
 		"counter","shelf"
 	];
 
+
+	// TODO I think this method would be more efficient if getObjects method return dictionaries instead of lists
 	this.getStateFromMessage = function(stateMsg) {
 		var objects= stateMsg.data;
 		var appliances = getObjectsOfClassFromMsg(objects, "space");
 		var containers = getObjectsOfClassFromMsg(objects, "container");
 		var ingredients = getObjectsOfClassFromMsg(objects, "simple_ingredient");
+		var complexIngredients = getObjectsOfClassFromMsg(objects, "complex_ingredient");
+		var unnamedIngredients = getUnnamedComplexIngredients(complexIngredients);
 		var workingContainers = [];
 		var ingredientContainers = [];
 
@@ -19,7 +23,7 @@ var StateMessageReader = function() {
 			ingredientContainerObjects = [];
 
 		loadIngredientContainers(ingredientContainers, ingredients, ingredientContainerObjects);
-		loadContainers(workingContainers, containerObjects);
+		loadContainers(workingContainers, containerObjects, ingredients, complexIngredients, unnamedIngredients);
 
 		var containersInAppliances = [];
 		loadAppliances(appliances, applianceObjects, containerObjects, ingredientContainerObjects, containersInAppliances);
@@ -97,6 +101,33 @@ var StateMessageReader = function() {
 		return classObjects;
 	};
 
+	var getObjectsFromList = function(objName, objList)
+	{
+		var obj;
+		for (var i = 0; i < objList.length; i++)
+		{
+			if (objName == objList[i].name)
+			{
+				obj = objList[i];
+			}
+		}
+		return obj;
+	};
+
+	var getUnnamedComplexIngredients = function(complexIngredients)
+	{
+		ingredients = {};
+		for (var i = 0; i < complexIngredients.length; i++)
+		{	
+			var ingredient  = complexIngredients[i];
+			if (!ingredient.swapped)
+			{
+				ingredients[ingredient.name] = ingredient;
+			}
+		}
+		return ingredients;
+	};	
+
 	// loadStateFromMsg
 	var loadAppliances = function(appliances, appliancesList, containerObjects, ingredientContainerObjects, containersInAppliances) {
 		var containers = [];
@@ -144,13 +175,22 @@ var StateMessageReader = function() {
 	};
 
 	// loadStateFromMsg
-	var loadContainers = function(containers, containersList) {
+	var loadContainers = function(containers, containersList, simpleIngredients, complexIngredients, unnamedIngredients) {
 		var container;
 
 		for (var i = 0; i < containers.length; i++) {
 			container = containers[i];
 			var containerObj = getNewContainerFromMsg(container);
-			containerObj.addContents(container.contains);
+
+			for (var j = 0; j < container.contains.length; j++)
+			{
+				var obj = getObjectsFromList(container.contains[j], simpleIngredients);
+				obj = (typeof obj !== 'undefined') ? obj : getObjectsFromList(container.contains[j], complexIngredients);
+				if (typeof obj !== 'undefined')
+				{
+					containerObj.addContents(obj, unnamedIngredients);
+				}
+			}
 			containersList.push(containerObj);
 		}
 	};
