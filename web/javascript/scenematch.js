@@ -86,7 +86,7 @@ var GameSceneMatch = function(playground, actionHandler, grid){
 		if ('state' in msg) {
 			inventoryGrid.onMessage(msg);
 		}
-		if ('recipe' in msg) {
+		if ('recipe' in msg || 'status' in msg) {
 			recipe.onMessage(msg);
 		}
 		if ('update' in msg) {
@@ -170,6 +170,10 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 	// public
 	this.onMessage = function(msg) {
 		loadStateFromMsg(msg.state);
+		if (msg.failed)
+		{
+			matchConsole.Error("You have failed the recipe, and will need to reset");
+		}
 		winFlag = msg.success;
 	};
 
@@ -217,19 +221,19 @@ var InventoryGrid = function(_matchConsole, _actionBar) {
 		var gridY = y - $("#grid").y();
 
 		var action = actionBar.getActiveAction();
-		var slot = getSlot(gridX, gridY);
+		var obj = getObjectFromPosition(gridX, gridY);
+		if (typeof obj === 'undefined') {
+			return;
+		}
+
 		if (action === EnumActions.ToString(EnumActions.Look)) {
-			var desc = getObjDesc(slot);
-			if (desc) matchConsole.Write(desc);
+			matchConsole.Write(obj.Desc());
 			performAction({"action": "refresh"});
 		} 
 		else 
 		{
-			var obj = getObjectFromPosition(gridX, gridY);
-			if (typeof obj !== 'undefined') {
-				var logMsg  = "Performing " + action + " on " + obj.ID;
-				performAction({"ID": obj.ID, "action": action, "message": logMsg});
-			}
+			var logMsg  = "Performing " + action + " on " + obj.ID;
+			performAction({"ID": obj.ID, "action": action, "message": logMsg});
 		}
 	};
 
@@ -770,19 +774,29 @@ var MouseTracker = function() {
 var MatchConsole = function() {
 	"use strict";
 	var Lines = [];
+	var Status = [];
 	var painter = new MatchConsolePainter();
 	
 	this.Peek = function() {
 		return Lines[this.Lines.length-1];
 	};
-	
-	this.Write = function(line) {
-		//this.Lines.shift();
+
+	this.Error = function(line) {
 		var lines = line.split(/\r\n|\r|\n/g);
 		for (var i = 0; i < lines.length; i++){
 			Lines.push(lines[i]);
+			Status.push(1);
 		}
-		painter.setText(Lines);
+		painter.setText(Lines, Status);
+	};
+	
+	this.Write = function(line) {
+		var lines = line.split(/\r\n|\r|\n/g);
+		for (var i = 0; i < lines.length; i++){
+			Lines.push(lines[i]);
+			Status.push(0);
+		}
+		painter.setText(Lines, Status);
 	};
 
 	this.GetPainter = function() {

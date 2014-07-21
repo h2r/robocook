@@ -3,6 +3,7 @@ package edu.brown.cs.h2r.Robocook;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -259,10 +260,19 @@ public class RobocookServer{
 		
 		responseToken.setBoolean("failed", kitchen.getIsBotched());
 		responseToken.setBoolean("success", kitchen.getIsSuccess());
-		
+		boolean[] status = kitchen.getCompletedSubgoals();
+		responseToken.setObject("status", status);
+
 		String updatedStatus;
 		if (updateResult.getIsSuccess()) {
-			updatedStatus = "Successfully performed action " + action;
+			updatedStatus = "Performed action " + action;
+			for (int i = 1; i < params.size(); i++)
+			{
+				updatedStatus += (i == 1) ? " with " : "";
+				updatedStatus += params.get(i);
+				updatedStatus += (i < params.size() - 2) ? ", " : "";
+				updatedStatus += (i == params.size() - 2) ? " and " : "";
+			}
 		}
 		else
 		{
