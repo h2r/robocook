@@ -9,6 +9,9 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.util.JSON;
 
+/**
+ * 
+ */
 public class RobocookServerToken extends LinkedHashMap<String, Object> {
 
 	private static final String ERROR_KEY = "Error";
