@@ -1,8 +1,8 @@
 Robocook Web Client
 ===================
-<p>Author: Lee Painton
-Author: Stephen Brawner</p>
+Author: Lee Painton\
+Author: Stephen Brawner
 
 Installation
 ============
-<p>Client can be run as-is, but will not provide functionality without active server</p>
+Client can be run as-is, but will not provide functionality without active server
