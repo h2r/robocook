@@ -1,7 +1,7 @@
 Robocook Web Client
 ===================
-Author: Lee Painton\
-Author: Stephen Brawner
+*Author: Lee Painton
+*Author: Stephen Brawner
 
 Installation
 ============
