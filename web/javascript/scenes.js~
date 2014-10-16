@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////
-// scenes.js	   										//
+//gamescenes.js											//
 //-----------------------------------------------//
-// File contains code for all miscellaneous		  //
+//File contains code for all miscellaneous		  //
 //	scenes that are not large enough to merit			//
 //	their own files.										  //
 //-----------------------------------------------//
-// Note:														//
+//Note:														//
 /////////////////////////////////////////////////
 
 //The MD5 hash of the player name is returned to the player as a token at the end of the game.

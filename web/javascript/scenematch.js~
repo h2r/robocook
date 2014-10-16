@@ -1,10 +1,10 @@
 /////////////////////////////////////////////////
-// scenematch.js											//
+//scenematch.js											//
 //-----------------------------------------------//
-// Contains the control logic for 
+//Contains the control logic for 
 // the main scene of the game
 //-----------------------------------------------//
-// Note:														//
+//Note:														//
 /////////////////////////////////////////////////
 
 var gameRecipe = null;
