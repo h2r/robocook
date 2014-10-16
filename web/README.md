@@ -1,14 +1,11 @@
 #Robocook Web Client
-====================
 * Author: Lee Painton
 * Author: Stephen Brawner
 
 ##Installation
-==============
 Client can be run as-is, but will not provide functionality without active server
 
 ##Architecture
-==============
 The section below provides some details regarding the architecture of the web client.  This is primarily intended for readers who are approaching the client for the first time and would like to know how it fits together as well as where they might find bits of code.
 ### Files Overview
   * game.js: Provides overall flow logic for the game as well as the main game loop
